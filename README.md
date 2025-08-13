@@ -4,19 +4,43 @@ Figma에서 생성된 React + TypeScript + Tailwind CSS 프로젝트입니다.
 
 ## 🚀 시작하기
 
-### 의존성 설치
+### 필수 조건
+- Node.js 18+ 버전이 설치되어 있어야 합니다
+- npm 또는 yarn 패키지 매니저가 필요합니다
+
+### 1단계: 의존성 설치
 ```bash
 npm install
 ```
+⚠️ **중요**: 프로젝트를 처음 실행하기 전에 반드시 이 단계를 먼저 수행해야 합니다.
 
-### 개발 서버 실행
+### 2단계: 개발 서버 실행
 ```bash
 npm start
 # 또는
 npm run dev
 ```
 
+### 3단계: 브라우저에서 확인
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+
+**참고**: 개발 서버가 시작되면 터미널에 로컬 및 네트워크 URL이 표시됩니다.
+
+## ❗ 문제 해결
+
+### "vite: command not found" 오류
+이 오류는 의존성이 설치되지 않았을 때 발생합니다.
+
+**해결 방법:**
+```bash
+npm install
+```
+
+### Tailwind CSS 경고
+`./**/*.ts` 패턴이 `node_modules`를 포함하여 성능 문제를 일으킬 수 있습니다.
+
+**해결 방법:**
+`tailwind.config.js`에서 `"./**/*.{js,ts,jsx,tsx}"` 패턴을 제거하고 `"./src/**/*.{js,ts,jsx,tsx}"`만 사용합니다.
 
 ### 빌드
 ```bash
