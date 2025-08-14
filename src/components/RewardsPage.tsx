@@ -75,13 +75,13 @@ const availableRewards = [
   {
     id: 5,
     category: "premium",
-    title: "MONKEYS Premium 1개월",
+    title: "SPARK Premium 1개월",
     description: "무제한 리롤, 프리미엄 미션, 광고 제거",
     originalPrice: "₩4,900",
     points: 1200,
     discount: "FREE",
     image: "https://images.unsplash.com/photo-1584515501397-335d595b2a17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHhzZWFyY2h8MXx8eW91bmclMjBwZW9wbGUlMjBhZHZlbnR1cmUlMjBkYWlseSUyMG1pc3Npb258ZW58MXx8fHwxNzU1MDg2NTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    brand: "MONKEYS",
+    brand: "SPARK",
     expires: "즉시 적용",
     popular: false,
     isPremium: true
