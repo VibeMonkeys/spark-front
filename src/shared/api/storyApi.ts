@@ -1,0 +1,143 @@
+import { api } from './base';
+import { 
+  ApiResponse, 
+  PagedResponse, 
+  Story, 
+  StoryFeedItem, 
+  MissionVerificationRequest,
+  MissionVerificationResponse 
+} from './types';
+
+export interface StoryComment {
+  id: string;
+  storyId: string;
+  userId: string;
+  userName: string;
+  userAvatarUrl: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface AddCommentRequest {
+  content: string;
+}
+
+export interface UpdateStoryRequest {
+  storyText: string;
+  userTags: string[];
+  isPublic: boolean;
+}
+
+export const storyApi = {
+  // 미션 인증 스토리 생성
+  createStory: async (request: MissionVerificationRequest): Promise<MissionVerificationResponse> => {
+    const response = await api.post<ApiResponse<MissionVerificationResponse>>('/stories', request);
+    return response.data.data;
+  },
+
+  // 스토리 피드 조회
+  getStoryFeed: async (
+    sortBy: string = 'latest',
+    page: number = 0,
+    size: number = 20,
+    category?: string,
+    userId?: string
+  ): Promise<PagedResponse<StoryFeedItem>> => {
+    const params = new URLSearchParams({
+      sortBy,
+      page: page.toString(),
+      size: size.toString(),
+    });
+    if (category) params.append('category', category);
+    if (userId) params.append('userId', userId);
+    
+    const response = await api.get<ApiResponse<PagedResponse<StoryFeedItem>>>(`/stories/feed?${params}`);
+    return response.data;
+  },
+
+  // 스토리 상세 조회
+  getStory: async (storyId: string, userId?: string): Promise<Story> => {
+    const params = userId ? `?userId=${userId}` : '';
+    const response = await api.get<ApiResponse<Story>>(`/stories/${storyId}${params}`);
+    return response.data;
+  },
+
+  // 사용자의 스토리 조회
+  getUserStories: async (
+    targetUserId: string,
+    page: number = 0,
+    size: number = 20,
+    currentUserId?: string
+  ): Promise<PagedResponse<Story>> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+    });
+    if (currentUserId) params.append('currentUserId', currentUserId);
+    
+    const response = await api.get<ApiResponse<PagedResponse<Story>>>(`/stories/user/${targetUserId}?${params}`);
+    return response.data;
+  },
+
+  // 스토리 좋아요
+  likeStory: async (storyId: string, userId: string): Promise<Story> => {
+    const response = await api.post<ApiResponse<Story>>(`/stories/${storyId}/like?userId=${userId}`);
+    return response.data;
+  },
+
+  // 스토리 좋아요 취소
+  unlikeStory: async (storyId: string, userId: string): Promise<Story> => {
+    const response = await api.delete<ApiResponse<Story>>(`/stories/${storyId}/like?userId=${userId}`);
+    return response.data;
+  },
+
+  // 스토리 댓글 조회
+  getStoryComments: async (storyId: string): Promise<StoryComment[]> => {
+    const response = await api.get<ApiResponse<StoryComment[]>>(`/stories/${storyId}/comments`);
+    return response.data;
+  },
+
+  // 스토리 댓글 추가
+  addComment: async (storyId: string, userId: string, request: AddCommentRequest): Promise<StoryComment> => {
+    const response = await api.post<ApiResponse<StoryComment>>(
+      `/stories/${storyId}/comments?userId=${userId}`,
+      request
+    );
+    return response.data;
+  },
+
+  // 스토리 수정
+  updateStory: async (storyId: string, userId: string, request: UpdateStoryRequest): Promise<Story> => {
+    const response = await api.put<ApiResponse<Story>>(`/stories/${storyId}?userId=${userId}`, request);
+    return response.data;
+  },
+
+  // 스토리 삭제
+  deleteStory: async (storyId: string, userId: string): Promise<void> => {
+    await api.delete(`/stories/${storyId}?userId=${userId}`);
+  },
+
+  // 스토리 검색
+  searchStories: async (
+    keyword?: string,
+    hashTag?: string,
+    category?: string,
+    location?: string,
+    page: number = 0,
+    size: number = 20,
+    userId?: string
+  ): Promise<PagedResponse<Story>> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+    });
+    if (keyword) params.append('keyword', keyword);
+    if (hashTag) params.append('hashTag', hashTag);
+    if (category) params.append('category', category);
+    if (location) params.append('location', location);
+    if (userId) params.append('userId', userId);
+    
+    const response = await api.get<ApiResponse<PagedResponse<Story>>>(`/stories/search?${params}`);
+    return response.data;
+  },
+};
