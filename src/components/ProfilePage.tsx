@@ -3,19 +3,30 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Settings, Star, Flame, Trophy, Calendar, Target, TrendingUp, Gift, LogOut } from "lucide-react";
+import { Settings, Star, Flame, Trophy, Calendar, Target, TrendingUp, Gift, LogOut, Info } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { userApi } from "../shared/api";
+import { userApi, levelApi } from "../shared/api";
+import { LevelProgress } from "./LevelProgress";
+import { LevelSystemModal } from "./LevelSystemModal";
+import { useState } from "react";
 
 
 export function ProfilePage() {
   const { user, logout } = useAuth();
+  const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
 
   // 프로필 데이터 조회
   const { data: profileData, isLoading, error } = useQuery({
     queryKey: ['profile', user?.id],
     queryFn: () => userApi.getProfilePage(user!.id),
+    enabled: !!user?.id,
+  });
+
+  // 레벨 진행 상황 조회
+  const { data: levelProgress } = useQuery({
+    queryKey: ['level-progress', user?.id],
+    queryFn: () => levelApi.getUserLevelProgress(user!.id),
     enabled: !!user?.id,
   });
 
@@ -88,7 +99,7 @@ export function ProfilePage() {
       <div className="max-w-md mx-auto px-4 pb-20">
         {/* Profile Header */}
         <div className="py-6">
-          <Card className="border-0 bg-white/60 backdrop-blur-sm">
+          <Card className="border-0 bg-white/60 backdrop-blur-sm mb-4">
             <CardContent className="p-6">
               <div className="flex items-center gap-4 mb-4">
                 <ImageWithFallback
@@ -101,17 +112,26 @@ export function ProfilePage() {
                   <p className="text-muted-foreground">레벨 {userData.level} {userData.level_title}</p>
                   <p className="text-xs text-muted-foreground">{userData.join_date} 가입</p>
                 </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span>다음 레벨까지</span>
-                  <span className="font-medium">{pointsToNextLevel}P</span>
-                </div>
-                <Progress value={progressToNextLevel} className="h-2" />
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setIsLevelModalOpen(true)}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  <Info className="size-4" />
+                </Button>
               </div>
             </CardContent>
           </Card>
+
+          {/* 새로운 레벨 진행 상황 표시 */}
+          {levelProgress && (
+            <LevelProgress 
+              levelProgress={levelProgress} 
+              showDetails={true}
+              className="mb-4"
+            />
+          )}
         </div>
 
         {/* Stats Overview */}
@@ -255,6 +275,12 @@ export function ProfilePage() {
           </Card>
         </section>
       </div>
+
+      {/* 레벨 시스템 모달 */}
+      <LevelSystemModal 
+        isOpen={isLevelModalOpen} 
+        onClose={() => setIsLevelModalOpen(false)} 
+      />
     </div>
   );
 }
