@@ -15,7 +15,7 @@ const MissionDetail = lazy(() => import("./components/MissionDetail").then(modul
 const MissionVerification = lazy(() => import("./components/MissionVerification").then(module => ({ default: module.MissionVerification })));
 const MissionSuccess = lazy(() => import("./components/MissionSuccess").then(module => ({ default: module.MissionSuccess })));
 const NavigationBar = lazy(() => import("./components/NavigationBar").then(module => ({ default: module.NavigationBar })));
-const AuthPage = lazy(() => import("./components/AuthPage").then(module => ({ default: module.AuthPage })));
+const LoginPage = lazy(() => import("./components/LoginPage").then(module => ({ default: module.LoginPage })));
 
 // React Query 클라이언트 생성
 const queryClient = new QueryClient({
@@ -178,9 +178,9 @@ function AppContent() {
     );
   }
 
-  // 로그인하지 않은 경우 인증 페이지 표시
+  // 로그인하지 않은 경우 로그인 페이지 표시
   if (!user) {
-    return <AuthPage onSuccess={login} />;
+    return <LoginPage />;
   }
 
   const handleMissionStart = () => {

@@ -9,12 +9,14 @@ import { useQuery } from "@tanstack/react-query";
 import { userApi, levelApi } from "../shared/api";
 import { LevelProgress } from "./LevelProgress";
 import { LevelSystemModal } from "./LevelSystemModal";
+import { ConfirmModal } from "./ui/confirm-modal";
 import { useState } from "react";
 
 
 export function ProfilePage() {
   const { user, logout } = useAuth();
   const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // 프로필 데이터 조회
   const { data: profileData, isLoading, error } = useQuery({
@@ -30,10 +32,13 @@ export function ProfilePage() {
     enabled: !!user?.id,
   });
 
-  const handleLogout = async () => {
-    if (confirm('정말 로그아웃하시겠습니까?')) {
-      await logout();
-    }
+  const handleLogout = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmLogout = async () => {
+    await logout();
+    setIsLogoutModalOpen(false);
   };
 
   if (isLoading) {
@@ -272,6 +277,18 @@ export function ProfilePage() {
       <LevelSystemModal 
         isOpen={isLevelModalOpen} 
         onClose={() => setIsLevelModalOpen(false)} 
+      />
+
+      {/* 로그아웃 확인 모달 */}
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={confirmLogout}
+        type="info"
+        title="로그아웃"
+        message="정말 로그아웃하시겠습니까?"
+        confirmText="로그아웃"
+        showCancel={true}
       />
     </div>
   );

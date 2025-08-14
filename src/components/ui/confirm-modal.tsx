@@ -94,7 +94,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       
       {/* Modal */}
       <div className={cn(
-        "relative w-full max-w-md mx-auto transform transition-all duration-300 ease-out",
+        "relative w-full max-w-sm mx-auto transform transition-all duration-300 ease-out",
         "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4"
       )}>
         <div className={cn(
@@ -103,17 +103,17 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           config.borderColor
         )}>
           {/* Header */}
-          <div className="flex items-start gap-4 p-6 pb-4">
+          <div className="flex items-start gap-3 p-4 pb-3">
             <div className={cn(
-              "flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center",
+              "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
               config.bgColor
             )}>
-              <IconComponent className={cn("w-6 h-6", config.iconColor)} />
+              <IconComponent className={cn("w-5 h-5", config.iconColor)} />
             </div>
             
             <div className="flex-1 min-w-0">
               <h3 className={cn(
-                "text-xl font-bold leading-6 mb-2",
+                "text-lg font-bold leading-6 mb-1",
                 config.titleColor
               )}>
                 {title}
@@ -132,7 +132,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 p-6 pt-2">
+          <div className="flex gap-3 p-4 pt-2">
             {showCancel && (
               <Button
                 variant="outline"
