@@ -4,7 +4,7 @@ export * from './types';
 export * from './homeApi';
 export * from './missionApi';
 export * from './storyApi';
-export * from './rewardApi';
+export * from './rewardsApi';
 export * from './userApi';
 export * from './levelApi';
 
@@ -12,6 +12,6 @@ export * from './levelApi';
 export { homeApi } from './homeApi';
 export { missionApi } from './missionApi';
 export { storyApi } from './storyApi';
-export { rewardApi } from './rewardApi';
+export { rewardsApi } from './rewardsApi';
 export { userApi } from './userApi';
 export { levelApi } from './levelApi';

@@ -101,35 +101,27 @@ export function ProfilePage() {
         <div className="py-6">
           <Card className="border-0 bg-white/60 backdrop-blur-sm mb-4">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-4">
                 <ImageWithFallback
                   src={userData.avatar_url}
                   alt={userData.name}
-                  className="size-16 rounded-full object-cover"
+                  className="size-16 rounded-full object-cover ring-2 ring-gray-200"
                 />
                 <div className="flex-1">
                   <h2 className="text-xl font-bold">{userData.name}</h2>
-                  <p className="text-muted-foreground">레벨 {userData.level} {userData.level_title}</p>
-                  <p className="text-xs text-muted-foreground">{userData.join_date} 가입</p>
+                  <p className="text-sm text-muted-foreground">{userData.join_date} 가입</p>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setIsLevelModalOpen(true)}
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  <Info className="size-4" />
-                </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* 새로운 레벨 진행 상황 표시 */}
+          {/* Level Progress */}
           {levelProgress && (
             <LevelProgress 
               levelProgress={levelProgress} 
               showDetails={true}
-              className="mb-4"
+              className="mb-2"
+              onLevelInfoClick={() => setIsLevelModalOpen(true)}
             />
           )}
         </div>

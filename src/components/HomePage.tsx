@@ -5,7 +5,7 @@ import { Progress } from "./ui/progress";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Clock, Users, Star, Flame, ChevronRight, MapPin, Target, RefreshCw } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { homeApi, missionApi } from "../shared/api";
+import { homeApi, missionApi, levelApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
 
 // 카테고리별 색상 매핑
@@ -54,6 +54,13 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
   const { data: todaysMissions, isLoading: isLoadingMissions, error: missionsError } = useQuery({
     queryKey: ['missions', 'today', user?.id],
     queryFn: () => missionApi.getTodaysMissions(user!.id),
+    enabled: !!user?.id,
+  });
+
+  // 레벨 진행 상황 조회
+  const { data: levelProgress } = useQuery({
+    queryKey: ['level-progress', user?.id],
+    queryFn: () => levelApi.getUserLevelProgress(user!.id),
     enabled: !!user?.id,
   });
 
@@ -106,16 +113,21 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
 
   // todaysMissions는 이미 API에서 직접 받아옴
   
-  // 임시 더미 데이터 (나중에 실제 API로 교체)
+  // 실제 사용자 데이터 및 레벨 진행 상황 사용
   const userSummary = {
     name: user?.name || '사용자',
-    current_streak: 7,
-    current_points: 1250,
-    level: 3,
-    level_title: 'INTERMEDIATE',
-    progress_to_next_level: 65,
-    points_to_next_level: 350
+    current_streak: user?.current_streak || 0,
+    current_points: user?.current_points || 0,
+    level: levelProgress?.current_level || user?.level || 1,
+    level_title: levelProgress?.level_title_display || user?.level_title || 'BEGINNER',
+    progress_to_next_level: levelProgress?.level_progress_percentage || 0,
+    points_to_next_level: levelProgress?.points_to_next_level || 0
   };
+
+  // 디버깅 로그
+  console.log('🏠 [HomePage] User data:', user);
+  console.log('🏠 [HomePage] Level progress:', levelProgress);
+  console.log('🏠 [HomePage] UserSummary:', userSummary);
   
   const recentStories: any[] = []; // 스토리 기능은 임시로 비활성화
   return (
@@ -214,7 +226,8 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
                     </div>
                     <Button 
                       size="sm" 
-                      className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-0"
+                      variant="outline"
+                      className="border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600"
                       onClick={() => onMissionSelect(mission.id)}
                     >
                       도전하기

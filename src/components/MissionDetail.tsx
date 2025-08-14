@@ -11,6 +11,7 @@ interface MissionDetailProps {
   onBack: () => void;
   onStartMission: () => void;
   onVerifyMission: () => void;
+  onViewMissionDetail?: (missionId: string) => void;
   isStartingMission?: boolean;
 }
 
@@ -63,7 +64,7 @@ const similarMissions = [
   }
 ];
 
-export function MissionDetail({ missionId, onBack, onStartMission, onVerifyMission, isStartingMission = false }: MissionDetailProps) {
+export function MissionDetail({ missionId, onBack, onStartMission, onVerifyMission, onViewMissionDetail, isStartingMission = false }: MissionDetailProps) {
   // 미션 상세 데이터 조회
   const { data: missionDetail, isLoading, error } = useQuery({
     queryKey: ['mission-detail', missionId],
@@ -217,20 +218,32 @@ export function MissionDetail({ missionId, onBack, onStartMission, onVerifyMissi
             <Button 
               onClick={onStartMission}
               disabled={isStartingMission}
-              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 h-14"
+              className="w-full relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 ease-out h-16 rounded-2xl group"
               size="lg"
             >
-              {isStartingMission ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  미션 시작 중...
-                </>
-              ) : (
-                <>
-                  <PlayCircle className="size-5 mr-2" />
-                  미션 시작하기
-                </>
-              )}
+              {/* 배경 애니메이션 효과 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              {/* 빛나는 효과 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+              
+              {/* 버튼 내용 */}
+              <div className="relative flex items-center justify-center gap-3">
+                {isStartingMission ? (
+                  <>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                    <span className="text-lg">미션 시작 중...</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="relative">
+                      <PlayCircle className="size-6 drop-shadow-lg" />
+                      <div className="absolute inset-0 bg-white/30 rounded-full animate-ping"></div>
+                    </div>
+                    <span className="text-lg tracking-wide">🚀 미션 시작하기</span>
+                  </>
+                )}
+              </div>
             </Button>
           ) : (
             <div className="space-y-3">
@@ -316,7 +329,12 @@ export function MissionDetail({ missionId, onBack, onStartMission, onVerifyMissi
                           <span className="text-xs text-muted-foreground">+{mission.points}P</span>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="border-purple-500 text-purple-600 hover:bg-purple-50 hover:border-purple-600"
+                        onClick={() => onViewMissionDetail?.(mission.id)}
+                      >
                         도전
                       </Button>
                     </div>

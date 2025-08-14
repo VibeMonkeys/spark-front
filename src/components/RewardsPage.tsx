@@ -4,126 +4,96 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Star, Gift, Coffee, ShoppingBag, Ticket, Clock, Check, Crown, Zap } from "lucide-react";
-
-const userPoints = {
-  current: 1240,
-  total: 3850,
-  thisMonth: 450
-};
+import { Star, Gift, Coffee, ShoppingBag, Ticket, Clock, Check, Crown, Zap, Palette, GraduationCap, Utensils } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { rewardsApi } from "../shared/api/rewardsApi";
+import { useAuth } from "../contexts/AuthContext";
 
 const rewardCategories = [
-  { id: "coffee", name: "카페", icon: Coffee },
-  { id: "shopping", name: "쇼핑", icon: ShoppingBag },
-  { id: "entertainment", name: "엔터테인먼트", icon: Ticket },
-  { id: "premium", name: "프리미엄", icon: Crown }
+  { id: "카페", name: "카페", icon: Coffee },
+  { id: "쇼핑", name: "쇼핑", icon: ShoppingBag },
+  { id: "엔터테인먼트", name: "엔터테인먼트", icon: Ticket },
+  { id: "음식", name: "음식", icon: Utensils },
+  { id: "뷰티", name: "뷰티", icon: Palette },
+  { id: "프리미엄", name: "프리미엄", icon: Crown }
 ];
 
-const availableRewards = [
-  {
-    id: 1,
-    category: "coffee",
-    title: "스타벅스 아메리카노",
-    description: "전국 스타벅스에서 사용 가능",
-    originalPrice: "₩4,500",
-    points: 350,
-    discount: "22%",
-    image: "https://images.unsplash.com/photo-1549185545-f5b8a1fc481a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmVhdGl2ZSUyMGFydCUyMGRhaWx5JTIwYWN0aXZpdHl8ZW58MXx8fHwxNzU1MDg2NTY4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    brand: "스타벅스",
-    expires: "30일",
-    popular: true
-  },
-  {
-    id: 2,
-    category: "entertainment",
-    title: "CGV 영화 관람권",
-    description: "평일 2D 영화 관람 (팝콘 세트 포함)",
-    originalPrice: "₩12,000",
-    points: 900,
-    discount: "25%",
-    image: "https://images.unsplash.com/photo-1489599743715-0a6c9f46b9e0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx8ZW58MXx8fHwxNzU1MDg2NTY4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    brand: "CGV",
-    expires: "60일",
-    popular: false
-  },
-  {
-    id: 3,
-    category: "coffee",
-    title: "투썸플레이스 케이크 세트",
-    description: "아메리카노 + 시그니처 케이크",
-    originalPrice: "₩8,500",
-    points: 650,
-    discount: "23%",
-    image: "https://images.unsplash.com/photo-1549185545-f5b8a1fc481a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjcmVhdGl2ZSUyMGFydCUyMGRhaWx5JTIwYWN0aXZpdHl8ZW58MXx8fHwxNzU1MDg2NTY4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    brand: "투썸플레이스",
-    expires: "30일",
-    popular: false
-  },
-  {
-    id: 4,
-    category: "shopping",
-    title: "GS25 편의점 상품권",
-    description: "전국 GS25에서 사용 가능",
-    originalPrice: "₩5,000",
-    points: 400,
-    discount: "20%",
-    image: "https://images.unsplash.com/photo-1570197506759-8b9de9b7a1b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx8ZW58MXx8fHwxNzU1MDg2NTY4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    brand: "GS25",
-    expires: "90일",
-    popular: true
-  },
-  {
-    id: 5,
-    category: "premium",
-    title: "SPARK Premium 1개월",
-    description: "무제한 리롤, 프리미엄 미션, 광고 제거",
-    originalPrice: "₩4,900",
-    points: 1200,
-    discount: "FREE",
-    image: "https://images.unsplash.com/photo-1584515501397-335d595b2a17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHhzZWFyY2h8MXx8eW91bmclMjBwZW9wbGUlMjBhZHZlbnR1cmUlMjBkYWlseSUyMG1pc3Npb258ZW58MXx8fHwxNzU1MDg2NTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-    brand: "SPARK",
-    expires: "즉시 적용",
-    popular: false,
-    isPremium: true
-  }
-];
-
-const rewardHistory = [
-  {
-    id: 1,
-    title: "스타벅스 아메리카노",
-    points: 350,
-    usedAt: "2시간 전",
-    status: "사용됨",
-    code: "STBK-1234-5678"
-  },
-  {
-    id: 2,
-    title: "GS25 편의점 상품권",
-    points: 400,
-    usedAt: "3일 전",
-    status: "사용됨",
-    code: "GS25-9876-5432"
-  },
-  {
-    id: 3,
-    title: "투썸플레이스 케이크 세트",
-    points: 650,
-    usedAt: "1주 전",
-    status: "만료됨",
-    code: "TSOM-1111-2222"
-  }
-];
+// 카테고리 매핑
+const getCategoryId = (category: string) => {
+  const categoryMap: Record<string, string> = {
+    "카페": "coffee",
+    "쇼핑": "shopping", 
+    "엔터테인먼트": "entertainment",
+    "음식": "food",
+    "뷰티": "beauty",
+    "프리미엄": "premium"
+  };
+  return categoryMap[category] || category.toLowerCase();
+};
 
 export function RewardsPage() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("shop");
   const [selectedCategory, setSelectedCategory] = useState("all");
+
+  // 리워드 페이지 전체 데이터 조회
+  const { data: rewardsPageData, isLoading, error } = useQuery({
+    queryKey: ['rewards-page', user?.id],
+    queryFn: () => rewardsApi.getRewardsPage(user!.id),
+    enabled: !!user?.id,
+  });
+
+  // 리워드 교환 mutation
+  const exchangeMutation = useMutation({
+    mutationFn: ({ rewardId, userId }: { rewardId: string; userId: string }) => {
+      return rewardsApi.exchangeReward(rewardId, userId);
+    },
+    onSuccess: () => {
+      // 리워드 페이지 데이터 새로고침
+      queryClient.invalidateQueries({ queryKey: ['rewards-page', user?.id] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to exchange reward:', error);
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <p className="text-gray-600">리워드 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !rewardsPageData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">리워드 정보를 불러오는 중 오류가 발생했습니다.</p>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['rewards-page', user?.id] })}>
+            다시 시도
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const { user_points: userPoints, available_rewards: availableRewards, reward_history: rewardHistory } = rewardsPageData;
 
   const filteredRewards = selectedCategory === "all" 
     ? availableRewards 
     : availableRewards.filter(reward => reward.category === selectedCategory);
 
   const canAfford = (points: number) => userPoints.current >= points;
+
+  const handleExchangeReward = (rewardId: string) => {
+    if (!user?.id) return;
+    exchangeMutation.mutate({ rewardId, userId: user.id });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50">
@@ -146,7 +116,7 @@ export function RewardsPage() {
                   <p className="text-sm opacity-90">사용 가능한 포인트</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-semibold">+{userPoints.thisMonth}</div>
+                  <div className="text-lg font-semibold">+{userPoints.this_month}</div>
                   <p className="text-xs opacity-90">이번 달 획득</p>
                 </div>
               </div>
@@ -203,7 +173,7 @@ export function RewardsPage() {
                       </Badge>
                     </div>
                   )}
-                  {reward.isPremium && (
+                  {reward.is_premium && (
                     <div className="absolute top-3 left-3 z-10">
                       <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
                         <Crown className="size-3 mr-1" />
@@ -214,7 +184,7 @@ export function RewardsPage() {
                   
                   <div className="flex">
                     <ImageWithFallback
-                      src={reward.image}
+                      src={reward.image_url}
                       alt={reward.title}
                       className="w-24 h-24 object-cover flex-shrink-0"
                     />
@@ -223,9 +193,9 @@ export function RewardsPage() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xs text-muted-foreground">{reward.brand}</span>
-                            {reward.discount !== "FREE" && (
+                            {reward.discount && (
                               <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                                {reward.discount} 할인
+                                {reward.discount}
                               </Badge>
                             )}
                           </div>
@@ -244,21 +214,22 @@ export function RewardsPage() {
                             <Star className="size-4 fill-current" />
                             <span className="font-bold">{reward.points.toLocaleString()}</span>
                           </div>
-                          {reward.originalPrice && (
+                          {reward.original_price && (
                             <span className="text-xs text-muted-foreground line-through">
-                              {reward.originalPrice}
+                              {reward.original_price}
                             </span>
                           )}
                         </div>
                         <Button
                           size="sm"
-                          disabled={!canAfford(reward.points)}
+                          disabled={!canAfford(reward.points) || exchangeMutation.isPending}
                           className={canAfford(reward.points) 
                             ? "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600" 
                             : "opacity-50"
                           }
+                          onClick={() => handleExchangeReward(reward.id)}
                         >
-                          {canAfford(reward.points) ? "교환하기" : "포인트 부족"}
+                          {exchangeMutation.isPending ? "교환 중..." : canAfford(reward.points) ? "교환하기" : "포인트 부족"}
                         </Button>
                       </div>
                     </CardContent>
@@ -286,17 +257,17 @@ export function RewardsPage() {
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-sm">{item.title}</h3>
                       <Badge 
-                        variant={item.status === "사용됨" ? "default" : "secondary"}
-                        className={item.status === "사용됨" ? "bg-green-500 text-white" : "bg-gray-500 text-white"}
+                        variant={item.status === "USED" ? "default" : "secondary"}
+                        className={item.status === "USED" ? "bg-green-500 text-white" : "bg-gray-500 text-white"}
                       >
-                        {item.status === "사용됨" ? <Check className="size-3 mr-1" /> : null}
-                        {item.status}
+                        {item.status === "USED" ? <Check className="size-3 mr-1" /> : null}
+                        {item.status === "USED" ? "사용됨" : item.status === "EXPIRED" ? "만료됨" : "사용 가능"}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <div className="text-muted-foreground">
                         <p>코드: {item.code}</p>
-                        <p>{item.usedAt}</p>
+                        <p>{item.used_at}</p>
                       </div>
                       <div className="text-right">
                         <div className="flex items-center gap-1 text-red-600">
@@ -326,11 +297,13 @@ export function RewardsPage() {
               </Card>
             )}
 
-            <div className="py-4 text-center">
-              <Button variant="outline" className="bg-white/60 backdrop-blur-sm">
-                더 많은 내역 보기
-              </Button>
-            </div>
+            {rewardHistory.length > 0 && (
+              <div className="py-4 text-center">
+                <Button variant="outline" className="bg-white/60 backdrop-blur-sm">
+                  더 많은 내역 보기
+                </Button>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>

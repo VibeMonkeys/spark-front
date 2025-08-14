@@ -38,7 +38,7 @@ export const Dialog = ({ open = false, onOpenChange = () => {}, children }: Dial
       {children}
       {open && (
         <div 
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={() => onOpenChange(false)}
         />
       )}
@@ -53,7 +53,8 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
     if (!open) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div className="pointer-events-auto">
         <div
           ref={ref}
           className={cn(
@@ -64,6 +65,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
           {...props}
         >
           {children}
+        </div>
         </div>
       </div>
     );

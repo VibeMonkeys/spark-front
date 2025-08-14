@@ -49,41 +49,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 앱 시작 시 localStorage에서 인증 정보 복원
   useEffect(() => {
     const initAuth = () => {
-      const savedUser = localStorage.getItem('current_user');
-      const savedToken = localStorage.getItem('auth_token');
-      const savedRefreshToken = localStorage.getItem('refresh_token');
+      // 강제로 localStorage 클리어해서 항상 최신 데이터 가져오기 (테스트용)
+      localStorage.clear();
+      console.log('🧹 [AuthContext] Cleared localStorage for fresh data');
 
-      if (savedUser && savedToken) {
-        try {
-          setUser(JSON.parse(savedUser));
-          setToken(savedToken);
-          console.log('🔑 [AuthContext] Restored user from localStorage:', JSON.parse(savedUser));
-          
-          // TODO: 토큰 유효성 검사 및 자동 갱신 로직
-          // 현재는 간단히 저장된 정보만 복원
-        } catch (error) {
-          console.error('Failed to parse saved auth data:', error);
-          localStorage.removeItem('current_user');
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('refresh_token');
-        }
-      } else {
-        // 임시: 테스트를 위해 자동 로그인 (나중에 제거)
-        console.log('🔧 [AuthContext] No saved user found, auto-login for testing');
-        const testUserId = '2190d61c-379d-4452-b4da-655bf67b4b71'; // 지나니
-        
-        userApi.getUser(testUserId)
-          .then(realUser => {
-            console.log('✅ [AuthContext] Auto-login user loaded:', realUser);
-            setUser(realUser);
-            setToken('temp_token_for_testing');
-            localStorage.setItem('current_user', JSON.stringify(realUser));
-            localStorage.setItem('auth_token', 'temp_token_for_testing');
-          })
-          .catch(error => {
-            console.error('❌ [AuthContext] Auto-login failed:', error);
-          });
-      }
+      // 항상 최신 API 데이터 로드
+      console.log('🔧 [AuthContext] Loading fresh user data from API');
+      const testUserId = '2190d61c-379d-4452-b4da-655bf67b4b71'; // 지나니
+      
+      userApi.getUser(testUserId)
+        .then(realUser => {
+          console.log('✅ [AuthContext] Fresh user data loaded:', realUser);
+          setUser(realUser);
+          setToken('temp_token_for_testing');
+          // localStorage에 저장하지 않아서 항상 최신 데이터 로드
+        })
+        .catch(error => {
+          console.error('❌ [AuthContext] Failed to load user data:', error);
+        });
       setIsLoading(false);
     };
 

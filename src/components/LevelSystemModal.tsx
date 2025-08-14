@@ -33,7 +33,7 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+      <DialogContent className="max-w-sm max-h-[90vh] p-0 w-[95vw]">
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center justify-between">
             <div>

@@ -2,19 +2,23 @@ import { FC } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
-import { Trophy, Star, Target, TrendingUp } from "lucide-react";
+import { Button } from "./ui/button";
+import { Trophy, Star, Target, TrendingUp, Info, Settings, LogOut } from "lucide-react";
+import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { UserLevelProgress } from "../shared/api/levelApi";
 
 interface LevelProgressProps {
   levelProgress: UserLevelProgress;
   className?: string;
   showDetails?: boolean;
+  onLevelInfoClick?: () => void;
 }
 
 export const LevelProgress: FC<LevelProgressProps> = ({ 
   levelProgress, 
   className = "", 
-  showDetails = false 
+  showDetails = false,
+  onLevelInfoClick
 }) => {
   const {
     current_level,
@@ -31,7 +35,7 @@ export const LevelProgress: FC<LevelProgressProps> = ({
   const isMaxLevel = next_level_points === null;
 
   return (
-    <Card className={`border-0 bg-gradient-to-r from-white to-gray-50 shadow-lg ${className}`}>
+    <Card className={`border-0 bg-white/60 backdrop-blur-sm ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -56,11 +60,23 @@ export const LevelProgress: FC<LevelProgressProps> = ({
               </CardDescription>
             </div>
           </div>
-          <div className="text-right">
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Trophy className="size-4" />
-              <span className="font-medium">{current_points.toLocaleString()}P</span>
+          <div className="flex items-center gap-2">
+            <div className="text-right mr-2">
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                <Trophy className="size-4" />
+                <span className="font-medium">{current_points.toLocaleString()}P</span>
+              </div>
             </div>
+            {onLevelInfoClick && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={onLevelInfoClick}
+                className="text-blue-600 hover:text-blue-700"
+              >
+                <Info className="size-4" />
+              </Button>
+            )}
           </div>
         </div>
       </CardHeader>

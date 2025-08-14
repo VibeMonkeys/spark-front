@@ -254,6 +254,7 @@ function AppContent() {
           onBack={handleBackToMain}
           onStartMission={handleMissionStart}
           onVerifyMission={handleMissionVerify}
+          onViewMissionDetail={handleMissionSelect}
           isStartingMission={startMissionMutation.isPending}
         />
       );

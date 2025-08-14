@@ -17,8 +17,17 @@ export const missionApi = {
 
   // 미션 상세 조회
   getMissionDetail: async (missionId: string): Promise<MissionDetailResponse> => {
-    const response = await api.get<ApiResponse<MissionDetailResponse>>(`/missions/${missionId}`);
-    return response.data.data;
+    try {
+      const response = await api.get<ApiResponse<MissionDetailResponse>>(`/missions/${missionId}`);
+      if (!response.data.success) {
+        throw new Error(response.data.error?.message || 'Mission not found');
+      }
+      return response.data.data;
+    } catch (error: any) {
+      console.error('Failed to fetch mission detail:', error);
+      // React Query에서 undefined 반환을 방지하기 위해 에러를 던집니다
+      throw error;
+    }
   },
 
   // 미션 시작
