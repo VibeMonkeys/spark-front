@@ -1,8 +1,14 @@
 import axios from 'axios';
 
+// 환경변수에서 API URL 가져오기
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8099/api/v1';
+
+console.log('🌐 [API] Base URL:', API_BASE_URL);
+console.log('🔧 [API] Environment:', import.meta.env.MODE);
+
 // API 기본 설정
 export const api = axios.create({
-  baseURL: 'http://localhost:8099/api/v1',
+  baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
