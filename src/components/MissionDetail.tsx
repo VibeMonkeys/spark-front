@@ -2,32 +2,50 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { ArrowLeft, Clock, Star, MapPin, Users, Camera, Heart } from "lucide-react";
+import { ArrowLeft, Clock, Star, MapPin, Users, Camera, Heart, Trophy, Zap, Calendar, Timer, CheckCircle, PlayCircle, Target } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { missionApi } from "../shared/api";
 
 interface MissionDetailProps {
+  missionId: string | null;
   onBack: () => void;
   onStartMission: () => void;
+  onVerifyMission: () => void;
+  isStartingMission?: boolean;
 }
 
-const missionData = {
-  id: 1,
-  category: "모험적",
-  title: "가보지 않은 길로 퇴근하기",
-  description: "평소와 다른 길을 선택해서 새로운 풍경을 만나보세요. 일상 속에서 작은 모험을 통해 새로운 발견의 즐거움을 느껴보세요.",
-  detailedDescription: "오늘은 평소 다니던 길 대신 새로운 경로를 선택해보세요. 지도를 보지 말고 직감을 따라 걸어보거나, 평소에 지나치기만 했던 골목길로 들어가 보세요. 작은 상점, 예쁜 건물, 또는 아름다운 나무 한 그루를 발견할 수 있을 거예요.",
-  difficulty: "Medium",
-  duration: "20분",
-  points: 20,
-  image: "https://images.unsplash.com/photo-1584515501397-335d595b2a17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHhzZWFyY2h8MXx8eW91bmclMjBwZW9wbGUlMjBhZHZlbnR1cmUlMjBkYWlseSUyMG1pc3Npb258ZW58MXx8fHwxNzU1MDg2NTY2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-  categoryColor: "bg-orange-500",
-  tips: [
-    "안전한 시간대와 장소를 선택하세요",
-    "휴대폰 배터리와 교통카드를 확인하세요",
-    "발견한 것들을 사진으로 기록해보세요",
-    "시간에 여유를 두고 출발하세요"
-  ],
-  completedBy: 1847,
-  averageRating: 4.6
+// 카테고리별 색상 매핑
+const getCategoryColor = (category: string) => {
+  const colors: Record<string, string> = {
+    "ADVENTUROUS": "bg-orange-500",
+    "SOCIAL": "bg-blue-500", 
+    "HEALTHY": "bg-green-500",
+    "CREATIVE": "bg-purple-500",
+    "LEARNING": "bg-indigo-500",
+  };
+  return colors[category] || "bg-gray-500";
+};
+
+// 난이도 한글 변환
+const getDifficultyText = (difficulty: string) => {
+  const texts: Record<string, string> = {
+    "EASY": "쉬움",
+    "MEDIUM": "보통", 
+    "HARD": "어려움",
+  };
+  return texts[difficulty] || difficulty;
+};
+
+// 카테고리 한글 변환
+const getCategoryText = (category: string) => {
+  const texts: Record<string, string> = {
+    "ADVENTUROUS": "모험적",
+    "SOCIAL": "사교적",
+    "HEALTHY": "건강",
+    "CREATIVE": "창의적",
+    "LEARNING": "학습",
+  };
+  return texts[category] || category;
 };
 
 const similarMissions = [
@@ -45,7 +63,56 @@ const similarMissions = [
   }
 ];
 
-export function MissionDetail({ onBack, onStartMission }: MissionDetailProps) {
+export function MissionDetail({ missionId, onBack, onStartMission, onVerifyMission, isStartingMission = false }: MissionDetailProps) {
+  // 미션 상세 데이터 조회
+  const { data: missionDetail, isLoading, error } = useQuery({
+    queryKey: ['mission-detail', missionId],
+    queryFn: () => missionApi.getMissionDetail(missionId!),
+    enabled: !!missionId,
+  });
+
+  if (!missionId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">미션을 선택해주세요.</p>
+          <Button onClick={onBack}>돌아가기</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+          <p className="text-gray-600">미션 상세 정보를 불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !missionDetail) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">미션 정보를 불러오는 중 오류가 발생했습니다.</p>
+          <Button onClick={onBack}>돌아가기</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // 백엔드 응답은 미션 데이터를 바로 반환
+  const missionData = missionDetail;
+  const tips = missionDetail.tips || [];
+  const similarMissions = missionDetail.similar_missions || [];
+
+  // TODO: 실제로는 백엔드에서 사용자의 미션 상태를 가져와야 함
+  // 현재는 임시로 로컬 상태로 관리
+  const isInProgress = false; // 미션이 시작되었는지 여부
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50">
       {/* Header */}
@@ -59,119 +126,206 @@ export function MissionDetail({ onBack, onStartMission }: MissionDetailProps) {
       </header>
 
       <div className="max-w-md mx-auto px-4 pb-20">
-        {/* Mission Image & Basic Info */}
-        <div className="py-6">
-          <Card className="overflow-hidden border-0 bg-white/60 backdrop-blur-sm">
+        {/* Mission Hero Image */}
+        <div className="py-4">
+          <Card className="overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl">
             <div className="relative">
               <ImageWithFallback
-                src={missionData.image}
+                src={missionData.image_url}
                 alt={missionData.title}
-                className="w-full h-48 object-cover"
+                className="w-full h-56 object-cover"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute top-4 left-4">
-                <Badge className={`${missionData.categoryColor} text-white border-0`}>
-                  {missionData.category}
+                <Badge className={`${getCategoryColor(missionData.category)} text-white border-0 shadow-lg`}>
+                  {getCategoryText(missionData.category)}
                 </Badge>
               </div>
-              <div className="absolute top-4 right-4 bg-black/20 backdrop-blur-sm rounded-full px-3 py-1">
-                <span className="text-sm text-white font-medium">+{missionData.points}P</span>
+              <div className="absolute top-4 right-4">
+                <div className="bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full px-3 py-1.5 shadow-lg">
+                  <span className="text-sm font-bold flex items-center gap-1">
+                    <Trophy className="size-4" />
+                    +{missionData.reward_points}P
+                  </span>
+                </div>
+              </div>
+              <div className="absolute bottom-4 left-4 right-4">
+                <h2 className="text-xl font-bold text-white mb-2">{missionData.title}</h2>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="bg-white/20 text-white border-white/30">
+                    {getDifficultyText(missionData.difficulty)}
+                  </Badge>
+                  <div className="flex items-center gap-1 text-white/90 text-sm">
+                    <Timer className="size-4" />
+                    <span>{missionData.duration}</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between mb-3">
-                <h2 className="text-xl font-bold">{missionData.title}</h2>
-                <Badge variant="outline">
-                  {missionData.difficulty}
-                </Badge>
-              </div>
-              
-              <p className="text-muted-foreground mb-4">{missionData.description}</p>
-              
-              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                <div className="flex items-center gap-1">
-                  <Clock className="size-4" />
-                  <span>{missionData.duration}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Users className="size-4" />
-                  <span>{missionData.completedBy.toLocaleString()}명 완료</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Star className="size-4 text-yellow-500 fill-current" />
-                  <span>{missionData.averageRating}</span>
-                </div>
-              </div>
+          </Card>
+        </div>
 
-              <Button 
-                onClick={onStartMission}
-                className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-0"
-                size="lg"
-              >
-                미션 시작하기
-              </Button>
+        {/* Mission Stats */}
+        <div className="mb-6">
+          <div className="grid grid-cols-3 gap-3">
+            <Card className="border-0 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-all">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Users className="size-5 text-blue-500" />
+                </div>
+                <div className="text-lg font-bold text-blue-600">{missionDetail.completed_by?.toLocaleString() || 0}</div>
+                <p className="text-xs text-muted-foreground">명 완료</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-all">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Star className="size-5 text-yellow-500" />
+                </div>
+                <div className="text-lg font-bold text-yellow-600">{(missionDetail.average_rating || 0).toFixed(1)}</div>
+                <p className="text-xs text-muted-foreground">평점</p>
+              </CardContent>
+            </Card>
+            <Card className="border-0 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-all">
+              <CardContent className="p-4 text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <Target className="size-5 text-purple-500" />
+                </div>
+                <div className="text-lg font-bold text-purple-600">{getDifficultyText(missionData.difficulty)}</div>
+                <p className="text-xs text-muted-foreground">난이도</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Mission Description */}
+        <section className="mb-6">
+          <Card className="border-0 bg-white/70 backdrop-blur-sm">
+            <CardContent className="p-5">
+              <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+                <Zap className="size-5 text-orange-500" />
+                미션 소개
+              </h3>
+              <p className="text-muted-foreground leading-relaxed text-base">{missionData.description}</p>
             </CardContent>
           </Card>
+        </section>
+
+        {/* Mission Action Button */}
+        <div className="mb-6">
+          {!isInProgress ? (
+            <Button 
+              onClick={onStartMission}
+              disabled={isStartingMission}
+              className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 h-14"
+              size="lg"
+            >
+              {isStartingMission ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  미션 시작 중...
+                </>
+              ) : (
+                <>
+                  <PlayCircle className="size-5 mr-2" />
+                  미션 시작하기
+                </>
+              )}
+            </Button>
+          ) : (
+            <div className="space-y-3">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="size-5 text-green-500" />
+                  <div>
+                    <p className="font-medium text-green-700">미션이 시작되었습니다!</p>
+                    <p className="text-sm text-green-600">언제든지 아래 버튼으로 인증하세요.</p>
+                  </div>
+                </div>
+              </div>
+              <Button 
+                onClick={onVerifyMission}
+                className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 h-14"
+                size="lg"
+              >
+                <Camera className="size-5 mr-2" />
+                인증하기
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Detailed Description */}
         <section className="mb-6">
-          <Card className="border-0 bg-white/60 backdrop-blur-sm">
+          <Card className="border-0 bg-white/70 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-lg">미션 설명</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <CheckCircle className="size-5 text-green-500" />
+                상세 설명
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground leading-relaxed">
-                {missionData.detailedDescription}
+              <p className="text-muted-foreground leading-relaxed text-base">
+                {missionDetail.detailed_description || missionData.description}
               </p>
             </CardContent>
           </Card>
         </section>
 
         {/* Tips */}
-        <section className="mb-6">
-          <Card className="border-0 bg-white/60 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-lg">미션 팁</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {missionData.tips.map((tip, index) => (
-                  <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <div className="size-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                    <span>{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </section>
+        {tips.length > 0 && (
+          <section className="mb-6">
+            <Card className="border-0 bg-gradient-to-br from-blue-50 to-purple-50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Heart className="size-5 text-red-500" />
+                  성공 팁
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  {tips.map((tip, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <div className="size-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-white text-xs font-bold">{index + 1}</span>
+                      </div>
+                      <span className="text-muted-foreground leading-relaxed">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Similar Missions */}
-        <section className="mb-6">
-          <h3 className="font-semibold text-lg mb-4">비슷한 미션</h3>
-          <div className="space-y-3">
-            {similarMissions.map((mission) => (
-              <Card key={mission.id} className="border-0 bg-white/40 backdrop-blur-sm">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-sm">{mission.title}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {mission.difficulty}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">+{mission.points}P</span>
+        {similarMissions.length > 0 && (
+          <section className="mb-6">
+            <h3 className="font-semibold text-lg mb-4">비슷한 미션</h3>
+            <div className="space-y-3">
+              {similarMissions.map((mission) => (
+                <Card key={mission.id} className="border-0 bg-white/40 backdrop-blur-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-sm">{mission.title}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="outline" className="text-xs">
+                            {getDifficultyText(mission.difficulty)}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">+{mission.points}P</span>
+                        </div>
                       </div>
+                      <Button variant="ghost" size="sm">
+                        도전
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="sm">
-                      도전
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
