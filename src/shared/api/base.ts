@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// 환경변수에서 API URL 가져오기
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8099/api/v1';
+// 환경변수에서 API URL 가져오기 (개발환경에서는 프록시 사용)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 console.log('🌐 [API] Base URL:', API_BASE_URL);
 console.log('🔧 [API] Environment:', import.meta.env.MODE);
@@ -15,40 +15,138 @@ export const api = axios.create({
   },
 });
 
-// 요청 인터셉터
+// 요청 인터셉터 - JWT 토큰 자동 추가
 api.interceptors.request.use(
   (config) => {
-    // TODO: 인증 토큰이 있다면 헤더에 추가
-    // const token = localStorage.getItem('auth_token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // 인증 토큰이 있다면 헤더에 추가
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('🔐 [API] Adding JWT token to request:', config.url);
+    }
     return config;
   },
   (error) => {
+    console.error('🚨 [API] Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
-// 응답 인터셉터
+// 토큰 갱신 중인지 추적하는 변수
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value: any) => void;
+  reject: (error: any) => void;
+}> = [];
+
+// 큐에 있는 요청들을 처리하는 함수
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+  
+  failedQueue = [];
+};
+
+// 응답 인터셉터 - 토큰 만료 시 자동 갱신
 api.interceptors.response.use(
   (response) => {
-    // 백엔드의 ApiResponse 구조를 그대로 반환 (homeApi에서 .data 접근)
     return response;
   },
-  (error) => {
-    // 에러 처리
+  async (error) => {
+    const originalRequest = error.config;
+
+    // 401 Unauthorized이고 아직 재시도하지 않은 경우
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // 이미 토큰 갱신 중이라면 큐에 추가
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then((token) => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        }).catch((err) => {
+          return Promise.reject(err);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem('refresh_token');
+      
+      if (refreshToken) {
+        try {
+          console.log('🔄 [API] Attempting to refresh token...');
+          
+          // 토큰 갱신 요청 (새로운 axios 인스턴스로 프록시 사용)
+          const refreshApi = axios.create({
+            baseURL: '',
+            timeout: 10000
+          });
+          const response = await refreshApi.post('/auth/refresh', {
+            refreshToken: refreshToken
+          });
+
+          if (response.data.success) {
+            const { token, refreshToken: newRefreshToken } = response.data.data;
+            
+            // 새로운 토큰들을 저장
+            localStorage.setItem('auth_token', token);
+            localStorage.setItem('refresh_token', newRefreshToken);
+            
+            console.log('✅ [API] Token refreshed successfully');
+            
+            // 대기 중인 요청들을 새 토큰으로 처리
+            processQueue(null, token);
+            
+            // 원래 요청을 새 토큰으로 재시도
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          } else {
+            throw new Error('Token refresh failed');
+          }
+        } catch (refreshError) {
+          console.error('❌ [API] Token refresh failed:', refreshError);
+          
+          // 토큰 갱신 실패 시 로그아웃 처리
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('current_user');
+          
+          processQueue(refreshError, null);
+          
+          // 로그인 페이지로 리다이렉트 (필요 시)
+          window.location.href = '/login';
+          
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      } else {
+        // refresh token이 없으면 바로 로그아웃 처리
+        console.warn('⚠️ [API] No refresh token available');
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('current_user');
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+    }
+
+    // 기타 에러 처리
     if (error.response) {
-      // 서버에서 응답이 온 경우
-      console.error('API Error:', error.response.data);
+      console.error('🚨 [API] Response error:', error.response.data);
       return Promise.reject(error.response.data);
     } else if (error.request) {
-      // 요청이 갔지만 응답이 없는 경우
-      console.error('Network Error:', error.request);
+      console.error('🚨 [API] Network error:', error.request);
       return Promise.reject({ message: '네트워크 오류가 발생했습니다.' });
     } else {
-      // 요청을 설정하는 중 오류가 발생한 경우
-      console.error('Error:', error.message);
+      console.error('🚨 [API] Request error:', error.message);
       return Promise.reject({ message: '요청 처리 중 오류가 발생했습니다.' });
     }
   }

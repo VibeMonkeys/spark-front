@@ -74,7 +74,10 @@ export const authApi = {
 
   // 로그아웃
   logout: async (): Promise<void> => {
-    await api.post('/auth/logout');
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (refreshToken) {
+      await api.post('/auth/logout', { refreshToken });
+    }
   },
 
   // 토큰 갱신

@@ -34,9 +34,11 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
+  refreshToken: string | null;
   login: (authData: AuthResponse) => void;
   logout: () => void;
   isLoading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +46,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // 앱 시작 시 localStorage에서 인증 정보 복원
@@ -53,40 +56,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // localStorage에서 저장된 인증 정보 확인
         const savedUser = localStorage.getItem('current_user');
         const savedToken = localStorage.getItem('auth_token');
+        const savedRefreshToken = localStorage.getItem('refresh_token');
         
-        if (savedUser && savedToken) {
+        if (savedUser && savedToken && savedRefreshToken) {
           // 저장된 인증 정보가 있으면 복원
-          console.log('🔄 [AuthContext] Restoring saved auth state');
+          console.log('🔄 [AuthContext] Restoring saved JWT auth state');
           const user = JSON.parse(savedUser);
           setUser(user);
           setToken(savedToken);
+          setRefreshToken(savedRefreshToken);
           
-          // 백그라운드에서 최신 사용자 데이터 업데이트
+          // JWT 토큰으로 최신 사용자 데이터 업데이트 시도
           try {
             const freshUser = await userApi.getUser(user.id);
-            console.log('✅ [AuthContext] Updated user data:', freshUser);
+            console.log('✅ [AuthContext] Updated user data with JWT:', freshUser);
             setUser(freshUser);
             localStorage.setItem('current_user', JSON.stringify(freshUser));
           } catch (error) {
-            console.warn('⚠️ [AuthContext] Failed to refresh user data:', error);
+            console.warn('⚠️ [AuthContext] Failed to refresh user data with JWT:', error);
+            // JWT가 만료되었을 수 있으므로 토큰 자동 갱신이 시도될 것임
             // 저장된 데이터로 계속 진행
           }
         } else {
-          // 저장된 인증 정보가 없으면 테스트 사용자로 자동 로그인 (개발용)
-          console.log('🔧 [AuthContext] No saved auth, loading test user');
-          const testUserId = '2190d61c-379d-4452-b4da-655bf67b4b71'; // 지나니
-          
-          const testUser = await userApi.getUser(testUserId);
-          console.log('✅ [AuthContext] Test user loaded:', testUser);
-          setUser(testUser);
-          setToken('temp_token_for_testing');
-          
-          // 인증 정보 저장
-          localStorage.setItem('current_user', JSON.stringify(testUser));
-          localStorage.setItem('auth_token', 'temp_token_for_testing');
+          // 저장된 인증 정보가 없으면 로그아웃 상태로 유지
+          console.log('ℹ️ [AuthContext] No saved auth state - user needs to login');
+          // 인증 관련 저장소 정리
+          localStorage.removeItem('current_user');
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('refresh_token');
         }
       } catch (error) {
         console.error('❌ [AuthContext] Failed to initialize auth:', error);
+        // 오류 발생 시 인증 정보 정리
+        localStorage.removeItem('current_user');
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('refresh_token');
       } finally {
         setIsLoading(false);
       }
@@ -96,34 +100,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (authData: AuthResponse) => {
+    console.log('🔐 [AuthContext] Logging in user with JWT:', authData.user.email);
+    
     setUser(authData.user);
     setToken(authData.token);
+    setRefreshToken(authData.refreshToken);
     
     // localStorage에 인증 정보 저장
     localStorage.setItem('current_user', JSON.stringify(authData.user));
     localStorage.setItem('auth_token', authData.token);
     localStorage.setItem('refresh_token', authData.refreshToken);
+    
+    console.log('✅ [AuthContext] JWT tokens saved to localStorage');
   };
 
   const logout = async () => {
     try {
-      // 서버에 로그아웃 요청
-      await authApi.logout();
+      // 서버에 로그아웃 요청 (refresh token으로)
+      if (refreshToken) {
+        await authApi.logout();
+        console.log('✅ [AuthContext] Server logout successful');
+      }
     } catch (error) {
-      console.error('Logout API call failed:', error);
+      console.error('⚠️ [AuthContext] Logout API call failed:', error);
       // API 호출이 실패해도 로컬에서는 로그아웃 처리
     }
+    
+    console.log('🚪 [AuthContext] Logging out and clearing JWT tokens');
     
     // 로컬 상태 및 저장소 정리
     setUser(null);
     setToken(null);
+    setRefreshToken(null);
     localStorage.removeItem('current_user');
     localStorage.removeItem('auth_token');
     localStorage.removeItem('refresh_token');
   };
 
+  const isAuthenticated = !!(user && token && refreshToken);
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      refreshToken, 
+      login, 
+      logout, 
+      isLoading, 
+      isAuthenticated 
+    }}>
       {children}
     </AuthContext.Provider>
   );

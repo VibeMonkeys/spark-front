@@ -11,10 +11,9 @@ export default defineConfig({
     proxy: {
       // 스프링부트 백엔드 API 프록시 설정
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:8099',
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        secure: false
       }
     }
   },
