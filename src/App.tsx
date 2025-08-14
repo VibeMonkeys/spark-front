@@ -295,7 +295,7 @@ function AppContent() {
       case "explore":
         return <FeedPage />;
       case "missions":
-        return <MissionsPage onMissionSelect={handleMissionSelect} onMissionContinue={handleMissionContinue} onNotification={showNotification} />;
+        return <MissionsPage onMissionSelect={handleMissionSelect} onMissionContinue={handleMissionContinue} onNotification={showNotification} onTabChange={setActiveTab} />;
       case "rewards":
         return <RewardsPage />;
       case "profile":

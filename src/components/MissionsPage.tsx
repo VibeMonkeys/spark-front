@@ -49,9 +49,10 @@ interface MissionsPageProps {
   onMissionSelect?: (missionId: string) => void;
   onMissionContinue?: (missionId: string) => void;
   onNotification?: (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void;
+  onTabChange?: (tab: string) => void;
 }
 
-export function MissionsPage({ onMissionSelect, onMissionContinue, onNotification }: MissionsPageProps) {
+export function MissionsPage({ onMissionSelect, onMissionContinue, onNotification, onTabChange }: MissionsPageProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [activeSubTab, setActiveSubTab] = useState("ongoing");
@@ -338,7 +339,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                   <Target className="size-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="font-semibold mb-2">진행 중인 미션이 없어요</h3>
                   <p className="text-sm text-muted-foreground mb-4">홈에서 새로운 미션을 선택해보세요!</p>
-                  <Button variant="outline">미션 둘러보기</Button>
+                  <Button variant="outline" onClick={() => onTabChange?.('home')}>미션 둘러보기</Button>
                 </CardContent>
               </Card>
             )}

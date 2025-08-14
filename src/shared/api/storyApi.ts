@@ -52,7 +52,10 @@ export const storyApi = {
     if (userId) params.append('userId', userId);
     
     const response = await api.get<ApiResponse<PagedResponse<StoryFeedItem>>>(`/stories/feed?${params}`);
-    return response.data;
+    if (!response.data.success) {
+      throw new Error(response.data.error?.message || 'Failed to fetch story feed');
+    }
+    return response.data.data;
   },
 
   // 스토리 상세 조회
@@ -82,13 +85,19 @@ export const storyApi = {
   // 스토리 좋아요
   likeStory: async (storyId: string, userId: string): Promise<Story> => {
     const response = await api.post<ApiResponse<Story>>(`/stories/${storyId}/like?userId=${userId}`);
-    return response.data;
+    if (!response.data.success) {
+      throw new Error(response.data.error?.message || 'Failed to like story');
+    }
+    return response.data.data;
   },
 
   // 스토리 좋아요 취소
   unlikeStory: async (storyId: string, userId: string): Promise<Story> => {
     const response = await api.delete<ApiResponse<Story>>(`/stories/${storyId}/like?userId=${userId}`);
-    return response.data;
+    if (!response.data.success) {
+      throw new Error(response.data.error?.message || 'Failed to unlike story');
+    }
+    return response.data.data;
   },
 
   // 스토리 댓글 조회
