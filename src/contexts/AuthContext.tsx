@@ -48,26 +48,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 앱 시작 시 localStorage에서 인증 정보 복원
   useEffect(() => {
-    const initAuth = () => {
-      // 강제로 localStorage 클리어해서 항상 최신 데이터 가져오기 (테스트용)
-      localStorage.clear();
-      console.log('🧹 [AuthContext] Cleared localStorage for fresh data');
-
-      // 항상 최신 API 데이터 로드
-      console.log('🔧 [AuthContext] Loading fresh user data from API');
-      const testUserId = '2190d61c-379d-4452-b4da-655bf67b4b71'; // 지나니
-      
-      userApi.getUser(testUserId)
-        .then(realUser => {
-          console.log('✅ [AuthContext] Fresh user data loaded:', realUser);
-          setUser(realUser);
+    const initAuth = async () => {
+      try {
+        // localStorage에서 저장된 인증 정보 확인
+        const savedUser = localStorage.getItem('current_user');
+        const savedToken = localStorage.getItem('auth_token');
+        
+        if (savedUser && savedToken) {
+          // 저장된 인증 정보가 있으면 복원
+          console.log('🔄 [AuthContext] Restoring saved auth state');
+          const user = JSON.parse(savedUser);
+          setUser(user);
+          setToken(savedToken);
+          
+          // 백그라운드에서 최신 사용자 데이터 업데이트
+          try {
+            const freshUser = await userApi.getUser(user.id);
+            console.log('✅ [AuthContext] Updated user data:', freshUser);
+            setUser(freshUser);
+            localStorage.setItem('current_user', JSON.stringify(freshUser));
+          } catch (error) {
+            console.warn('⚠️ [AuthContext] Failed to refresh user data:', error);
+            // 저장된 데이터로 계속 진행
+          }
+        } else {
+          // 저장된 인증 정보가 없으면 테스트 사용자로 자동 로그인 (개발용)
+          console.log('🔧 [AuthContext] No saved auth, loading test user');
+          const testUserId = '2190d61c-379d-4452-b4da-655bf67b4b71'; // 지나니
+          
+          const testUser = await userApi.getUser(testUserId);
+          console.log('✅ [AuthContext] Test user loaded:', testUser);
+          setUser(testUser);
           setToken('temp_token_for_testing');
-          // localStorage에 저장하지 않아서 항상 최신 데이터 로드
-        })
-        .catch(error => {
-          console.error('❌ [AuthContext] Failed to load user data:', error);
-        });
-      setIsLoading(false);
+          
+          // 인증 정보 저장
+          localStorage.setItem('current_user', JSON.stringify(testUser));
+          localStorage.setItem('auth_token', 'temp_token_for_testing');
+        }
+      } catch (error) {
+        console.error('❌ [AuthContext] Failed to initialize auth:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     initAuth();
