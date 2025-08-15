@@ -40,10 +40,10 @@ export function CompletedMissionsModal({ isOpen, onClose }: CompletedMissionsMod
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">완료한 미션</h2>
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <h2 className="text-lg font-bold text-gray-900">완료한 미션</h2>
           <Button
             variant="ghost"
             size="sm"
@@ -55,50 +55,40 @@ export function CompletedMissionsModal({ isOpen, onClose }: CompletedMissionsMod
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 max-h-[60vh] overflow-y-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
             </div>
           ) : missions.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {missions.map((mission) => (
                 <div
                   key={mission.id}
-                  className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors"
+                  className="flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors"
                 >
                   <ImageWithFallback
                     src={mission.image_url || "https://images.unsplash.com/photo-1584515501397-335d595b2a17?w=400"}
                     alt={mission.title}
-                    className="size-16 rounded-xl object-cover"
+                    className="size-12 rounded-lg object-cover flex-shrink-0"
                   />
                   
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate mb-1">
+                    <h3 className="font-medium text-gray-900 text-sm truncate mb-1">
                       {mission.title}
                     </h3>
-                    <p className="text-sm text-gray-500 mb-2 line-clamp-2">
-                      {mission.description}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
                         {mission.category}
                       </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {mission.difficulty}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 text-blue-600 mb-2">
-                      <Star className="size-4 fill-current" />
-                      <span className="text-sm font-medium">+{mission.reward_points}P</span>
+                      <div className="flex items-center gap-1 text-blue-600">
+                        <Star className="size-3 fill-current" />
+                        <span className="text-xs font-medium">+{mission.reward_points}P</span>
+                      </div>
                     </div>
                     <p className="text-xs text-gray-400">
                       {mission.completed_at ? 
                         new Date(mission.completed_at).toLocaleDateString('ko-KR', {
-                          year: 'numeric',
                           month: 'short',
                           day: 'numeric'
                         }) : '완료됨'
@@ -109,42 +99,38 @@ export function CompletedMissionsModal({ isOpen, onClose }: CompletedMissionsMod
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500">완료한 미션이 없습니다.</p>
+            <div className="text-center py-8">
+              <p className="text-sm text-gray-500">완료한 미션이 없습니다.</p>
             </div>
           )}
         </div>
 
         {/* Footer with Pagination */}
         {pageInfo && pageInfo.total_pages > 1 && (
-          <div className="flex items-center justify-between p-6 border-t border-gray-100 bg-gray-50">
-            <div className="text-sm text-gray-600">
-              {pageInfo.total_elements}개 미션 중 {currentPage * pageSize + 1}-{Math.min((currentPage + 1) * pageSize, pageInfo.total_elements)}개 표시
+          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 bg-gray-50">
+            <div className="text-xs text-gray-500">
+              {currentPage + 1} / {pageInfo.total_pages} 페이지
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handlePrevPage}
                 disabled={!pageInfo.has_previous}
-                className="h-8"
+                className="h-7 w-7 p-0"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3 w-3" />
               </Button>
-              
-              <span className="text-sm font-medium px-3">
-                {currentPage + 1} / {pageInfo.total_pages}
-              </span>
               
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleNextPage}
                 disabled={!pageInfo.has_next}
-                className="h-8"
+                className="h-7 w-7 p-0"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3 w-3" />
               </Button>
             </div>
           </div>

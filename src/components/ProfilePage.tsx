@@ -46,14 +46,14 @@ export function ProfilePage() {
   });
 
   // 카테고리별 통계 조회
-  const { data: categoryStatistics } = useQuery({
+  const { data: categoryStatistics, refetch: refetchCategoryStats } = useQuery({
     queryKey: ['category-statistics', user?.id],
     queryFn: () => missionApi.getCategoryStatistics(user!.id),
     enabled: !!user?.id,
   });
 
   // 최근 완료한 미션 조회
-  const { data: recentCompletedMissions } = useQuery({
+  const { data: recentCompletedMissions, refetch: refetchRecentMissions } = useQuery({
     queryKey: ['missions-completed-recent', user?.id],
     queryFn: () => missionApi.getCompletedMissions(user!.id, 0, 5),
     enabled: !!user?.id,
@@ -66,6 +66,15 @@ export function ProfilePage() {
   const confirmLogout = async () => {
     await logout();
     setIsLogoutModalOpen(false);
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    // 활동 탭을 클릭할 때 최신 데이터 불러오기
+    if (value === 'activity') {
+      refetchCategoryStats();
+      refetchRecentMissions();
+    }
   };
 
   if (isLoading) {
@@ -162,7 +171,7 @@ export function ProfilePage() {
         </div>
 
         {/* Tabbed Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-4 bg-gray-100 h-14 rounded-lg p-1">
             <TabsTrigger 
               value="overview" 
