@@ -144,15 +144,19 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
       });
     },
     onSuccess: (verificationResponse) => {
-      // 홈페이지 데이터 다시 불러오기
+      // 홈페이지 및 피드 데이터 다시 불러오기
       queryClient.invalidateQueries({ queryKey: ['home', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['story-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] });
+      
+      console.log('✅ [MissionVerification] Story created successfully:', verificationResponse);
       
       // API 응답에서 받은 데이터 사용
       const result = {
-        pointsEarned: verificationResponse.points_earned,
-        streakCount: verificationResponse.streak_count,
-        levelUp: verificationResponse.level_up,
-        newLevel: verificationResponse.new_level
+        pointsEarned: verificationResponse.pointsEarned || verificationResponse.points_earned || 20,
+        streakCount: verificationResponse.streakCount || verificationResponse.streak_count || 1,
+        levelUp: verificationResponse.levelUp || verificationResponse.level_up || false,
+        newLevel: verificationResponse.newLevel || verificationResponse.new_level
       };
       
       onSubmit(result);
@@ -212,11 +216,33 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
   };
 
   const handleSubmit = () => {
-    if (!missionId) return;
+    console.log('🎯 [handleSubmit] Called with:', { missionId, userId: user?.id, story: story.trim(), selectedImages: selectedImages.length });
     
+    if (!missionId || !user?.id) {
+      console.log('❌ [handleSubmit] Missing missionId or userId');
+      return;
+    }
+    
+    // 스토리가 10글자 이상이거나 이미지가 있으면 생성
     if (story.trim().length >= 10 || selectedImages.length > 0) {
-      // 미션 완료 API 직접 호출
-      completeMissionMutation.mutate();
+      console.log('✅ [handleSubmit] Conditions met, creating story...');
+      
+      // 스토리 생성 데이터 준비
+      const storyRequest: StoryCreateRequest = {
+        mission_id: missionId,
+        story: story.trim() || "미션을 완료했습니다! 🎉", // 기본 메시지
+        images: selectedImages,
+        location: location,
+        is_public: isPublic,
+        user_tags: [] // 사용자가 입력한 태그가 있다면 여기에 추가
+      };
+
+      console.log('📝 [handleSubmit] Story request:', storyRequest);
+
+      // 스토리 생성 (스토리가 생성되면 자동으로 미션 완료 처리)
+      createStoryMutation.mutate(storyRequest);
+    } else {
+      console.log('❌ [handleSubmit] Conditions not met - need at least 10 characters or image');
     }
   };
 
@@ -433,16 +459,16 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
               {/* Submit Button */}
               <Button
                 onClick={handleSubmit}
-                disabled={(story.trim().length < 10 && selectedImages.length === 0) || completeMissionMutation.isPending}
+                disabled={(story.trim().length < 10 && selectedImages.length === 0) || createStoryMutation.isPending}
                 className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-0 disabled:opacity-50 shadow-lg transform hover:scale-105 transition-all duration-200 h-14"
                 size="lg"
               >
                 <Send className="size-5 mr-2" />
                 <span className="font-bold">
-                  {completeMissionMutation.isPending ? "미션 완료 중..." : 
-                   (story.trim().length >= 10 || selectedImages.length > 0) ? "🎉 미션 완료하기" : "미션 완료하기"}
+                  {createStoryMutation.isPending ? "스토리 생성 중..." : 
+                   (story.trim().length >= 10 || selectedImages.length > 0) ? "🎉 미션 완료 & 피드 공유" : "미션 완료하기"}
                 </span>
-                {(story.trim().length >= 10 || selectedImages.length > 0) && !completeMissionMutation.isPending && (
+                {(story.trim().length >= 10 || selectedImages.length > 0) && !createStoryMutation.isPending && (
                   <span className="ml-2">→</span>
                 )}
               </Button>
