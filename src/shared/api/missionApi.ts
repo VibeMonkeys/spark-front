@@ -112,4 +112,35 @@ export const missionApi = {
     const response = await api.post<ApiResponse<Mission>>(`/missions/${missionId}/abandon?userId=${userId}`);
     return response.data.data;
   },
+
+  // 미션 인증 및 완료 (스토리 자동 생성 포함)
+  verifyMission: async (missionId: string, verificationData: {
+    story: string;
+    images: string[];
+    location: string;
+    isPublic: boolean;
+    userTags: string[];
+  }): Promise<{
+    storyId: string;
+    pointsEarned: number;
+    streakCount: number;
+    levelUp?: boolean;
+    newLevel?: number;
+  }> => {
+    const response = await api.post<ApiResponse<{
+      storyId: string;
+      pointsEarned: number;
+      streakCount: number;
+      levelUp?: boolean;
+      newLevel?: number;
+    }>>(`/missions/${missionId}/verify`, {
+      mission_id: missionId,
+      story: verificationData.story,
+      images: verificationData.images,
+      location: verificationData.location,
+      is_public: verificationData.isPublic,
+      user_tags: verificationData.userTags
+    });
+    return response.data.data;
+  },
 };

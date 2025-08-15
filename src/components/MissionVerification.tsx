@@ -84,126 +84,46 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
     enabled: !!missionId,
   });
 
-  // 미션 완료 뮤테이션
-  const completeMissionMutation = useMutation({
+  // 미션 인증 및 완료 뮤테이션 (통합)
+  const verifyMissionMutation = useMutation({
     mutationFn: () => {
       if (!missionId || !user?.id) {
         throw new Error('Mission ID or User ID is missing');
       }
-      return missionApi.completeMission(missionId, user.id);
-    },
-    onSuccess: (completionResponse) => {
-      // 캐시 무효화 - 모든 관련 미션 데이터 새로고침
-      queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] }); // 진행 중인 미션
-      queryClient.invalidateQueries({ queryKey: ['missions-completed', user?.id] }); // 완료된 미션  
-      queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] }); // 오늘의 미션
-      queryClient.invalidateQueries({ queryKey: ['home', user?.id] }); // 홈페이지 데이터
-      queryClient.invalidateQueries({ queryKey: ['daily-limit', user?.id] }); // 일일 제한 정보
       
-      // 사용자 정보도 새로고침 (포인트, 연속일 업데이트)
-      queryClient.invalidateQueries({ queryKey: ['user', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['level-progress', user?.id] });
-      
-      // 포인트 정보를 포함한 결과 반환
-      console.log('✅ [MissionVerification] Mission completion API Success:', completionResponse);
-      const result = {
-        pointsEarned: completionResponse.points_earned,
-        streakCount: completionResponse.streak_count,
-        levelUp: completionResponse.level_up,
-        newLevel: completionResponse.new_level
-      };
-      console.log('✅ [MissionVerification] Mission completion result:', result);
-      
-      // 미션 완료 결과 저장
-      setMissionCompletionResult(result);
-      
-      // 2. 미션 완료 후 스토리 생성 (선택사항)
-      if ((story.trim().length >= 10 || selectedImages.length > 0) && isPublic) {
-        console.log('📝 [MissionVerification] Creating story after mission completion...');
-        
-        const storyRequest: StoryCreateRequest = {
-          mission_id: missionId!,
-          story: story.trim() || "미션을 완료했습니다! 🎉",
-          images: selectedImages,
-          location: location,
-          is_public: isPublic,
-          user_tags: []
-        };
-        
-        createStoryMutation.mutate(storyRequest);
-      } else {
-        console.log('📝 [MissionVerification] No story to create, going directly to success screen');
-        onSubmit(result);
-      }
-    },
-    onError: (error) => {
-      console.error('미션 완료 실패:', error);
-      
-      // 개발 중이므로 API 에러 시에도 성공으로 처리하여 UX 테스트 가능하도록 함
-      console.log('⚠️ 개발 모드: API 에러 시 실제 사용자 데이터로 시뮬레이션 처리');
-      console.log('🎯 [MissionVerification] Mission Data:', missionData);
-      console.log('🎯 [MissionVerification] User Data:', user);
-      const simulatedResult = {
-        pointsEarned: missionData?.reward_points || 20,
-        streakCount: (user?.current_streak || 1) + 1, // 미션 완료 후 연속일 증가
-        levelUp: false,
-        newLevel: undefined
-      };
-      console.log('🎯 [MissionVerification] Simulated Result:', simulatedResult);
-      
-      // 관련 데이터 새로고침 (시뮬레이션 모드)
-      queryClient.invalidateQueries({ queryKey: ['home', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['missions-completed', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['level-progress', user?.id] });
-      
-      onSubmit(simulatedResult);
-    },
-  });
-
-  // 미션 인증 스토리 생성 뮤테이션
-  const createStoryMutation = useMutation({
-    mutationFn: (request: StoryCreateRequest) => {
-      // camelCase로 변환해서 전송
-      return storyApi.createStory({
-        missionId: request.mission_id,
-        story: request.story,
-        images: request.images,
-        location: request.location,
-        isPublic: request.is_public,
-        userTags: request.user_tags
+      return missionApi.verifyMission(missionId, {
+        story: story.trim() || "미션을 완료했습니다! 🎉",
+        images: selectedImages,
+        location: location,
+        isPublic: isPublic,
+        userTags: []
       });
     },
     onSuccess: (verificationResponse) => {
-      // 스토리 생성 후 관련 데이터 새로고침
-      queryClient.invalidateQueries({ queryKey: ['home', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['story-feed'] });
+      // 캐시 무효화 - 모든 관련 데이터 새로고침
       queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['missions-completed', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['missions-completed', user?.id] }); 
+      queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['home', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['daily-limit', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['user', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['level-progress', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['story-feed'] }); // 스토리 피드도 새로고침
       
-      console.log('✅ [MissionVerification] Story created successfully:', verificationResponse);
+      console.log('✅ [MissionVerification] Mission verification successful:', verificationResponse);
       
-      // 미션 완료는 이미 완료되었으므로, 저장된 미션 완료 결과를 사용
-      console.log('📝 [MissionVerification] Story creation completed, proceeding to success screen with saved mission completion data');
+      const result = {
+        pointsEarned: verificationResponse.pointsEarned,
+        streakCount: verificationResponse.streakCount,
+        levelUp: verificationResponse.levelUp,
+        newLevel: verificationResponse.newLevel
+      };
       
-      if (missionCompletionResult) {
-        onSubmit(missionCompletionResult);
-      } else {
-        // 백업으로 현재 미션 데이터 기반 결과 생성
-        const result = {
-          pointsEarned: missionData?.reward_points || 20,
-          streakCount: (user?.current_streak || 0) + 1,
-          levelUp: false,
-          newLevel: undefined
-        };
-        onSubmit(result);
-      }
+      // 성공 화면으로 이동
+      onSubmit(result);
     },
     onError: (error) => {
-      console.error('미션 인증 실패:', error);
+      console.error('미션 완료 실패:', error);
       
       // 개발 중이므로 API 에러 시에도 성공으로 처리하여 UX 테스트 가능하도록 함
       console.log('⚠️ 개발 모드: API 에러 시 실제 사용자 데이터로 시뮬레이션 처리');
@@ -270,10 +190,10 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
     
     // 완료 조건 확인 (10글자 이상 스토리 또는 이미지 업로드)
     if (story.trim().length >= 10 || selectedImages.length > 0) {
-      console.log('✅ [handleSubmit] Conditions met, completing mission...');
+      console.log('✅ [handleSubmit] Conditions met, verifying mission...');
       
-      // 1. 먼저 미션 완료 API 호출
-      completeMissionMutation.mutate();
+      // 통합된 미션 인증 API 호출 (미션 완료 + 스토리 생성)
+      verifyMissionMutation.mutate();
     } else {
       console.log('❌ [handleSubmit] Conditions not met - need at least 10 characters or image');
     }
@@ -492,17 +412,16 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
               {/* Submit Button */}
               <Button
                 onClick={handleSubmit}
-                disabled={(story.trim().length < 10 && selectedImages.length === 0) || completeMissionMutation.isPending || createStoryMutation.isPending}
+                disabled={(story.trim().length < 10 && selectedImages.length === 0) || verifyMissionMutation.isPending}
                 className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-0 disabled:opacity-50 shadow-lg transform hover:scale-105 transition-all duration-200 h-14"
                 size="lg"
               >
                 <Send className="size-5 mr-2" />
                 <span className="font-bold">
-                  {completeMissionMutation.isPending ? "미션 완료 중..." : 
-                   createStoryMutation.isPending ? "스토리 생성 중..." :
+                  {verifyMissionMutation.isPending ? "미션 인증 중..." :
                    (story.trim().length >= 10 || selectedImages.length > 0) ? "🎉 미션 완료 & 피드 공유" : "미션 완료하기"}
                 </span>
-                {(story.trim().length >= 10 || selectedImages.length > 0) && !completeMissionMutation.isPending && !createStoryMutation.isPending && (
+                {(story.trim().length >= 10 || selectedImages.length > 0) && !verifyMissionMutation.isPending && (
                   <span className="ml-2">→</span>
                 )}
               </Button>
