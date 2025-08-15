@@ -12,6 +12,7 @@ import { LevelProgress } from "./LevelProgress";
 import { LevelSystemModal } from "./LevelSystemModal";
 import { ConfirmModal } from "./ui/confirm-modal";
 import { StatsSection } from "./StatsSection";
+import { CompletedMissionsModal } from "./CompletedMissionsModal";
 import { useState } from "react";
 
 
@@ -20,6 +21,7 @@ export function ProfilePage() {
   const { user, logout } = useAuth();
   const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isCompletedMissionsModalOpen, setIsCompletedMissionsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
   // 프로필 데이터 조회
@@ -372,7 +374,12 @@ export function ProfilePage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">최근 완료한 미션</CardTitle>
-                  <Button variant="ghost" size="sm" className="text-blue-600">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-blue-600"
+                    onClick={() => setIsCompletedMissionsModalOpen(true)}
+                  >
                     전체보기
                   </Button>
                 </div>
@@ -427,6 +434,12 @@ export function ProfilePage() {
         message="정말 로그아웃하시겠습니까?"
         confirmText="로그아웃"
         showCancel={true}
+      />
+
+      {/* 완료한 미션 전체보기 모달 */}
+      <CompletedMissionsModal
+        isOpen={isCompletedMissionsModalOpen}
+        onClose={() => setIsCompletedMissionsModalOpen(false)}
       />
     </div>
   );

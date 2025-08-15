@@ -64,6 +64,7 @@ export interface Mission {
   average_rating?: number;
   assigned_at?: string;
   expires_at?: string;
+  completed_at?: string;
 }
 
 export interface Story {
