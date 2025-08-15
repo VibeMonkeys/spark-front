@@ -136,39 +136,6 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
   // 실제 데이터 추출 및 테스트 데이터 폴백
   const ongoingMissions = ongoingMissionsData || [];
   const completedMissions = completedMissionsData?.items || [];
-  
-    ongoingMissionsData,
-    ongoingMissions: ongoingMissions.length,
-    completedMissionsData,
-    completedMissions: completedMissions.length
-  });
-
-  // 디버깅을 위한 콘솔 로그
-    user: user?.id,
-    ongoingMissions,
-    ongoingMissionsLength: ongoingMissions?.length || 0,
-    isLoadingOngoing,
-    ongoingError: ongoingError?.toString(),
-    completedMissionsData,
-    completedMissions: completedMissions?.length || 0,
-    isLoadingCompleted,
-    completedError: completedError?.toString(),
-    activeSubTab
-  });
-
-  // 조건부 렌더링 디버깅
-  if (isLoadingOngoing) {
-  }
-  if (ongoingError) {
-  }
-  if (ongoingMissions?.length > 0) {
-  } else {
-  }
-  
-  if (isLoadingCompleted) {
-  }
-  if (completedError) {
-  }
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
