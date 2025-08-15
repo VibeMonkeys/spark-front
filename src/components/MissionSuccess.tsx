@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Star, Trophy, Flame, TrendingUp, ArrowRight, Home } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface MissionSuccessProps {
   pointsEarned: number;
@@ -22,10 +23,23 @@ export function MissionSuccess({
   onViewProfile 
 }: MissionSuccessProps) {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   
   // 디버깅용 로그
   console.log('🎯 [MissionSuccess] Props:', { pointsEarned, streakCount, levelUp, newLevel });
   console.log('🎯 [MissionSuccess] User:', user);
+  
+  const handleViewProfile = () => {
+    // 프로필 관련 모든 쿼리 무효화하여 최신 데이터 로드
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+    queryClient.invalidateQueries({ queryKey: ['user-stats'] });
+    queryClient.invalidateQueries({ queryKey: ['achievements'] });
+    queryClient.invalidateQueries({ queryKey: ['level-progress'] });
+    
+    if (onViewProfile) {
+      onViewProfile();
+    }
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center p-4">
@@ -179,7 +193,7 @@ export function MissionSuccess({
           
           {onViewProfile && (
             <Button 
-              onClick={onViewProfile}
+              onClick={handleViewProfile}
               variant="outline"
               className="w-full bg-white/60 backdrop-blur-sm"
               size="lg"
