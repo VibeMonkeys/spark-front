@@ -2,8 +2,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Settings, Star, Flame, Trophy, Calendar, Target, TrendingUp, Gift, LogOut, Info } from "lucide-react";
+import { Settings, Star, Flame, Trophy, Calendar, Target, TrendingUp, Gift, LogOut, Info, User, BarChart3, Award, Activity } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { userApi, levelApi } from "../shared/api";
@@ -18,6 +19,7 @@ export function ProfilePage() {
   const { user, logout } = useAuth();
   const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   // 프로필 데이터 조회
   const { data: profileData, isLoading, error } = useQuery({
@@ -103,178 +105,208 @@ export function ProfilePage() {
       </header>
 
       <div className="max-w-md mx-auto px-4 pb-20">
-        {/* Profile Header */}
-        <div className="py-6">
-          <Card className="border-0 bg-white/60 backdrop-blur-sm mb-4">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
+        {/* Compact Profile Header */}
+        <div className="py-4">
+          <Card className="border-0 bg-white/60 backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
                 <ImageWithFallback
                   src={userData.avatar_url}
                   alt={userData.name}
-                  className="size-16 rounded-full object-cover ring-2 ring-gray-200"
+                  className="size-12 rounded-full object-cover ring-2 ring-gray-200"
                 />
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold">{userData.name}</h2>
-                  <p className="text-sm text-muted-foreground">{userData.join_date} 가입</p>
+                  <h2 className="text-lg font-bold">{userData.name}</h2>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Star className="size-3" />
+                      {userData.current_points.toLocaleString()}P
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Flame className="size-3" />
+                      {userData.current_streak}일
+                    </span>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Level Progress */}
-          {levelProgress && (
-            <LevelProgress 
-              levelProgress={levelProgress} 
-              showDetails={true}
-              className="mb-2"
-              onLevelInfoClick={() => setIsLevelModalOpen(true)}
-            />
-          )}
         </div>
 
-        {/* RPG Stats Section */}
-        <StatsSection className="mb-6" />
+        {/* Tabbed Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 bg-gray-100 h-14 rounded-lg p-1">
+            <TabsTrigger 
+              value="overview" 
+              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm rounded-md"
+            >
+              <BarChart3 className="size-4" />
+              <span className="text-xs font-medium">개요</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="stats" 
+              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm rounded-md"
+            >
+              <User className="size-4" />
+              <span className="text-xs font-medium">스탯</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="achievements" 
+              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm rounded-md"
+            >
+              <Award className="size-4" />
+              <span className="text-xs font-medium">업적</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="activity" 
+              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm rounded-md"
+            >
+              <Activity className="size-4" />
+              <span className="text-xs font-medium">활동</span>
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Stats Overview */}
-        <section className="mb-6">
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="border-0 bg-white/60 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <Star className="size-4 text-blue-500" />
-                  <span className="text-xl font-bold text-blue-500">{userData.current_points.toLocaleString()}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">현재 포인트</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-0 bg-white/60 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <Flame className="size-4 text-orange-500" />
-                  <span className="text-xl font-bold text-orange-500">{userData.current_streak}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">연속 완료일</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-0 bg-white/60 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <Target className="size-4 text-green-500" />
-                  <span className="text-xl font-bold text-green-500">{userData.completed_missions}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">완료한 미션</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="border-0 bg-white/60 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <Calendar className="size-4 text-purple-500" />
-                  <span className="text-xl font-bold text-purple-500">{userData.total_days}</span>
-                </div>
-                <p className="text-xs text-muted-foreground">활동 일수</p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* Category Stats */}
-        <section className="mb-6">
-          <Card className="border-0 bg-white/60 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="size-5" />
-                카테고리별 통계
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {categoryStats.map((category) => (
-                <div key={category.name} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className={`size-3 rounded-full ${category.color}`} />
-                      <span>{category.name}</span>
-                    </div>
-                    <span className="font-medium">{category.completed}개</span>
+          <TabsContent value="overview" className="mt-4 space-y-4">
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <Star className="size-4 text-blue-500" />
+                    <span className="text-xl font-bold text-blue-500">{userData.current_points.toLocaleString()}</span>
                   </div>
-                  <Progress value={category.percentage} className="h-1.5" />
+                  <p className="text-xs text-muted-foreground">현재 포인트</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <Flame className="size-4 text-orange-500" />
+                    <span className="text-xl font-bold text-orange-500">{userData.current_streak}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">연속 완료일</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <Target className="size-4 text-green-500" />
+                    <span className="text-xl font-bold text-green-500">{userData.completed_missions}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">완료한 미션</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <Calendar className="size-4 text-purple-500" />
+                    <span className="text-xl font-bold text-purple-500">{userData.total_days}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">활동 일수</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Level Progress */}
+            {levelProgress && (
+              <LevelProgress 
+                levelProgress={levelProgress} 
+                showDetails={true}
+                onLevelInfoClick={() => setIsLevelModalOpen(true)}
+              />
+            )}
+          </TabsContent>
+
+          <TabsContent value="stats" className="mt-4">
+            <StatsSection />
+          </TabsContent>
+
+          <TabsContent value="achievements" className="mt-4 space-y-4">
+            <div className="grid grid-cols-3 gap-3">
+              {achievements.map((achievement) => (
+                <div
+                  key={achievement.id}
+                  className={`text-center p-3 rounded-lg transition-all ${
+                    achievement.unlocked
+                      ? "bg-gradient-to-br from-yellow-100 to-orange-100"
+                      : "bg-gray-100 opacity-50"
+                  }`}
+                >
+                  <div className="text-2xl mb-1">{achievement.icon}</div>
+                  <p className="text-xs font-medium">{achievement.name}</p>
+                  <p className="text-xs text-muted-foreground">{achievement.description}</p>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        </section>
+            </div>
+          </TabsContent>
 
-        {/* Achievements */}
-        <section className="mb-6">
-          <Card className="border-0 bg-white/60 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Trophy className="size-5" />
-                업적
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-3">
-                {achievements.map((achievement) => (
-                  <div
-                    key={achievement.id}
-                    className={`text-center p-3 rounded-lg transition-all ${
-                      achievement.unlocked
-                        ? "bg-gradient-to-br from-yellow-100 to-orange-100"
-                        : "bg-gray-100 opacity-50"
-                    }`}
-                  >
-                    <div className="text-2xl mb-1">{achievement.icon}</div>
-                    <p className="text-xs font-medium">{achievement.name}</p>
-                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
+          <TabsContent value="activity" className="mt-4 space-y-4">
+            {/* Category Stats */}
+            <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="size-5" />
+                  카테고리별 통계
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {categoryStats.map((category) => (
+                  <div key={category.name} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className={`size-3 rounded-full ${category.color}`} />
+                        <span>{category.name}</span>
+                      </div>
+                      <span className="font-medium">{category.completed}개</span>
+                    </div>
+                    <Progress value={category.percentage} className="h-1.5" />
                   </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Recent Missions */}
-        <section className="mb-6">
-          <Card className="border-0 bg-white/60 backdrop-blur-sm">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">최근 완료한 미션</CardTitle>
-                <Button variant="ghost" size="sm" className="text-blue-600">
-                  전체보기
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {recentMissions.map((mission) => (
-                <div key={mission.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors">
-                  <ImageWithFallback
-                    src={mission.image_url || "https://images.unsplash.com/photo-1584515501397-335d595b2a17?w=400"}
-                    alt={mission.title}
-                    className="size-10 rounded-lg object-cover"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium truncate">{mission.title}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="secondary" className="text-xs">
-                        {mission.category}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">{mission.completed_at}</span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 text-blue-600">
-                      <Star className="size-3 fill-current" />
-                      <span className="text-xs font-medium">+{mission.points}P</span>
-                    </div>
-                  </div>
+              </CardContent>
+            </Card>
+            
+            {/* Recent Missions */}
+            <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">최근 완료한 미션</CardTitle>
+                  <Button variant="ghost" size="sm" className="text-blue-600">
+                    전체보기
+                  </Button>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </section>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {recentMissions.map((mission) => (
+                  <div key={mission.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors">
+                    <ImageWithFallback
+                      src={mission.image_url || "https://images.unsplash.com/photo-1584515501397-335d595b2a17?w=400"}
+                      alt={mission.title}
+                      className="size-10 rounded-lg object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-medium truncate">{mission.title}</h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="secondary" className="text-xs">
+                          {mission.category}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">{mission.completed_at}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-center gap-1 text-blue-600">
+                        <Star className="size-3 fill-current" />
+                        <span className="text-xs font-medium">+{mission.points}P</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* 레벨 시스템 모달 */}
