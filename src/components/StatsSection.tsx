@@ -88,56 +88,43 @@ export function StatsSection({ className }: StatsSectionProps) {
   };
 
   const renderStatItem = (statKey: string, stat: StatValue) => (
-    <div key={statKey} className="bg-white/80 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">{stat?.icon || '🎯'}</span>
-          <span className="font-medium text-sm">{stat?.displayName || 'Unknown'}</span>
+    <div 
+      key={statKey} 
+      className="relative bg-white/90 backdrop-blur-sm rounded-xl p-3 border border-gray-200/50 hover:border-gray-300/50 hover:shadow-md transition-all duration-200"
+    >
+      <div className="flex items-center gap-3">
+        {/* 아이콘 */}
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 flex-shrink-0">
+          <span className="text-base">{stat?.icon || '🎯'}</span>
         </div>
-        <Badge 
-          variant="secondary" 
-          className="text-xs"
-          style={{ backgroundColor: `${stat?.grade?.color || '#9CA3AF'}20`, color: stat?.grade?.color || '#9CA3AF' }}
-        >
-          {stat?.grade?.displayName || 'N/A'}
-        </Badge>
-      </div>
-      
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-bold" style={{ color: stat?.color || '#6B7280' }}>
+        
+        {/* 스탯 정보 - 세로 배치 */}
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
+            {stat?.displayName || 'Unknown'}
+          </div>
+          <div className="text-xl font-bold text-gray-900 leading-tight">
             {stat?.current || 0}
-          </span>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>{stat?.grade?.displayName || 'N/A'}</span>
           </div>
         </div>
         
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>기본: {stat?.base || 0} | 할당: {stat?.allocated || 0}</span>
+        {/* + 버튼 */}
+        <div className="flex-shrink-0">
+          {userStats && userStats.availablePoints > 0 ? (
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-6 h-6 rounded-full p-0 border border-blue-300 hover:border-blue-500 hover:bg-blue-50 transition-all"
+              onClick={() => handleAllocatePoints(STAT_TYPES.find(t => t.key === statKey)?.name || '')}
+            >
+              <Plus className="size-2.5 text-blue-600" />
+            </Button>
+          ) : (
+            <div className="w-6 h-6 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center">
+              <Plus className="size-2 text-gray-300" />
+            </div>
+          )}
         </div>
-        
-        {userStats && userStats.availablePoints > 0 ? (
-          <Button
-            size="sm"
-            variant="outline"
-            className="w-full mt-2"
-            onClick={() => handleAllocatePoints(STAT_TYPES.find(t => t.key === statKey)?.name || '')}
-          >
-            <Plus className="size-3 mr-1" />
-            포인트 할당
-          </Button>
-        ) : (
-          <div className="mt-2 text-xs text-center text-muted-foreground p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded border border-blue-200">
-            <div className="flex items-center justify-center gap-1 mb-1">
-              <span>🎁</span>
-              <span className="font-medium">미션 완료 시</span>
-            </div>
-            <div className="text-xs text-blue-600">
-              자동 +2P · 할당 +1P
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -204,58 +191,34 @@ export function StatsSection({ className }: StatsSectionProps) {
   return (
     <>
       <Card className={`border-0 bg-white/60 backdrop-blur-sm ${className}`}>
-        <CardHeader>
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="size-5" />
-              RPG 스탯
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              {userStats.availablePoints > 0 && (
-                <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                  <Zap className="size-3 mr-1" />
-                  {userStats.availablePoints}P 사용 가능
-                </Badge>
-              )}
-              <Badge variant="outline">
-                총합 {userStats.totalStats}
-              </Badge>
+            <div>
+              <CardTitle className="text-xl flex items-center gap-2 text-gray-900">
+                <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                  <Star className="size-3 text-white" />
+                </div>
+                능력치
+              </CardTitle>
+              <CardDescription className="mt-1 text-gray-600 flex items-center gap-2">
+                <Trophy className="size-3" />
+                총 스탯: {userStats.totalStats}
+              </CardDescription>
             </div>
+            {userStats.availablePoints > 0 && (
+              <div className="text-right">
+                <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 px-3 py-1.5 text-sm font-semibold">
+                  <Zap className="size-3 mr-1" />
+                  {userStats.availablePoints} SP
+                </Badge>
+                <div className="text-xs text-gray-500 mt-1">스킬 포인트</div>
+              </div>
+            )}
           </div>
-          <CardDescription>
-            미션을 완료하면서 나만의 캐릭터를 성장시켜보세요!
-          </CardDescription>
         </CardHeader>
         
-        <CardContent className="space-y-4">
-          {/* 주요 스탯 요약 */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="text-center p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <Trophy className="size-4 text-blue-600" />
-                <span className="text-lg font-bold text-blue-600">{userStats.totalStats}</span>
-              </div>
-              <p className="text-xs text-blue-700">총 스탯</p>
-            </div>
-            
-            <div className="text-center p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <span className="text-lg">{userStats.dominantStat?.icon || '🎯'}</span>
-                <span className="text-lg font-bold text-purple-600">{userStats.dominantStat?.value || 0}</span>
-              </div>
-              <p className="text-xs text-purple-700">최고 스탯</p>
-            </div>
-            
-            <div className="text-center p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <Target className="size-4 text-green-600" />
-                <span className="text-lg font-bold text-green-600">{(userStats.averageStatValue || 0).toFixed(1)}</span>
-              </div>
-              <p className="text-xs text-green-700">평균 스탯</p>
-            </div>
-          </div>
-
-          {/* 개별 스탯 */}
+        <CardContent className="pt-0">
+          {/* 스탯 그리드 */}
           <div className="grid grid-cols-2 gap-3">
             {STAT_TYPES.map(({ key }) => {
               const stat = userStats?.[key as keyof typeof userStats] as StatValue;
@@ -268,12 +231,15 @@ export function StatsSection({ className }: StatsSectionProps) {
             }).filter(Boolean)}
           </div>
 
-          {/* 간단한 팁 */}
-          <div className="bg-gray-50 rounded-lg p-3 mt-4">
-            <p className="text-xs text-muted-foreground text-center">
-              💡 미션 완료시 자동 스탯 증가 + 할당 포인트를 받아요!
-            </p>
-          </div>
+          {/* 하단 정보 */}
+          {userStats.availablePoints === 0 && (
+            <div className="mt-4 text-center p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200/50">
+              <div className="flex items-center justify-center gap-2 text-sm text-amber-700">
+                <span>⚡</span>
+                <span>미션 클리어로 경험치를 획득하세요!</span>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -287,44 +253,55 @@ export function StatsSection({ className }: StatsSectionProps) {
         }}
         onConfirm={confirmAllocation}
         type="info"
-        title="스탯 포인트 할당"
+        title="스킬 포인트 할당"
         confirmText="할당하기"
         showCancel={true}
         isLoading={allocatePointsMutation.isPending}
       >
-        <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            {selectedStat && `${STAT_TYPES.find(t => t.name === selectedStat)?.key}에 포인트를 할당하시겠습니까?`}
-          </p>
+        <div className="space-y-6">
+          <div className="text-center">
+            <div className="text-lg text-gray-700">
+              <span className="font-semibold text-purple-600">
+                {selectedStat && STAT_TYPES.find(t => t.name === selectedStat)?.key}
+              </span> 스킬을 강화합니다
+            </div>
+          </div>
           
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-4">
             <Button
               size="sm"
               variant="outline"
+              className="w-10 h-10 rounded-full border-2 hover:border-red-400 hover:bg-red-50"
               disabled={pointsToAllocate <= 1}
               onClick={() => setPointsToAllocate(Math.max(1, pointsToAllocate - 1))}
             >
-              <Minus className="size-4" />
+              <Minus className="size-4 text-red-500" />
             </Button>
             
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">{pointsToAllocate}</span>
-              <span className="text-sm text-muted-foreground">포인트</span>
+            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl px-6 py-4 border-2 border-purple-200">
+              <div className="text-3xl font-bold text-purple-700 text-center">
+                {pointsToAllocate}
+              </div>
+              <div className="text-xs text-purple-500 text-center mt-1 font-medium">
+                SP
+              </div>
             </div>
             
             <Button
               size="sm"
               variant="outline"
+              className="w-10 h-10 rounded-full border-2 hover:border-green-400 hover:bg-green-50"
               disabled={!userStats || pointsToAllocate >= userStats.availablePoints}
               onClick={() => setPointsToAllocate(pointsToAllocate + 1)}
             >
-              <Plus className="size-4" />
+              <Plus className="size-4 text-green-500" />
             </Button>
           </div>
           
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground">
-              사용 가능: {userStats?.availablePoints || 0}P
+          <div className="text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 border border-blue-200">
+            <p className="text-sm text-blue-700">
+              <Zap className="size-3 inline mr-1" />
+              보유 스킬 포인트: <span className="font-bold text-purple-600">{userStats?.availablePoints || 0} SP</span>
             </p>
           </div>
         </div>

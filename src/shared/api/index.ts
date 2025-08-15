@@ -8,6 +8,7 @@ export * from './rewardsApi';
 export * from './userApi';
 export * from './levelApi';
 export * from './statsApi';
+export * from './achievement';
 
 // 편의를 위한 통합 객체
 export { homeApi } from './homeApi';
@@ -17,3 +18,4 @@ export { rewardsApi } from './rewardsApi';
 export { userApi } from './userApi';
 export { levelApi } from './levelApi';
 export { statsApi } from './statsApi';
+export { achievementApi } from './achievement';

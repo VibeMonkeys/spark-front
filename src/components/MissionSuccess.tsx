@@ -102,7 +102,7 @@ export function MissionSuccess({
               
               <div className="mt-3 pt-2 border-t border-blue-100 text-center">
                 <p className="text-xs text-blue-600 font-medium">
-                  📊 프로필 > 스탯에서 할당 포인트를 사용할 수 있어요!
+                  📊 프로필 &gt; 스탯에서 할당 포인트를 사용할 수 있어요!
                 </p>
               </div>
             </div>

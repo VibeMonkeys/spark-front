@@ -18,6 +18,11 @@ export const api = axios.create({
 // 요청 인터셉터 - JWT 토큰 자동 추가
 api.interceptors.request.use(
   (config) => {
+    // 디버깅용 URL 로깅
+    console.log('🌐 [API] Request URL:', config.url);
+    console.log('🌐 [API] Base URL:', config.baseURL);
+    console.log('🌐 [API] Full URL:', axios.getUri(config));
+    
     // 인증 토큰이 있다면 헤더에 추가
     const token = localStorage.getItem('auth_token');
     if (token) {
