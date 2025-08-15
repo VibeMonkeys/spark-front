@@ -302,18 +302,6 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                     </div>
                     <p className="text-xs text-muted-foreground mb-2">{mission.description}</p>
                     
-                    {/* 스탯 보상 정보 */}
-                    <div className="mb-3 p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="text-blue-600 font-medium">🎁 완료 보상</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-green-600">⚡ {getCategoryText(mission.category)} +2</span>
-                          <span className="text-blue-600">🎯 할당 +1</span>
-                        </div>
-                      </div>
-                    </div>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
