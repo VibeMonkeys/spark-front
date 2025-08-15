@@ -71,10 +71,8 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
     queryKey: ['mission-detail', missionId],
     queryFn: async () => {
       if (!missionId) throw new Error('Mission ID is required');
-      console.log('🔍 [MissionVerification] Fetching mission detail for:', missionId);
       try {
         const result = await missionApi.getMissionDetail(missionId);
-        console.log('✅ [MissionVerification] Mission detail loaded:', result);
         return result;
       } catch (error) {
         console.error('❌ [MissionVerification] Failed to load mission detail:', error);
@@ -110,10 +108,6 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
       queryClient.invalidateQueries({ queryKey: ['level-progress', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['story-feed'] }); // 스토리 피드도 새로고침
       
-      console.log('✅ [MissionVerification] Mission verification successful:', verificationResponse);
-      console.log('🎯 [MissionVerification] Points earned:', verificationResponse.points_earned);
-      console.log('🔥 [MissionVerification] Streak count:', verificationResponse.streak_count);
-      console.log('📈 [MissionVerification] Stats increased:', verificationResponse.stats_increased);
       
       const result = {
         pointsEarned: verificationResponse.points_earned,
@@ -129,16 +123,12 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
       console.error('미션 완료 실패:', error);
       
       // 개발 중이므로 API 에러 시에도 성공으로 처리하여 UX 테스트 가능하도록 함
-      console.log('⚠️ 개발 모드: API 에러 시 실제 사용자 데이터로 시뮬레이션 처리');
-      console.log('🎯 [MissionVerification] Mission Data:', missionData);
-      console.log('🎯 [MissionVerification] User Data:', user);
       const simulatedResult = {
         pointsEarned: missionData?.reward_points || 20,
         streakCount: (user?.current_streak || 1) + 1, // 미션 완료 후 연속일 증가
         levelUp: false,
         newLevel: undefined
       };
-      console.log('🎯 [MissionVerification] Simulated Result:', simulatedResult);
       
       // 관련 데이터 새로고침 (시뮬레이션 모드)
       queryClient.invalidateQueries({ queryKey: ['home', user?.id] });
@@ -184,21 +174,17 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
   };
 
   const handleSubmit = () => {
-    console.log('🎯 [handleSubmit] Called with:', { missionId, userId: user?.id, story: story.trim(), selectedImages: selectedImages.length });
     
     if (!missionId || !user?.id) {
-      console.log('❌ [handleSubmit] Missing missionId or userId');
       return;
     }
     
     // 완료 조건 확인 (10글자 이상 스토리 또는 이미지 업로드)
     if (story.trim().length >= 10 || selectedImages.length > 0) {
-      console.log('✅ [handleSubmit] Conditions met, verifying mission...');
       
       // 통합된 미션 인증 API 호출 (미션 완료 + 스토리 생성)
       verifyMissionMutation.mutate();
     } else {
-      console.log('❌ [handleSubmit] Conditions not met - need at least 10 characters or image');
     }
   };
 

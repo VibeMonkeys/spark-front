@@ -108,7 +108,6 @@ export function MissionDetail({
       queryClient.invalidateQueries({ queryKey: ['mission-detail', missionId] });
       queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['missions'] }); // 모든 미션 관련 쿼리 무효화
-      console.log('🚀 [MissionDetail] 미션 시작 성공:', startedMission);
       
       // 성공 알림 표시
       if (onShowNotification) {

@@ -27,7 +27,6 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
   const loginMutation = useMutation({
     mutationFn: authApi.login,
     onSuccess: (response) => {
-      console.log('Login success:', response);
       onSuccess(response);
     },
     onError: (error: any) => {
@@ -45,7 +44,6 @@ export function AuthPage({ onSuccess }: AuthPageProps) {
   const signupMutation = useMutation({
     mutationFn: authApi.signup,
     onSuccess: (response) => {
-      console.log('Signup success:', response);
       onSuccess(response);
     },
     onError: (error: any) => {

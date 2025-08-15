@@ -26,8 +26,6 @@ export function MissionSuccess({
   const queryClient = useQueryClient();
   
   // 디버깅용 로그
-  console.log('🎯 [MissionSuccess] Props:', { pointsEarned, streakCount, levelUp, newLevel });
-  console.log('🎯 [MissionSuccess] User:', user);
   
   const handleViewProfile = () => {
     // 프로필 관련 모든 쿼리 무효화하여 최신 데이터 로드

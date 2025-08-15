@@ -95,15 +95,11 @@ function AppContent() {
   // 미션 시작 API 호출
   const startMissionMutation = useMutation({
     mutationFn: ({ missionId, userId }: { missionId: string; userId: string }) => {
-      console.log('🚀 [App] Starting mission mutation:', { missionId, userId });
-      console.log('🚀 [App] API URL will be:', `http://localhost:8099/api/v1/missions/${missionId}/start?userId=${userId}`);
       return missionApi.startMission(missionId, userId);
     },
     onSuccess: (data) => {
-      console.log('✅ [App] New mission started successfully:', data);
       
       // 성공시 관련 쿼리들을 무효화하여 데이터 새로고침
-      console.log('🔄 [App] Invalidating queries for user:', user?.id);
       queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] }); // 사용자별 진행중 미션
       queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] }); // 오늘의 미션
       queryClient.invalidateQueries({ queryKey: ['missions'] }); // 모든 미션 관련 쿼리 무효화
@@ -117,7 +113,6 @@ function AppContent() {
       );
       
       // 미션 탭으로 이동
-      console.log('🔄 [App] Switching to missions tab');
       setCurrentView("main");
       setActiveTab("missions");
       setSelectedMissionId(null);
@@ -184,7 +179,6 @@ function AppContent() {
   }
 
   const handleMissionStart = () => {
-    console.log('🎯 [App] handleMissionStart called with:', { selectedMissionId, userId: user?.id });
     
     if (!selectedMissionId || !user?.id) {
       console.error('❌ [App] Mission start failed - missing data:', { selectedMissionId, userId: user?.id });
@@ -196,7 +190,6 @@ function AppContent() {
       return;
     }
 
-    console.log('🚀 [App] Calling startMissionMutation.mutate with:', { selectedMissionId, userId: user.id });
     
     // 실제 미션 시작 API 호출
     startMissionMutation.mutate({

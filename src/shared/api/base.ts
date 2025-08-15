@@ -3,8 +3,6 @@ import axios from 'axios';
 // 환경변수에서 API URL 가져오기 (개발환경에서는 프록시 사용)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-console.log('🌐 [API] Base URL:', API_BASE_URL);
-console.log('🔧 [API] Environment:', import.meta.env.MODE);
 
 // API 기본 설정
 export const api = axios.create({
@@ -19,15 +17,11 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // 디버깅용 URL 로깅
-    console.log('🌐 [API] Request URL:', config.url);
-    console.log('🌐 [API] Base URL:', config.baseURL);
-    console.log('🌐 [API] Full URL:', axios.getUri(config));
     
     // 인증 토큰이 있다면 헤더에 추가
     const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('🔐 [API] Adding JWT token to request:', config.url);
     }
     return config;
   },
@@ -86,7 +80,6 @@ api.interceptors.response.use(
       
       if (refreshToken) {
         try {
-          console.log('🔄 [API] Attempting to refresh token...');
           
           // 토큰 갱신 요청 (새로운 axios 인스턴스로 프록시 사용)
           const refreshApi = axios.create({
@@ -104,7 +97,6 @@ api.interceptors.response.use(
             localStorage.setItem('auth_token', token);
             localStorage.setItem('refresh_token', newRefreshToken);
             
-            console.log('✅ [API] Token refreshed successfully');
             
             // 대기 중인 요청들을 새 토큰으로 처리
             processQueue(null, token);

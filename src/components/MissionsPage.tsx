@@ -107,11 +107,8 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
   const { data: ongoingMissionsData = [], isLoading: isLoadingOngoing, error: ongoingError } = useQuery({
     queryKey: ['missions-ongoing', user?.id],
     queryFn: async () => {
-      console.log('🔍 [MissionsPage] Fetching ongoing missions for user:', user?.id);
-      console.log('🔍 [MissionsPage] API URL will be:', `http://localhost:8099/api/v1/missions/ongoing?userId=${user?.id}`);
       try {
         const result = await missionApi.getOngoingMissions(user!.id);
-        console.log('✅ [MissionsPage] Ongoing missions API response:', result);
         return result;
       } catch (error) {
         console.error('❌ [MissionsPage] Failed to load ongoing missions:', error);
@@ -125,10 +122,8 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
   const { data: completedMissionsData, isLoading: isLoadingCompleted, error: completedError } = useQuery({
     queryKey: ['missions-completed', user?.id],
     queryFn: async () => {
-      console.log('🔍 [MissionsPage] Fetching completed missions for user:', user?.id);
       try {
         const result = await missionApi.getCompletedMissions(user!.id, 0, 20);
-        console.log('✅ [MissionsPage] Completed missions API response:', result);
         return result;
       } catch (error) {
         console.error('❌ [MissionsPage] Failed to load completed missions:', error);
@@ -142,7 +137,6 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
   const ongoingMissions = ongoingMissionsData || [];
   const completedMissions = completedMissionsData?.items || [];
   
-  console.log('🔧 [MissionsPage] Final data processing:', {
     ongoingMissionsData,
     ongoingMissions: ongoingMissions.length,
     completedMissionsData,
@@ -150,7 +144,6 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
   });
 
   // 디버깅을 위한 콘솔 로그
-  console.log('📊 [MissionsPage] Render state:', {
     user: user?.id,
     ongoingMissions,
     ongoingMissionsLength: ongoingMissions?.length || 0,
@@ -165,22 +158,16 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
 
   // 조건부 렌더링 디버깅
   if (isLoadingOngoing) {
-    console.log('🔄 [MissionsPage] Currently loading ongoing missions...');
   }
   if (ongoingError) {
-    console.log('❌ [MissionsPage] Error loading ongoing missions:', ongoingError);
   }
   if (ongoingMissions?.length > 0) {
-    console.log('✅ [MissionsPage] Found ongoing missions:', ongoingMissions.length, ongoingMissions);
   } else {
-    console.log('🚫 [MissionsPage] No ongoing missions found, array:', ongoingMissions);
   }
   
   if (isLoadingCompleted) {
-    console.log('🔄 [MissionsPage] Currently loading completed missions...');
   }
   if (completedError) {
-    console.log('❌ [MissionsPage] Error loading completed missions:', completedError);
   }
 
   const renderStars = (rating: number) => {

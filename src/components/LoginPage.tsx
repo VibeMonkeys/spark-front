@@ -46,7 +46,6 @@ export function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: authApi.login,
     onSuccess: (response) => {
-      console.log('Login success:', response);
       login(response);
     },
     onError: (error: any) => {
@@ -64,7 +63,6 @@ export function LoginPage() {
   const signupMutation = useMutation({
     mutationFn: authApi.signup,
     onSuccess: (response) => {
-      console.log('Signup success:', response);
       login(response);
     },
     onError: (error: any) => {
@@ -156,7 +154,6 @@ export function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', { mode, formData });
     
     if (!validateForm()) {
       return;

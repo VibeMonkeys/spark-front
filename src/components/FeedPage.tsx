@@ -259,7 +259,6 @@ export function FeedPage() {
               className="bg-white/60 backdrop-blur-sm"
               onClick={() => {
                 // TODO: 다음 페이지 로드 기능 구현
-                console.log('Load more stories');
               }}
             >
               더 많은 스토리 보기

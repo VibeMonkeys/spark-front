@@ -146,9 +146,6 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
   };
 
   // 디버깅 로그
-  console.log('🏠 [HomePage] User data:', user);
-  console.log('🏠 [HomePage] Level progress:', levelProgress);
-  console.log('🏠 [HomePage] UserSummary:', userSummary);
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50">

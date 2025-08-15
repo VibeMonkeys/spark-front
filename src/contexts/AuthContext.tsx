@@ -60,7 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         if (savedUser && savedToken && savedRefreshToken) {
           // 저장된 인증 정보가 있으면 복원
-          console.log('🔄 [AuthContext] Restoring saved JWT auth state');
           const user = JSON.parse(savedUser);
           setUser(user);
           setToken(savedToken);
@@ -69,7 +68,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // JWT 토큰으로 최신 사용자 데이터 업데이트 시도
           try {
             const freshUser = await userApi.getUser(user.id);
-            console.log('✅ [AuthContext] Updated user data with JWT:', freshUser);
             setUser(freshUser);
             localStorage.setItem('current_user', JSON.stringify(freshUser));
           } catch (error) {
@@ -79,7 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else {
           // 저장된 인증 정보가 없으면 로그아웃 상태로 유지
-          console.log('ℹ️ [AuthContext] No saved auth state - user needs to login');
           // 인증 관련 저장소 정리
           localStorage.removeItem('current_user');
           localStorage.removeItem('auth_token');
@@ -100,7 +97,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (authData: AuthResponse) => {
-    console.log('🔐 [AuthContext] Logging in user with JWT:', authData.user.email);
     
     setUser(authData.user);
     setToken(authData.token);
@@ -111,7 +107,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('auth_token', authData.token);
     localStorage.setItem('refresh_token', authData.refreshToken);
     
-    console.log('✅ [AuthContext] JWT tokens saved to localStorage');
   };
 
   const logout = async () => {
@@ -119,14 +114,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // 서버에 로그아웃 요청 (refresh token으로)
       if (refreshToken) {
         await authApi.logout();
-        console.log('✅ [AuthContext] Server logout successful');
       }
     } catch (error) {
       console.error('⚠️ [AuthContext] Logout API call failed:', error);
       // API 호출이 실패해도 로컬에서는 로그아웃 처리
     }
     
-    console.log('🚪 [AuthContext] Logging out and clearing JWT tokens');
     
     // 로컬 상태 및 저장소 정리
     setUser(null);
