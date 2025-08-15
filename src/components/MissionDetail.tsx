@@ -213,11 +213,16 @@ export function MissionDetail({
                   {getCategoryText(missionData.category)}
                 </Badge>
               </div>
-              <div className="absolute top-4 right-4">
+              <div className="absolute top-4 right-4 flex flex-col gap-2">
                 <div className="bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full px-3 py-1.5 shadow-lg">
                   <span className="text-sm font-bold flex items-center gap-1">
                     <Trophy className="size-4" />
                     +{missionData.reward_points}P
+                  </span>
+                </div>
+                <div className="bg-blue-500/90 text-white rounded-full px-3 py-1 shadow-lg">
+                  <span className="text-xs font-medium flex items-center gap-1">
+                    ⚡ {getCategoryText(missionData.category)} +2
                   </span>
                 </div>
               </div>

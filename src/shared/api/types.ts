@@ -257,3 +257,75 @@ export interface MissionVerificationRequest {
   isPublic: boolean;
   userTags: string[];
 }
+
+// 스탯 관련 타입들
+export interface StatGrade {
+  name: string;
+  displayName: string;
+  minValue: number;
+  maxValue: number;
+  color: string;
+}
+
+export interface StatValue {
+  current: number;
+  allocated: number;
+  base: number;
+  grade: StatGrade;
+  displayName: string;
+  icon: string;
+  color: string;
+}
+
+export interface DominantStat {
+  type: string;
+  displayName: string;
+  value: number;
+  icon: string;
+  color: string;
+}
+
+export interface UserStats {
+  userId: string;
+  strength: StatValue;
+  intelligence: StatValue;
+  creativity: StatValue;
+  sociability: StatValue;
+  adventurous: StatValue;
+  discipline: StatValue;
+  availablePoints: number;
+  totalEarnedPoints: number;
+  totalStats: number;
+  averageStatValue: number;
+  dominantStat: DominantStat;
+  lastUpdatedAt: string;
+  createdAt: string;
+}
+
+export interface StatsRankingItem {
+  rank: number;
+  userId: string;
+  username: string;
+  avatarUrl?: string;
+  statValue: number;
+  statType?: string;
+  totalStats: number;
+}
+
+export interface UserRankingInfo {
+  userId: string;
+  totalStatsRank: number;
+  strengthRank: number;
+  intelligenceRank: number;
+  creativityRank: number;
+  sociabilityRank: number;
+  adventurousRank: number;
+  disciplineRank: number;
+  totalUsers: number;
+}
+
+// 스탯 관련 요청 타입들
+export interface AllocateStatPointsRequest {
+  statType: string;
+  points: number;
+}

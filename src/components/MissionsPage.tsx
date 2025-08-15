@@ -283,6 +283,9 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                       <div className="bg-white/90 rounded-full px-2 py-1">
                         <span className="text-xs text-purple-600 font-medium">+{mission.reward_points}P</span>
                       </div>
+                      <div className="bg-blue-500/90 rounded-full px-2 py-1">
+                        <span className="text-xs text-white font-medium">⚡+2</span>
+                      </div>
                     </div>
                     {mission.progress > 0 && (
                       <div className="absolute bottom-3 left-3 right-3">
@@ -297,7 +300,21 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                         {getDifficultyText(mission.difficulty)}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-3">{mission.description}</p>
+                    <p className="text-xs text-muted-foreground mb-2">{mission.description}</p>
+                    
+                    {/* 스탯 보상 정보 */}
+                    <div className="mb-3 p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="text-blue-600 font-medium">🎁 완료 보상</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">⚡ {getCategoryText(mission.category)} +2</span>
+                          <span className="text-blue-600">🎯 할당 +1</span>
+                        </div>
+                      </div>
+                    </div>
+                    
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
                         <div className="flex items-center gap-1">
@@ -378,13 +395,26 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground mb-3">{mission.description}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>+{mission.reward_points}P 획득</span>
-                        <span>•</span>
-                        <span>{getDifficultyText(mission.difficulty)}</span>
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <span>+{mission.reward_points}P 획득</span>
+                          <span>•</span>
+                          <span>{getDifficultyText(mission.difficulty)}</span>
+                        </div>
+                        <span className="text-xs text-green-600 font-medium">완료</span>
                       </div>
-                      <span className="text-xs text-green-600 font-medium">완료</span>
+                      
+                      {/* 획득한 스탯 보상 표시 */}
+                      <div className="mt-2 p-2 bg-green-50 rounded-lg border border-green-100">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-green-700 font-medium">✅ 획득한 보상</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-green-600">⚡ {getCategoryText(mission.category)} +2</span>
+                            <span className="text-blue-600">🎯 할당 +1</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

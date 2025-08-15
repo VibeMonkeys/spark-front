@@ -10,6 +10,7 @@ import { userApi, levelApi } from "../shared/api";
 import { LevelProgress } from "./LevelProgress";
 import { LevelSystemModal } from "./LevelSystemModal";
 import { ConfirmModal } from "./ui/confirm-modal";
+import { StatsSection } from "./StatsSection";
 import { useState } from "react";
 
 
@@ -130,6 +131,9 @@ export function ProfilePage() {
             />
           )}
         </div>
+
+        {/* RPG Stats Section */}
+        <StatsSection className="mb-6" />
 
         {/* Stats Overview */}
         <section className="mb-6">

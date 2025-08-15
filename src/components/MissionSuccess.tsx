@@ -69,6 +69,44 @@ export function MissionSuccess({
               </div>
             </div>
 
+            {/* 스탯 보상 표시 */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200 mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  🎁
+                </div>
+                <h4 className="font-semibold text-sm text-gray-800">스탯 보상 획득!</h4>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-2 p-3 bg-white/60 rounded-lg">
+                  <div className="bg-green-100 p-2 rounded-full">
+                    <span className="text-lg">⚡</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700">자동 스탯 증가</p>
+                    <p className="text-xs text-gray-500">카테고리별 +2P</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 p-3 bg-white/60 rounded-lg">
+                  <div className="bg-blue-100 p-2 rounded-full">
+                    <span className="text-lg">🎯</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700">할당 포인트</p>
+                    <p className="text-xs text-gray-500">자유 배분 +1P</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-3 pt-2 border-t border-blue-100 text-center">
+                <p className="text-xs text-blue-600 font-medium">
+                  📊 프로필 > 스탯에서 할당 포인트를 사용할 수 있어요!
+                </p>
+              </div>
+            </div>
+
             {/* Level Up Notification */}
             {levelUp && newLevel && (
               <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg p-4 mb-4">

@@ -258,8 +258,13 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
                       </div>
                       
                       {/* Right: Points */}
-                      <div className="flex items-center gap-1 bg-gray-100 text-gray-700 rounded-lg px-3 py-1.5 border border-gray-200">
-                        <span className="text-sm font-semibold">+{mission.reward_points}P</span>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 bg-gray-100 text-gray-700 rounded-lg px-3 py-1.5 border border-gray-200">
+                          <span className="text-sm font-semibold">+{mission.reward_points}P</span>
+                        </div>
+                        <div className="flex items-center gap-1 bg-blue-100 text-blue-700 rounded-lg px-3 py-1.5 border border-blue-200">
+                          <span className="text-sm font-semibold">스탯+2</span>
+                        </div>
                       </div>
                     </div>
                     
