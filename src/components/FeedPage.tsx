@@ -137,7 +137,7 @@ export function FeedPage() {
               variant={filter === "latest" ? "default" : "outline"}
               size="sm"
               onClick={() => setFilter("latest")}
-              className={filter === "latest" ? "bg-purple-500 hover:bg-purple-600" : ""}
+              className={filter === "latest" ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
             >
               최신순
             </Button>
@@ -145,7 +145,7 @@ export function FeedPage() {
               variant={filter === "popular" ? "default" : "outline"}
               size="sm"
               onClick={() => setFilter("popular")}
-              className={filter === "popular" ? "bg-purple-500 hover:bg-purple-600" : ""}
+              className={filter === "popular" ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
             >
               <TrendingUp className="size-4 mr-1" />
               인기순
@@ -177,11 +177,11 @@ export function FeedPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-sm">{story.user.name}</span>
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="secondary" className="text-xs border border-gray-200 bg-gray-50">
                             {story.user.level}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-gray-400">
                           {story.time_ago} • {story.location || '위치 미정'}
                         </p>
                       </div>

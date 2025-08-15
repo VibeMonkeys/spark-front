@@ -366,19 +366,41 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
             <CardContent className="p-3">
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-muted-foreground">완료 조건</span>
-                <span className="font-medium">
-                  {story.trim().length >= 10 || selectedImages.length > 0 ? "✅ 완료" : "❌ 미완료"}
-                </span>
+                <div className="flex items-center gap-1 font-medium">
+                  {story.trim().length >= 10 || selectedImages.length > 0 ? (
+                    <>
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-green-600">완료</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                      <span className="text-orange-600">미완료</span>
+                    </>
+                  )}
+                </div>
               </div>
               <div className="text-xs text-muted-foreground mb-2">
                 {story.trim().length >= 10 && selectedImages.length > 0 ? (
-                  <span className="text-green-600 font-medium">🎉 사진과 스토리 모두 완료! 훌륭해요!</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-green-600 font-medium">사진과 스토리 모두 완료! 훌륭해요!</span>
+                  </div>
                 ) : story.trim().length >= 10 ? (
-                  <span className="text-green-600 font-medium">✍️ 스토리 작성 완료 ({story.trim().length}자)</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-green-600 font-medium">스토리 작성 완료 ({story.trim().length}자)</span>
+                  </div>
                 ) : selectedImages.length > 0 ? (
-                  <span className="text-green-600 font-medium">📸 사진 업로드 완료 ({selectedImages.length}장)</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    <span className="text-green-600 font-medium">사진 업로드 완료 ({selectedImages.length}장)</span>
+                  </div>
                 ) : (
-                  <span className="text-orange-600">📝 사진 업로드 또는 10자 이상 스토리 작성 필요</span>
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                    <span className="text-orange-600">사진 업로드 또는 10자 이상 스토리 작성 필요</span>
+                  </div>
                 )}
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
@@ -392,8 +414,8 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
               {(story.trim().length < 10 && selectedImages.length === 0) && (
                 <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg mb-4">
                   <p className="text-sm text-orange-700 text-center">
-                    💡 <span className="font-medium">미션을 완료하려면</span><br />
-                    📸 사진을 업로드하거나 ✍️ 10자 이상의 스토리를 작성해주세요
+                    <span className="font-medium">미션을 완료하려면</span><br />
+                    사진을 업로드하거나 10자 이상의 스토리를 작성해주세요
                   </p>
                 </div>
               )}
@@ -408,7 +430,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
                 <Send className="size-5 mr-2" />
                 <span className="font-bold">
                   {verifyMissionMutation.isPending ? "미션 인증 중..." :
-                   (story.trim().length >= 10 || selectedImages.length > 0) ? "🎉 미션 완료 & 피드 공유" : "미션 완료하기"}
+                   (story.trim().length >= 10 || selectedImages.length > 0) ? "미션 완료 & 피드 공유" : "미션 완료하기"}
                 </span>
                 {(story.trim().length >= 10 || selectedImages.length > 0) && !verifyMissionMutation.isPending && (
                   <span className="ml-2">→</span>
