@@ -200,12 +200,11 @@ export interface RewardsPageResponse {
 }
 
 export interface CategoryStatResponse {
-  category: string;
-  displayName: string;
-  completedCount: number;
-  successRate: number;
-  totalPoints: number;
-  averageRating: number;
+  name: string;
+  completed: number;
+  total: number;
+  percentage: number;
+  color: string;
 }
 
 export interface MissionVerificationResponse {

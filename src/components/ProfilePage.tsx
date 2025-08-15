@@ -7,12 +7,13 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Settings, Star, Flame, Trophy, Calendar, Target, TrendingUp, Gift, LogOut, Info, User, BarChart3, Award, Activity } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { userApi, levelApi, achievementApi } from "../shared/api";
+import { userApi, levelApi, achievementApi, missionApi } from "../shared/api";
 import { LevelProgress } from "./LevelProgress";
 import { LevelSystemModal } from "./LevelSystemModal";
 import { ConfirmModal } from "./ui/confirm-modal";
 import { StatsSection } from "./StatsSection";
 import { useState } from "react";
+
 
 
 export function ProfilePage() {
@@ -39,6 +40,20 @@ export function ProfilePage() {
   const { data: achievements, isLoading: isLoadingAchievements } = useQuery({
     queryKey: ['achievements', user?.id],
     queryFn: () => achievementApi.getUserAchievements(),
+    enabled: !!user?.id,
+  });
+
+  // 카테고리별 통계 조회
+  const { data: categoryStatistics } = useQuery({
+    queryKey: ['category-statistics', user?.id],
+    queryFn: () => missionApi.getCategoryStatistics(user!.id),
+    enabled: !!user?.id,
+  });
+
+  // 최근 완료한 미션 조회
+  const { data: recentCompletedMissions } = useQuery({
+    queryKey: ['missions-completed-recent', user?.id],
+    queryFn: () => missionApi.getCompletedMissions(user!.id, 0, 5),
     enabled: !!user?.id,
   });
 
@@ -77,9 +92,13 @@ export function ProfilePage() {
 
   const userData = profileData.user;
   const userStatistics = profileData.statistics;
-  const categoryStats = userData.statistics?.category_stats || [];
   const achievementsData = achievements || [];
-  const recentMissions = profileData.recent_missions;
+  
+  // 카테고리별 통계 데이터 (백엔드에서 이미 변환된 데이터 사용)
+  const categoryStats = categoryStatistics || [];
+  
+  // 최근 완료한 미션 데이터
+  const recentMissions = recentCompletedMissions?.items || [];
 
   // 다음 레벨까지 진행도 계산 (임시 계산법)
   const nextLevelPoints = (userData.level + 1) * 1000;
@@ -329,18 +348,22 @@ export function ProfilePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {categoryStats.map((category) => (
-                  <div key={category.name} className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className={`size-3 rounded-full ${category.color}`} />
-                        <span>{category.name}</span>
+                {categoryStats.length > 0 ? (
+                  categoryStats.map((category) => (
+                    <div key={category.name} className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className={`size-3 rounded-full ${category.color}`} />
+                          <span>{category.name}</span>
+                        </div>
+                        <span className="font-medium">{category.completed}개</span>
                       </div>
-                      <span className="font-medium">{category.completed}개</span>
+                      <Progress value={category.percentage} className="h-1.5" />
                     </div>
-                    <Progress value={category.percentage} className="h-1.5" />
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-4">카테고리별 통계를 불러오는 중...</p>
+                )}
               </CardContent>
             </Card>
             
@@ -355,30 +378,33 @@ export function ProfilePage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {recentMissions.map((mission) => (
-                  <div key={mission.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors">
-                    <ImageWithFallback
-                      src={mission.image_url || "https://images.unsplash.com/photo-1584515501397-335d595b2a17?w=400"}
-                      alt={mission.title}
-                      className="size-10 rounded-lg object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium truncate">{mission.title}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="secondary" className="text-xs">
-                          {mission.category}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">{mission.completed_at}</span>
+                {recentMissions.length > 0 ? (
+                  recentMissions.map((mission) => (
+                    <div key={mission.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/50 transition-colors">
+                      <ImageWithFallback
+                        src={mission.image_url || "https://images.unsplash.com/photo-1584515501397-335d595b2a17?w=400"}
+                        alt={mission.title}
+                        className="size-10 rounded-lg object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium truncate">{mission.title}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge variant="secondary" className="text-xs">
+                            {mission.category}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-1 text-blue-600">
+                          <Star className="size-3 fill-current" />
+                          <span className="text-xs font-medium">+{mission.reward_points}P</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-blue-600">
-                        <Star className="size-3 fill-current" />
-                        <span className="text-xs font-medium">+{mission.points}P</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-4">완료한 미션이 없습니다</p>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
