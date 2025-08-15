@@ -121,18 +121,30 @@ export const missionApi = {
     isPublic: boolean;
     userTags: string[];
   }): Promise<{
-    storyId: string;
-    pointsEarned: number;
-    streakCount: number;
-    levelUp?: boolean;
-    newLevel?: number;
+    story_id: string;
+    points_earned: number;
+    streak_count: number;
+    level_up?: boolean;
+    new_level?: number;
+    stats_increased?: {
+      category: string;
+      pointsGained: number;
+      allocatablePointsGained: number;
+      totalStats: number;
+    };
   }> => {
     const response = await api.post<ApiResponse<{
-      storyId: string;
-      pointsEarned: number;
-      streakCount: number;
-      levelUp?: boolean;
-      newLevel?: number;
+      story_id: string;
+      points_earned: number;
+      streak_count: number;
+      level_up?: boolean;
+      new_level?: number;
+      stats_increased?: {
+        category: string;
+        pointsGained: number;
+        allocatablePointsGained: number;
+        totalStats: number;
+      };
     }>>(`/missions/${missionId}/verify`, {
       mission_id: missionId,
       story: verificationData.story,

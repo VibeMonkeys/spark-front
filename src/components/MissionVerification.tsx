@@ -111,12 +111,15 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
       queryClient.invalidateQueries({ queryKey: ['story-feed'] }); // 스토리 피드도 새로고침
       
       console.log('✅ [MissionVerification] Mission verification successful:', verificationResponse);
+      console.log('🎯 [MissionVerification] Points earned:', verificationResponse.points_earned);
+      console.log('🔥 [MissionVerification] Streak count:', verificationResponse.streak_count);
+      console.log('📈 [MissionVerification] Stats increased:', verificationResponse.stats_increased);
       
       const result = {
-        pointsEarned: verificationResponse.pointsEarned,
-        streakCount: verificationResponse.streakCount,
-        levelUp: verificationResponse.levelUp,
-        newLevel: verificationResponse.newLevel
+        pointsEarned: verificationResponse.points_earned,
+        streakCount: verificationResponse.streak_count,
+        levelUp: verificationResponse.level_up,
+        newLevel: verificationResponse.new_level
       };
       
       // 성공 화면으로 이동

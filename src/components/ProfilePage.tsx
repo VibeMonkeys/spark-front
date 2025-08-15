@@ -241,7 +241,7 @@ export function ProfilePage() {
                 {achievementsData.map((achievement) => (
                   <Card
                     key={achievement.id}
-                    className={`relative overflow-hidden border-0 transition-all duration-300 hover:scale-105 ${
+                    className={`relative overflow-hidden border-0 transition-all duration-300 hover:scale-105 h-40 ${
                       achievement.isUnlocked
                         ? "bg-white shadow-lg"
                         : "bg-gray-50 opacity-60"
@@ -255,9 +255,9 @@ export function ProfilePage() {
                       />
                       
                       {/* Achievement Icon */}
-                      <div className="flex items-center justify-center mb-3">
+                      <div className="flex items-center justify-center mb-2">
                         <div 
-                          className={`size-12 rounded-full flex items-center justify-center text-xl ${
+                          className={`size-10 rounded-full flex items-center justify-center text-lg ${
                             achievement.isUnlocked 
                               ? "bg-gradient-to-br from-blue-50 to-purple-50" 
                               : "bg-gray-100"
@@ -274,7 +274,7 @@ export function ProfilePage() {
                         }`}>
                           {achievement.name}
                         </h4>
-                        <p className="text-xs text-gray-500 leading-relaxed">
+                        <p className="text-xs text-gray-500 leading-tight line-clamp-2">
                           {achievement.description}
                         </p>
                         
@@ -292,22 +292,15 @@ export function ProfilePage() {
                         )}
                         
                         {/* Unlock Status */}
-                        <div className="flex items-center justify-center mt-2">
-                          {achievement.isUnlocked ? (
+                        {achievement.isUnlocked && (
+                          <div className="flex items-center justify-center mt-1">
                             <Badge 
-                              className="text-xs px-2 py-1 bg-green-100 text-green-700 border-green-200"
+                              className="text-xs px-2 py-0.5 bg-green-100 text-green-700 border-green-200"
                             >
                               ✓ 달성완료
                             </Badge>
-                          ) : (
-                            <Badge 
-                              variant="outline" 
-                              className="text-xs px-2 py-1 text-gray-500 border-gray-300"
-                            >
-                              미달성
-                            </Badge>
-                          )}
-                        </div>
+                          </div>
+                        )}
                         
                         {/* Rarity Badge */}
                         <div className="absolute top-2 right-2">

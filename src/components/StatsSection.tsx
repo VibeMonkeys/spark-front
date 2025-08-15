@@ -194,19 +194,18 @@ export function StatsSection({ className }: StatsSectionProps) {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-xl flex items-center gap-2 text-gray-900">
+              <CardTitle className="text-xl flex items-center gap-2">
                 <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
                   <Star className="size-3 text-white" />
                 </div>
-                능력치
+                <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent font-bold">
+                  능력치
+                </span>
               </CardTitle>
               <CardDescription className="mt-1 text-gray-600 flex items-center gap-2">
                 <Trophy className="size-3" />
                 총 스탯: {userStats.totalStats}
               </CardDescription>
-              <div className="mt-2 text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded">
-                💡 미션 완료시: 카테고리별 스탯 자동 +1, 할당 포인트 +2
-              </div>
             </div>
             {userStats.availablePoints > 0 && (
               <div className="text-right">
@@ -232,6 +231,38 @@ export function StatsSection({ className }: StatsSectionProps) {
               }
               return renderStatItem(key, stat);
             }).filter(Boolean)}
+          </div>
+
+          {/* 보상 정보 카드 */}
+          <div className="mt-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200/50">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="bg-blue-100 p-2 rounded-full">
+                🎁
+              </div>
+              <h4 className="font-semibold text-sm text-gray-800">미션 완료 보상</h4>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-2 p-3 bg-white/60 rounded-lg">
+                <div className="bg-green-100 p-2 rounded-full">
+                  <span className="text-lg">⚡</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-700">자동 증가</p>
+                  <p className="text-xs text-gray-500">카테고리별 +1</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 p-3 bg-white/60 rounded-lg">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <span className="text-lg">🎯</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-700">할당 포인트</p>
+                  <p className="text-xs text-gray-500">자유 배분 +2</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* 하단 정보 */}

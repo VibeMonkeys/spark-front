@@ -209,11 +209,17 @@ export interface CategoryStatResponse {
 }
 
 export interface MissionVerificationResponse {
-  storyId: string;
-  pointsEarned: number;
-  streakCount: number;
-  levelUp: boolean;
-  newLevel?: number;
+  story_id: string;
+  points_earned: number;
+  streak_count: number;
+  level_up: boolean;
+  new_level?: number;
+  stats_increased?: {
+    category: string;
+    pointsGained: number;
+    allocatablePointsGained: number;
+    totalStats: number;
+  };
 }
 
 export interface MissionCompletionResponse {
