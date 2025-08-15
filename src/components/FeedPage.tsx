@@ -42,24 +42,75 @@ export function FeedPage() {
     enabled: !!user?.id,
   });
 
-  // 좋아요 토글 mutation
+  // 좋아요 토글 mutation (낙관적 업데이트 포함)
   const likeMutation = useMutation({
-    mutationFn: ({ storyId, isLiked }: { storyId: string; isLiked: boolean }) => {
+    mutationFn: async ({ storyId, isLiked }: { storyId: string; isLiked: boolean }) => {
       if (!user?.id) throw new Error('User not authenticated');
-      return isLiked 
-        ? storyApi.unlikeStory(storyId, user.id)
-        : storyApi.likeStory(storyId, user.id);
+      
+      const result = isLiked 
+        ? await storyApi.unlikeStory(storyId, user.id)
+        : await storyApi.likeStory(storyId, user.id);
+      
+      return result;
     },
-    onSuccess: () => {
-      // 피드 데이터 새로고침
-      queryClient.invalidateQueries({ queryKey: ['story-feed'] });
+    onMutate: async ({ storyId, isLiked }) => {
+      // 진행 중인 쿼리를 취소하여 낙관적 업데이트가 덮어쓰이지 않도록 함
+      await queryClient.cancelQueries({ queryKey: ['story-feed', filter, user?.id] });
+      
+      // 이전 상태 저장 (롤백용)
+      const previousData = queryClient.getQueryData(['story-feed', filter, user?.id]);
+      
+      // 낙관적으로 피드 데이터 업데이트
+      queryClient.setQueryData(['story-feed', filter, user?.id], (old: any) => {
+        if (!old?.items) return old;
+        
+        return {
+          ...old,
+          items: old.items.map((story: StoryFeedItem) => {
+            if (story.id === storyId) {
+              return {
+                ...story,
+                is_liked: !isLiked,
+                likes: isLiked ? story.likes - 1 : story.likes + 1
+              };
+            }
+            return story;
+          })
+        };
+      });
+      
+      return { previousData };
     },
-    onError: (error: any) => {
-      console.error('Like/unlike failed:', error);
+    onSuccess: (data, variables) => {
+      // 서버 응답으로 캐시를 정확히 업데이트
+      queryClient.setQueryData(['story-feed', filter, user?.id], (old: any) => {
+        if (!old?.items) return old;
+        
+        return {
+          ...old,
+          items: old.items.map((story: StoryFeedItem) => {
+            if (story.id === variables.storyId) {
+              return {
+                ...story,
+                likes: data.likes,
+                is_liked: data.is_liked
+              };
+            }
+            return story;
+          })
+        };
+      });
+    },
+    onError: (error: any, variables, context) => {
+      // 오류 발생 시 이전 데이터로 롤백
+      if (context?.previousData) {
+        queryClient.setQueryData(['story-feed', filter, user?.id], context.previousData);
+      }
     }
   });
 
   const handleLike = (storyId: string, isCurrentlyLiked: boolean) => {
+    if (!user?.id) return;
     likeMutation.mutate({ storyId, isLiked: isCurrentlyLiked });
   };
 
@@ -226,23 +277,39 @@ export function FeedPage() {
                         <button
                           onClick={() => handleLike(story.id, story.is_liked)}
                           disabled={likeMutation.isPending}
-                          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-50"
+                          className={`
+                            flex items-center gap-1 text-sm transition-all duration-200 disabled:opacity-50
+                            ${story.is_liked 
+                              ? 'text-red-500 hover:text-red-600' 
+                              : 'text-muted-foreground hover:text-red-500'
+                            }
+                            ${likeMutation.isPending ? 'animate-pulse' : 'hover:scale-105'}
+                          `}
                         >
                           <Heart 
-                            className={`size-4 ${story.is_liked ? 'text-red-500 fill-current' : ''}`} 
+                            className={`
+                              size-4 transition-all duration-200
+                              ${story.is_liked ? 'text-red-500 fill-current scale-110' : 'hover:scale-110'} 
+                              ${likeMutation.isPending ? 'animate-bounce' : ''}
+                            `} 
                           />
-                          <span>{story.likes}</span>
+                          <span className={`
+                            font-medium transition-all duration-200
+                            ${story.is_liked ? 'text-red-500' : ''}
+                          `}>
+                            {story.likes}
+                          </span>
                         </button>
-                        <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-blue-500 transition-colors">
-                          <MessageCircle className="size-4" />
-                          <span>{story.comments}</span>
+                        <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-blue-500 transition-colors hover:scale-105 duration-200">
+                          <MessageCircle className="size-4 hover:scale-110 transition-transform duration-200" />
+                          <span className="font-medium">{story.comments}</span>
                         </button>
                       </div>
                       <button 
                         onClick={() => handleShare(story.id)}
-                        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-purple-500 transition-colors"
+                        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-purple-500 transition-all duration-200 hover:scale-105"
                       >
-                        <Share className="size-4" />
+                        <Share className="size-4 hover:scale-110 transition-transform duration-200" />
                       </button>
                     </div>
                   </div>
