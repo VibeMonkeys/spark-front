@@ -51,7 +51,7 @@ export const storyApi = {
     if (category) params.append('category', category);
     if (userId) params.append('userId', userId);
     
-    const response = await api.get<ApiResponse<PagedResponse<StoryFeedItem>>>(`/stories/feed?${params}`);
+    const response = await api.get<ApiResponse<PagedResponse<any>>>(`/stories/feed?${params}`);
     if (!response.data.success) {
       throw new Error(response.data.error?.message || 'Failed to fetch story feed');
     }

@@ -10,21 +10,24 @@ import { useAuth } from "../contexts/AuthContext";
 
 interface StoryFeedItem {
   id: string;
-  userId: string;
-  userName: string;
-  userAvatarUrl: string;
-  userLevel: string;
-  missionId: string;
-  missionTitle: string;
-  missionCategory: string;
-  storyText: string;
+  user: {
+    name: string;
+    avatar_url: string;
+    level: string;
+  };
+  mission: {
+    title: string;
+    category: string;
+    category_color: string;
+  };
+  story: string;
   images: string[];
   location: string;
-  likeCount: number;
-  commentCount: number;
-  isLikedByCurrentUser: boolean;
-  hashTags: string[];
-  createdAt: string;
+  tags: string[];
+  likes: number;
+  comments: number;
+  time_ago: string;
+  is_liked: boolean;
 }
 
 export function FeedPage() {
@@ -75,43 +78,7 @@ export function FeedPage() {
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'ADVENTURE':
-      case 'ADVENTUROUS':
-        return 'bg-orange-500';
-      case 'SOCIAL':
-        return 'bg-blue-500';
-      case 'HEALTH':
-      case 'HEALTHY':
-        return 'bg-green-500';
-      case 'CREATIVE':
-        return 'bg-purple-500';
-      case 'LEARNING':
-        return 'bg-indigo-500';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-
-  const getCategoryDisplayName = (category: string) => {
-    switch (category) {
-      case 'ADVENTURE':
-      case 'ADVENTUROUS':
-        return '모험적';
-      case 'SOCIAL':
-        return '사교적';
-      case 'HEALTH':
-      case 'HEALTHY':
-        return '건강';
-      case 'CREATIVE':
-        return '창의적';
-      case 'LEARNING':
-        return '학습';
-      default:
-        return category;
-    }
-  };
+  // getCategoryDisplayName 함수는 더 이상 사용하지 않음 (백엔드에서 한글 카테고리명 직접 제공)
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -150,7 +117,7 @@ export function FeedPage() {
     );
   }
 
-  const stories = feedData?.data || [];
+  const stories = feedData?.items || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50">
@@ -203,25 +170,25 @@ export function FeedPage() {
                   <div className="p-4 pb-3">
                     <div className="flex items-center gap-3 mb-3">
                       <ImageWithFallback
-                        src={story.userAvatarUrl}
-                        alt={story.userName}
+                        src={story.user.avatar_url}
+                        alt={story.user.name}
                         className="size-10 rounded-full object-cover"
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">{story.userName}</span>
+                          <span className="font-semibold text-sm">{story.user.name}</span>
                           <Badge variant="secondary" className="text-xs">
-                            {story.userLevel}
+                            {story.user.level}
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {formatTimeAgo(story.createdAt)} • {story.location || '위치 미정'}
+                          {story.time_ago} • {story.location || '위치 미정'}
                         </p>
                       </div>
                     </div>
                     
-                    <Badge className={`${getCategoryColor(story.missionCategory)} text-white border-0 text-xs`}>
-                      {getCategoryDisplayName(story.missionCategory)} • {story.missionTitle}
+                    <Badge className={`${story.mission.category_color} text-white border-0 text-xs`}>
+                      {story.mission.category} • {story.mission.title}
                     </Badge>
                   </div>
 
@@ -239,13 +206,13 @@ export function FeedPage() {
                   {/* Content */}
                   <div className="p-4">
                     <p className="text-sm text-foreground/90 leading-relaxed mb-2">
-                      {story.storyText}
+                      {story.story}
                     </p>
                     
                     {/* Hash Tags */}
-                    {story.hashTags && story.hashTags.length > 0 && (
+                    {story.tags && story.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-4">
-                        {story.hashTags.map((tag, index) => (
+                        {story.tags.map((tag, index) => (
                           <span key={index} className="text-xs text-blue-600 hover:text-blue-700">
                             #{tag}
                           </span>
@@ -257,18 +224,18 @@ export function FeedPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <button
-                          onClick={() => handleLike(story.id, story.isLikedByCurrentUser)}
+                          onClick={() => handleLike(story.id, story.is_liked)}
                           disabled={likeMutation.isPending}
                           className="flex items-center gap-1 text-sm text-muted-foreground hover:text-red-500 transition-colors disabled:opacity-50"
                         >
                           <Heart 
-                            className={`size-4 ${story.isLikedByCurrentUser ? 'text-red-500 fill-current' : ''}`} 
+                            className={`size-4 ${story.is_liked ? 'text-red-500 fill-current' : ''}`} 
                           />
-                          <span>{story.likeCount}</span>
+                          <span>{story.likes}</span>
                         </button>
                         <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-blue-500 transition-colors">
                           <MessageCircle className="size-4" />
-                          <span>{story.commentCount}</span>
+                          <span>{story.comments}</span>
                         </button>
                       </div>
                       <button 
