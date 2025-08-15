@@ -222,7 +222,7 @@ export function MissionDetail({
                 </div>
                 <div className="bg-blue-500/90 text-white rounded-full px-3 py-1 shadow-lg">
                   <span className="text-xs font-medium flex items-center gap-1">
-                    ⚡ {getCategoryText(missionData.category)} +2
+                    ⚡ {getCategoryText(missionData.category)} +1
                   </span>
                 </div>
               </div>

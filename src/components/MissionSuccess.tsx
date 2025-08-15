@@ -99,7 +99,7 @@ export function MissionSuccess({
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-700">자동 스탯 증가</p>
-                    <p className="text-xs text-gray-500">카테고리별 +2P</p>
+                    <p className="text-xs text-gray-500">카테고리별 +1P</p>
                   </div>
                 </div>
                 
@@ -109,7 +109,7 @@ export function MissionSuccess({
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-700">할당 포인트</p>
-                    <p className="text-xs text-gray-500">자유 배분 +1P</p>
+                    <p className="text-xs text-gray-500">자유 배분 +2P</p>
                   </div>
                 </div>
               </div>

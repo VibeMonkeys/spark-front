@@ -204,6 +204,9 @@ export function StatsSection({ className }: StatsSectionProps) {
                 <Trophy className="size-3" />
                 총 스탯: {userStats.totalStats}
               </CardDescription>
+              <div className="mt-2 text-xs text-gray-500 bg-blue-50 px-2 py-1 rounded">
+                💡 미션 완료시: 카테고리별 스탯 자동 +1, 할당 포인트 +2
+              </div>
             </div>
             {userStats.availablePoints > 0 && (
               <div className="text-right">
