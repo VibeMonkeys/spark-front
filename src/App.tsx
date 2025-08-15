@@ -252,10 +252,16 @@ function AppContent() {
         <MissionDetail
           missionId={selectedMissionId}
           onBack={handleBackToMain}
-          onStartMission={handleMissionStart}
+          onStartMission={() => {}} // 빈 함수 - MissionDetail에서 직접 처리
           onVerifyMission={handleMissionVerify}
           onViewMissionDetail={handleMissionSelect}
           isStartingMission={startMissionMutation.isPending}
+          onShowNotification={showNotification}
+          onNavigateToMissions={() => {
+            setCurrentView("main");
+            setActiveTab("missions");
+            setSelectedMissionId(null);
+          }}
         />
       );
     }

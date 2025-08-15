@@ -224,6 +224,22 @@ export interface MissionCompletionResponse {
   new_level?: number;
   total_points: number;
   this_month_points: number;
+  remaining_missions?: Mission[];
+}
+
+// 일일 미션 제한 정보
+export interface DailyMissionLimit {
+  max_daily_starts: number;
+  current_started: number;
+  remaining_starts: number;
+  can_start: boolean;
+  reset_time: string;
+}
+
+// 오늘의 미션 응답 (제한 정보 포함)
+export interface TodaysMissionsResponse {
+  missions: Mission[];
+  daily_limit: DailyMissionLimit;
 }
 
 // 요청 DTO 타입들

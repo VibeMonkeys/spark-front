@@ -1,10 +1,13 @@
+import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { ArrowLeft, Clock, Star, MapPin, Users, Camera, Heart, Trophy, Zap, Calendar, Timer, CheckCircle, PlayCircle, Target } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { missionApi } from "../shared/api";
+import { useAuth } from "../contexts/AuthContext";
+import { MissionLimitIndicator, MissionLimitExceededModal } from "../shared/ui";
 
 interface MissionDetailProps {
   missionId: string | null;
@@ -13,6 +16,8 @@ interface MissionDetailProps {
   onVerifyMission: () => void;
   onViewMissionDetail?: (missionId: string) => void;
   isStartingMission?: boolean;
+  onShowNotification?: (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void;
+  onNavigateToMissions?: () => void;
 }
 
 // 카테고리별 색상 매핑
@@ -64,13 +69,79 @@ const similarMissions = [
   }
 ];
 
-export function MissionDetail({ missionId, onBack, onStartMission, onVerifyMission, onViewMissionDetail, isStartingMission = false }: MissionDetailProps) {
+export function MissionDetail({ 
+  missionId, 
+  onBack, 
+  onStartMission, 
+  onVerifyMission, 
+  onViewMissionDetail, 
+  isStartingMission = false,
+  onShowNotification,
+  onNavigateToMissions
+}: MissionDetailProps) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [showLimitModal, setShowLimitModal] = React.useState(false);
+
   // 미션 상세 데이터 조회
   const { data: missionDetail, isLoading, error } = useQuery({
     queryKey: ['mission-detail', missionId],
     queryFn: () => missionApi.getMissionDetail(missionId!),
     enabled: !!missionId,
   });
+
+  // 일일 제한 정보 조회
+  const { data: dailyLimit } = useQuery({
+    queryKey: ['daily-limit', user?.id],
+    queryFn: () => missionApi.getDailyMissionLimit(user!.id),
+    enabled: !!user?.id,
+  });
+
+
+  // 미션 시작 뮤테이션
+  const startMissionMutation = useMutation({
+    mutationFn: (missionId: string) => missionApi.startMission(missionId, user!.id),
+    onSuccess: (startedMission) => {
+      // 관련 쿼리들 무효화하여 데이터 새로고침
+      queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['daily-limit', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['mission-detail', missionId] });
+      queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['missions'] }); // 모든 미션 관련 쿼리 무효화
+      console.log('🚀 [MissionDetail] 미션 시작 성공:', startedMission);
+      
+      // 성공 알림 표시
+      if (onShowNotification) {
+        onShowNotification(
+          'success',
+          '🎯 미션 시작!',
+          '미션이 시작되었습니다! 미션 탭에서 진행 중인 미션을 확인하고 인증해보세요.'
+        );
+      }
+      
+      // 미션 탭으로 이동
+      if (onNavigateToMissions) {
+        onNavigateToMissions();
+      }
+    },
+    onError: (error: any) => {
+      console.error('❌ [MissionDetail] 미션 시작 실패:', error);
+      // 제한 초과 오류인 경우에만 모달 표시
+      if (error?.response?.data?.error?.code === 'DAILY_LIMIT_EXCEEDED') {
+        setShowLimitModal(true);
+      }
+    },
+  });
+
+  const handleStartMission = () => {
+    if (!missionId) return;
+    
+    if (dailyLimit?.can_start) {
+      startMissionMutation.mutate(missionId);
+    } else {
+      setShowLimitModal(true);
+    }
+  };
 
   if (!missionId) {
     return (
@@ -212,27 +283,51 @@ export function MissionDetail({ missionId, onBack, onStartMission, onVerifyMissi
           </Card>
         </section>
 
+        {/* Daily Limit Info */}
+        {dailyLimit && (
+          <div className="mb-4">
+            <MissionLimitIndicator 
+              limit={dailyLimit} 
+              compact={false}
+              showProgress={true}
+              showBadge={true}
+            />
+          </div>
+        )}
+
         {/* Mission Action Button */}
         <div className="mb-6">
           {!isInProgress ? (
             <Button 
-              onClick={onStartMission}
-              disabled={isStartingMission}
-              className="w-full relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 ease-out h-16 rounded-2xl group"
+              onClick={handleStartMission}
+              disabled={startMissionMutation.isPending || !dailyLimit?.can_start}
+              className={`w-full relative overflow-hidden font-semibold border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 ease-out h-16 rounded-2xl group ${
+                dailyLimit?.can_start 
+                  ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white" 
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
               size="lg"
             >
               {/* 배경 애니메이션 효과 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              
-              {/* 빛나는 효과 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+              {dailyLimit?.can_start && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  {/* 빛나는 효과 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                </>
+              )}
               
               {/* 버튼 내용 */}
               <div className="relative flex items-center justify-center gap-3">
-                {isStartingMission ? (
+                {startMissionMutation.isPending ? (
                   <>
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
                     <span className="text-lg">미션 시작 중...</span>
+                  </>
+                ) : !dailyLimit?.can_start ? (
+                  <>
+                    <span className="text-lg">일일 제한 도달 (3/3)</span>
                   </>
                 ) : (
                   <>
@@ -345,6 +440,16 @@ export function MissionDetail({ missionId, onBack, onStartMission, onVerifyMissi
           </section>
         )}
       </div>
+
+      {/* 제한 초과 모달 */}
+      {dailyLimit && (
+        <MissionLimitExceededModal
+          open={showLimitModal}
+          onOpenChange={setShowLimitModal}
+          limit={dailyLimit}
+          onClose={() => setShowLimitModal(false)}
+        />
+      )}
     </div>
   );
 }

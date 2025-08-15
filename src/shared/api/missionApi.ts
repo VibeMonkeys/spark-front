@@ -5,13 +5,21 @@ import {
   Mission, 
   MissionDetailResponse, 
   CategoryStatResponse,
-  MissionCompletionResponse
+  MissionCompletionResponse,
+  TodaysMissionsResponse,
+  DailyMissionLimit
 } from './types';
 
 export const missionApi = {
-  // 오늘의 미션 조회
-  getTodaysMissions: async (userId: string): Promise<Mission[]> => {
-    const response = await api.get<ApiResponse<Mission[]>>(`/missions/today?userId=${userId}`);
+  // 오늘의 미션 조회 (제한 정보 포함)
+  getTodaysMissions: async (userId: string): Promise<TodaysMissionsResponse> => {
+    const response = await api.get<ApiResponse<TodaysMissionsResponse>>(`/missions/today?userId=${userId}`);
+    return response.data.data;
+  },
+
+  // 일일 미션 시작 제한 정보 조회
+  getDailyMissionLimit: async (userId: string): Promise<DailyMissionLimit> => {
+    const response = await api.get<ApiResponse<DailyMissionLimit>>(`/missions/daily-limit?userId=${userId}`);
     return response.data.data;
   },
 

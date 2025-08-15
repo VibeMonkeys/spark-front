@@ -1,12 +1,14 @@
+import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Clock, Users, Star, Flame, ChevronRight, MapPin, Target, RefreshCw } from "lucide-react";
+import { Clock, Users, Star, Flame, Target, RefreshCw } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { homeApi, missionApi, levelApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
+import { MissionLimitIndicator } from "../shared/ui";
 
 // 카테고리별 색상 매핑
 const getCategoryColor = (category: string) => {
@@ -50,8 +52,8 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // 오늘의 미션 조회 (템플릿 미션)
-  const { data: todaysMissions, isLoading: isLoadingMissions, error: missionsError } = useQuery({
+  // 오늘의 미션 조회 (템플릿 미션 + 제한 정보)
+  const { data: todaysMissionsResponse, isLoading: isLoadingMissions, error: missionsError } = useQuery({
     queryKey: ['missions', 'today', user?.id],
     queryFn: () => missionApi.getTodaysMissions(user!.id),
     enabled: !!user?.id,
@@ -70,20 +72,6 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
     onSuccess: () => {
       // 오늘의 미션 데이터 다시 불러오기
       queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] });
-    },
-  });
-
-  // 미션 시작 뮤테이션
-  const startMissionMutation = useMutation({
-    mutationFn: (missionId: string) => missionApi.startMission(missionId, user!.id),
-    onSuccess: (startedMission) => {
-      // 오늘의 미션 데이터 다시 불러오기
-      queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] });
-      // 성공 메시지 또는 미션 상세 페이지로 이동
-      console.log('미션 시작됨:', startedMission);
-    },
-    onError: (error) => {
-      console.error('미션 시작 실패:', error);
     },
   });
 
@@ -111,7 +99,9 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
     );
   }
 
-  // todaysMissions는 이미 API에서 직접 받아옴
+  // todaysMissionsResponse에서 미션 목록과 제한 정보 추출
+  const todaysMissions = todaysMissionsResponse?.missions || [];
+  const dailyLimit = todaysMissionsResponse?.daily_limit;
   
   // 실제 사용자 데이터 및 레벨 진행 상황 사용
   const userSummary = {
@@ -129,7 +119,6 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
   console.log('🏠 [HomePage] Level progress:', levelProgress);
   console.log('🏠 [HomePage] UserSummary:', userSummary);
   
-  const recentStories: any[] = []; // 스토리 기능은 임시로 비활성화
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50">
       {/* Header */}
@@ -193,6 +182,18 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
             </Button>
           </div>
 
+          {/* 일일 제한 정보 표시 */}
+          {dailyLimit && (
+            <div className="mb-4">
+              <MissionLimitIndicator 
+                limit={dailyLimit} 
+                compact={false}
+                showProgress={true}
+                showBadge={true}
+              />
+            </div>
+          )}
+
           <div className="space-y-4">
             {todaysMissions?.map((mission) => (
               <Card key={mission.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm">
@@ -232,49 +233,6 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
                     >
                       도전하기
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* Recent Stories */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">최근 스토리</h2>
-            <Button variant="ghost" size="sm" className="text-blue-600">
-              더보기
-              <ChevronRight className="size-4 ml-1" />
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            {recentStories.map((story) => (
-              <Card key={story.storyId} className="border-0 bg-white/60 backdrop-blur-sm">
-                <CardContent className="p-4">
-                  <div className="flex gap-3">
-                    <ImageWithFallback
-                      src={story.user.avatarUrl}
-                      alt={story.user.name}
-                      className="size-12 rounded-full object-cover flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-sm">{story.user.name}</span>
-                        <Badge variant="secondary" className="text-xs">
-                          {story.mission.title}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-2">{story.content.storyText}</p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Star className="size-3 text-red-500 fill-current" />
-                          <span>{story.interactions.likes}</span>
-                        </div>
-                        <span>{story.timeAgo}</span>
-                      </div>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
