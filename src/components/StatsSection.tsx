@@ -32,9 +32,8 @@ const STAT_TYPES = [
 
 export function StatsSection({ className }: StatsSectionProps) {
   const queryClient = useQueryClient();
-  const [selectedStat, setSelectedStat] = useState<string | null>(null);
-  const [pointsToAllocate, setPointsToAllocate] = useState(1);
-  const [isAllocationModalOpen, setIsAllocationModalOpen] = useState(false);
+  const [pendingAllocations, setPendingAllocations] = useState<Record<string, number>>({});
+  const [isApplyMode, setIsApplyMode] = useState(false);
 
   // 사용자 스탯 데이터 조회
   const { data: statsResponse, isLoading, error } = useQuery({
@@ -48,14 +47,23 @@ export function StatsSection({ className }: StatsSectionProps) {
     }
   });
 
-  // 스탯 포인트 할당 뮤테이션
+  // 스탯 포인트 일괄 할당 뮤테이션
   const allocatePointsMutation = useMutation({
-    mutationFn: statsApi.allocateStatPoints,
+    mutationFn: async () => {
+      // 모든 펜딩 할당을 순차적으로 수행
+      for (const [statKey, points] of Object.entries(pendingAllocations)) {
+        if (points > 0) {
+          const statType = STAT_TYPES.find(t => t.key === statKey)?.name;
+          if (statType) {
+            await statsApi.allocateStatPoints({ statType, points });
+          }
+        }
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-stats'] });
-      setIsAllocationModalOpen(false);
-      setSelectedStat(null);
-      setPointsToAllocate(1);
+      setPendingAllocations({});
+      setIsApplyMode(false);
     },
     onError: (error) => {
       console.error('스탯 포인트 할당 실패:', error);
@@ -73,61 +81,119 @@ export function StatsSection({ className }: StatsSectionProps) {
            typeof stat.displayName === 'string';
   };
 
-  const handleAllocatePoints = (statType: string) => {
-    setSelectedStat(statType);
-    setIsAllocationModalOpen(true);
-  };
-
-  const confirmAllocation = () => {
-    if (selectedStat && pointsToAllocate > 0) {
-      allocatePointsMutation.mutate({
-        statType: selectedStat,
-        points: pointsToAllocate
-      });
+  const handleStatIncrement = (statKey: string) => {
+    const currentPending = pendingAllocations[statKey] || 0;
+    const totalPendingPoints = Object.values(pendingAllocations).reduce((sum, points) => sum + points, 0);
+    
+    if (userStats && totalPendingPoints < userStats.availablePoints) {
+      setPendingAllocations(prev => ({
+        ...prev,
+        [statKey]: currentPending + 1
+      }));
+      setIsApplyMode(true);
     }
   };
 
-  const renderStatItem = (statKey: string, stat: StatValue) => (
-    <div 
-      key={statKey} 
-      className="relative bg-white/90 backdrop-blur-sm rounded-xl p-3 border border-gray-200/50 hover:border-gray-300/50 hover:shadow-md transition-all duration-200"
-    >
-      <div className="flex items-center gap-3">
-        {/* 아이콘 */}
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 flex-shrink-0">
-          <span className="text-base">{stat?.icon || '🎯'}</span>
-        </div>
-        
-        {/* 스탯 정보 - 세로 배치 */}
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-gray-700 whitespace-nowrap overflow-hidden text-ellipsis">
-            {stat?.displayName || 'Unknown'}
-          </div>
-          <div className="text-xl font-bold text-gray-900 leading-tight">
-            {stat?.current || 0}
-          </div>
-        </div>
-        
-        {/* + 버튼 */}
-        <div className="flex-shrink-0">
-          {userStats && userStats.availablePoints > 0 ? (
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-6 h-6 rounded-full p-0 border border-blue-300 hover:border-blue-500 hover:bg-blue-50 transition-all"
-              onClick={() => handleAllocatePoints(STAT_TYPES.find(t => t.key === statKey)?.name || '')}
-            >
-              <Plus className="size-2.5 text-blue-600" />
-            </Button>
-          ) : (
-            <div className="w-6 h-6 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center">
-              <Plus className="size-2 text-gray-300" />
+  const handleStatDecrement = (statKey: string) => {
+    const currentPending = pendingAllocations[statKey] || 0;
+    if (currentPending > 0) {
+      setPendingAllocations(prev => {
+        const newAllocations = { ...prev };
+        if (currentPending === 1) {
+          delete newAllocations[statKey];
+        } else {
+          newAllocations[statKey] = currentPending - 1;
+        }
+        return newAllocations;
+      });
+      
+      // 모든 펜딩 할당이 0이면 적용 모드 해제
+      const totalPending = Object.values(pendingAllocations).reduce((sum, points) => sum + points, 0);
+      if (totalPending <= 1) {
+        setIsApplyMode(false);
+      }
+    }
+  };
+
+  const handleApplyAllocations = () => {
+    allocatePointsMutation.mutate();
+  };
+
+  const handleCancelAllocations = () => {
+    setPendingAllocations({});
+    setIsApplyMode(false);
+  };
+
+  const getTotalPendingPoints = () => {
+    return Object.values(pendingAllocations).reduce((sum, points) => sum + points, 0);
+  };
+
+  const renderStatItem = (statKey: string, stat: StatValue) => {
+    const pendingPoints = pendingAllocations[statKey] || 0;
+    const totalPendingPoints = getTotalPendingPoints();
+    const canAllocate = userStats && totalPendingPoints < userStats.availablePoints;
+    
+    return (
+      <div 
+        key={statKey} 
+        className={`relative bg-white rounded-2xl p-3 border transition-all duration-200 ${
+          pendingPoints > 0 ? 'border-blue-300 bg-blue-50/30' : 'border-gray-200 hover:shadow-sm'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          {/* 스탯 정보 */}
+          <div className="flex items-center gap-2">
+            <div className="text-xl">{stat?.icon || '🎯'}</div>
+            <div>
+              <div className="text-xs font-medium text-gray-600">
+                {stat?.displayName || 'Unknown'}
+              </div>
+              <div className="flex items-baseline gap-1">
+                <div className="text-lg font-bold text-gray-900">
+                  {(stat?.current || 0) + pendingPoints}
+                </div>
+                {pendingPoints > 0 && (
+                  <div className="text-xs text-blue-600 font-medium">
+                    (+{pendingPoints})
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+          </div>
+          
+          {/* +/- 버튼 */}
+          <div className="flex items-center gap-1">
+            {pendingPoints > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-5 h-5 rounded-full p-0 border-gray-300 hover:border-red-500 hover:bg-red-50 transition-all"
+                onClick={() => handleStatDecrement(statKey)}
+              >
+                <Minus className="size-2 text-red-600" />
+              </Button>
+            )}
+            
+            {userStats && userStats.availablePoints > 0 ? (
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-6 h-6 rounded-full p-0 border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all"
+                onClick={() => handleStatIncrement(statKey)}
+                disabled={!canAllocate}
+              >
+                <Plus className="size-3 text-blue-600" />
+              </Button>
+            ) : (
+              <div className="w-6 h-6 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center">
+                <Plus className="size-2 text-gray-300" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (isLoading) {
     return (
@@ -194,26 +260,21 @@ export function StatsSection({ className }: StatsSectionProps) {
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-xl flex items-center gap-2">
-                <div className="w-6 h-6 rounded bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                  <Star className="size-3 text-white" />
-                </div>
-                <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent font-bold">
-                  능력치
-                </span>
+              <CardTitle className="text-lg font-bold text-gray-900">
+                능력치
               </CardTitle>
-              <CardDescription className="mt-1 text-gray-600 flex items-center gap-2">
-                <Trophy className="size-3" />
+              <CardDescription className="mt-1 text-gray-600">
                 총 스탯: {userStats.totalStats}
               </CardDescription>
             </div>
             {userStats.availablePoints > 0 && (
-              <div className="text-right">
-                <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 px-3 py-1.5 text-sm font-semibold">
-                  <Zap className="size-3 mr-1" />
-                  {userStats.availablePoints} SP
-                </Badge>
-                <div className="text-xs text-gray-500 mt-1">스킬 포인트</div>
+              <div className="flex flex-col">
+                <div className="bg-blue-500 text-white px-3 py-2 rounded-2xl self-end">
+                  <div className="text-sm font-semibold">
+                    {userStats.availablePoints - getTotalPendingPoints()} SP
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500 mt-1 text-right pr-1">분배가능</div>
               </div>
             )}
           </div>
@@ -234,112 +295,63 @@ export function StatsSection({ className }: StatsSectionProps) {
           </div>
 
           {/* 보상 정보 카드 */}
-          <div className="mt-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200/50">
+          <div className="mt-4 bg-gray-50 rounded-2xl p-3">
             <div className="flex items-center gap-2 mb-3">
-              <div className="bg-blue-100 p-2 rounded-full">
-                🎁
-              </div>
-              <h4 className="font-semibold text-sm text-gray-800">미션 완료 보상</h4>
+              <div className="text-base">🎁</div>
+              <h4 className="font-semibold text-sm text-gray-900">미션 완료 보상</h4>
             </div>
             
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-2 p-3 bg-white/60 rounded-lg">
-                <div className="bg-green-100 p-2 rounded-full">
-                  <span className="text-lg">⚡</span>
-                </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex items-center gap-2 p-2 bg-white rounded-xl">
+                <div className="text-sm">⚡</div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-700">자동 증가</p>
-                  <p className="text-xs text-gray-500">카테고리별 +1</p>
+                  <p className="text-xs font-medium text-gray-900">자동 증가</p>
+                  <p className="text-xs text-gray-600">카테고리별 +1</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 p-3 bg-white/60 rounded-lg">
-                <div className="bg-blue-100 p-2 rounded-full">
-                  <span className="text-lg">🎯</span>
-                </div>
+              <div className="flex items-center gap-2 p-2 bg-white rounded-xl">
+                <div className="text-sm">🎯</div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-700">할당 포인트</p>
-                  <p className="text-xs text-gray-500">자유 배분 +2</p>
+                  <p className="text-xs font-medium text-gray-900">할당 포인트</p>
+                  <p className="text-xs text-gray-600">자유 배분 +2</p>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* 적용/취소 버튼 */}
+          {isApplyMode && (
+            <div className="mt-4 flex gap-2">
+              <Button
+                onClick={handleCancelAllocations}
+                variant="outline"
+                className="flex-1 rounded-2xl border-gray-300 hover:bg-gray-50"
+              >
+                취소
+              </Button>
+              <Button
+                onClick={handleApplyAllocations}
+                disabled={allocatePointsMutation.isPending}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl"
+              >
+                {allocatePointsMutation.isPending ? '적용 중...' : `적용하기 (${getTotalPendingPoints()}SP)`}
+              </Button>
+            </div>
+          )}
+          
           {/* 하단 정보 */}
-          {userStats.availablePoints === 0 && (
-            <div className="mt-4 text-center p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200/50">
-              <div className="flex items-center justify-center gap-2 text-sm text-amber-700">
+          {userStats.availablePoints === 0 && !isApplyMode && (
+            <div className="mt-3 text-center p-3 bg-blue-50 rounded-2xl">
+              <div className="flex items-center justify-center gap-2 text-blue-700">
                 <span>⚡</span>
-                <span>미션 클리어로 경험치를 획득하세요!</span>
+                <span className="text-sm font-medium">미션 클리어로 경험치를 획득하세요!</span>
               </div>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* 스탯 포인트 할당 모달 */}
-      <ConfirmModal
-        isOpen={isAllocationModalOpen}
-        onClose={() => {
-          setIsAllocationModalOpen(false);
-          setSelectedStat(null);
-          setPointsToAllocate(1);
-        }}
-        onConfirm={confirmAllocation}
-        type="info"
-        title="스킬 포인트 할당"
-        confirmText="할당하기"
-        showCancel={true}
-        isLoading={allocatePointsMutation.isPending}
-      >
-        <div className="space-y-6">
-          <div className="text-center">
-            <div className="text-lg text-gray-700">
-              <span className="font-semibold text-purple-600">
-                {selectedStat && STAT_TYPES.find(t => t.name === selectedStat)?.key}
-              </span> 스킬을 강화합니다
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-10 h-10 rounded-full border-2 hover:border-red-400 hover:bg-red-50"
-              disabled={pointsToAllocate <= 1}
-              onClick={() => setPointsToAllocate(Math.max(1, pointsToAllocate - 1))}
-            >
-              <Minus className="size-4 text-red-500" />
-            </Button>
-            
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl px-6 py-4 border-2 border-purple-200">
-              <div className="text-3xl font-bold text-purple-700 text-center">
-                {pointsToAllocate}
-              </div>
-              <div className="text-xs text-purple-500 text-center mt-1 font-medium">
-                SP
-              </div>
-            </div>
-            
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-10 h-10 rounded-full border-2 hover:border-green-400 hover:bg-green-50"
-              disabled={!userStats || pointsToAllocate >= userStats.availablePoints}
-              onClick={() => setPointsToAllocate(pointsToAllocate + 1)}
-            >
-              <Plus className="size-4 text-green-500" />
-            </Button>
-          </div>
-          
-          <div className="text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 border border-blue-200">
-            <p className="text-sm text-blue-700">
-              <Zap className="size-3 inline mr-1" />
-              보유 스킬 포인트: <span className="font-bold text-purple-600">{userStats?.availablePoints || 0} SP</span>
-            </p>
-          </div>
-        </div>
-      </ConfirmModal>
     </>
   );
 }

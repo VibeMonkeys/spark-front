@@ -142,28 +142,27 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
       </header>
 
       <div className="max-w-md mx-auto px-4 pb-20">
-        {/* Compact Profile Header */}
+        {/* Enhanced Profile Header */}
         <div className="py-4">
           <Card className="border-0 bg-white/60 backdrop-blur-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <ImageWithFallback
-                  src={userData.avatar_url}
-                  alt={userData.name}
-                  className="size-12 rounded-full object-cover ring-2 ring-gray-200"
-                />
-                <div className="flex-1">
-                  <h2 className="text-lg font-bold">{userData.name}</h2>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Star className="size-3" />
-                      {userData.current_points.toLocaleString()}P
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Flame className="size-3" />
-                      {userData.current_streak}일
-                    </span>
+            <CardContent className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="relative">
+                  <ImageWithFallback
+                    src={userData.avatar_url}
+                    alt={userData.name}
+                    className="size-16 rounded-full object-cover ring-2 ring-gray-200"
+                  />
+                  <div className="absolute -bottom-1 -right-1 size-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                    <span className="text-xs text-white font-bold">✓</span>
                   </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl font-bold text-gray-900 mb-1">{userData.name}</h2>
+                  <p className="text-sm text-gray-600 mb-2 leading-relaxed">
+                    레벨 {userData.level} {userData.level_title} • 매일 성장하는 스파크 멤버 🌟
+                  </p>
+                  
                 </div>
               </div>
             </CardContent>
@@ -172,38 +171,38 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-gray-100 h-14 rounded-lg p-1">
+          <TabsList className="grid w-full grid-cols-4 bg-white/60 backdrop-blur-sm h-16 rounded-xl p-1 border border-gray-200/50">
             <TabsTrigger 
               value="overview" 
-              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm rounded-md"
+              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
             >
               <BarChart3 className="size-4" />
               <span className="text-xs font-medium">개요</span>
             </TabsTrigger>
             <TabsTrigger 
               value="stats" 
-              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm rounded-md"
+              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
             >
               <User className="size-4" />
               <span className="text-xs font-medium">스탯</span>
             </TabsTrigger>
             <TabsTrigger 
               value="achievements" 
-              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm rounded-md"
+              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
             >
               <Award className="size-4" />
               <span className="text-xs font-medium">업적</span>
             </TabsTrigger>
             <TabsTrigger 
               value="activity" 
-              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm rounded-md"
+              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
             >
               <Activity className="size-4" />
               <span className="text-xs font-medium">활동</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="mt-4 space-y-4">
+          <TabsContent value="overview" className="mt-2 space-y-4">
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
               <Card className="border-0 bg-white/60 backdrop-blur-sm">
@@ -255,11 +254,11 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
             />
           </TabsContent>
 
-          <TabsContent value="stats" className="mt-4">
+          <TabsContent value="stats" className="mt-2">
             <StatsSection />
           </TabsContent>
 
-          <TabsContent value="achievements" className="mt-4 space-y-4">
+          <TabsContent value="achievements" className="mt-2 space-y-4">
             {isLoadingAchievements ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
@@ -347,7 +346,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
             )}
           </TabsContent>
 
-          <TabsContent value="activity" className="mt-4 space-y-4">
+          <TabsContent value="activity" className="mt-2 space-y-4">
             {/* Category Stats */}
             <Card className="border-0 bg-white/60 backdrop-blur-sm">
               <CardHeader>
