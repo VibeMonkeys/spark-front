@@ -16,7 +16,7 @@ export interface SignupRequest {
 
 export interface AuthResponse {
   user: {
-    id: string;
+    id: number;
     email: string;
     name: string;
     avatar_url: string;

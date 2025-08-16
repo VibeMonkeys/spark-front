@@ -48,17 +48,17 @@ export const levelApi = {
   /**
    * 전체 레벨 시스템 조회
    */
-  getLevelSystem: async (userId: string): Promise<LevelSystemResponse> => {
+  getLevelSystem: async (userId: number): Promise<LevelSystemResponse> => {
     const response = await api.get(`/levels/system?user_id=${userId}`);
-    return response.data;
+    return response.data.data;
   },
 
   /**
    * 사용자 레벨 진행 상황 조회
    */
-  getUserLevelProgress: async (userId: string): Promise<UserLevelProgress> => {
+  getUserLevelProgress: async (userId: number): Promise<UserLevelProgress> => {
     const response = await api.get(`/levels/progress?user_id=${userId}`);
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -66,7 +66,7 @@ export const levelApi = {
    */
   getLevelInfo: async (level: number): Promise<LevelInfo> => {
     const response = await api.get(`/levels/${level}`);
-    return response.data;
+    return response.data.data;
   },
 
   /**
@@ -74,6 +74,6 @@ export const levelApi = {
    */
   getAllLevels: async (): Promise<LevelInfo[]> => {
     const response = await api.get('/levels/all');
-    return response.data;
+    return response.data.data;
   }
 };
