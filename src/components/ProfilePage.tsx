@@ -264,84 +264,129 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
-                {achievementsData.map((achievement) => (
-                  <Card
-                    key={achievement.id}
-                    className={`relative overflow-hidden border-0 transition-all duration-300 hover:scale-105 h-40 ${
-                      achievement.isUnlocked
-                        ? "bg-white shadow-lg"
-                        : "bg-gray-50 opacity-60"
-                    }`}
-                  >
-                    <CardContent className="p-4">
-                      {/* Rarity Border */}
-                      <div 
-                        className="absolute top-0 left-0 right-0 h-1"
-                        style={{ backgroundColor: achievement.rarity.color }}
-                      />
-                      
-                      {/* Achievement Icon */}
-                      <div className="flex items-center justify-center mb-2">
-                        <div 
-                          className={`size-10 rounded-full flex items-center justify-center text-lg ${
-                            achievement.isUnlocked 
-                              ? "bg-gradient-to-br from-blue-50 to-purple-50" 
-                              : "bg-gray-100"
-                          }`}
+              <div className="space-y-4">
+                {/* 완료된 업적 */}
+                {achievementsData.filter(achievement => achievement.isUnlocked).length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                      <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                        {achievementsData.filter(achievement => achievement.isUnlocked).length}
+                      </div>
+                      완료된 업적
+                    </h3>
+                    <div className="space-y-3">
+                      {achievementsData.filter(achievement => achievement.isUnlocked).map((achievement) => (
+                        <Card
+                          key={achievement.id}
+                          className="border border-gray-200 bg-white shadow-sm transition-all duration-200"
                         >
-                          {achievement.icon}
-                        </div>
-                      </div>
-                      
-                      {/* Achievement Info */}
-                      <div className="text-center space-y-1">
-                        <h4 className={`text-sm font-semibold ${
-                          achievement.isUnlocked ? "text-gray-900" : "text-gray-500"
-                        }`}>
-                          {achievement.name}
-                        </h4>
-                        <p className="text-xs text-gray-500 leading-tight line-clamp-2">
-                          {achievement.description}
-                        </p>
-                        
-                        {/* Progress Bar for uncompleted achievements */}
-                        {!achievement.isUnlocked && achievement.progress > 0 && (
-                          <div className="mt-2">
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div 
-                                className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-                                style={{ width: `${achievement.progress}%` }}
-                              />
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-3">
+                              {/* Achievement Icon */}
+                              <div className="size-12 rounded-2xl flex items-center justify-center text-xl bg-blue-50">
+                                {achievement.icon}
+                              </div>
+                              
+                              {/* Achievement Info */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                  <h4 className="font-semibold text-gray-900">
+                                    {achievement.name}
+                                  </h4>
+                                  <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                    ✓
+                                  </div>
+                                </div>
+                                
+                                <p className="text-sm text-gray-600 mb-2 line-clamp-1">
+                                  {achievement.description}
+                                </p>
+                                
+                                {/* Rarity */}
+                                <div className="mt-2">
+                                  <span 
+                                    className="text-xs px-2 py-1 rounded-full text-white font-medium"
+                                    style={{ backgroundColor: achievement.rarity.color }}
+                                  >
+                                    {achievement.rarity.name}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                            <p className="text-xs text-gray-400 mt-1">{achievement.progress}%</p>
-                          </div>
-                        )}
-                        
-                        {/* Unlock Status */}
-                        {achievement.isUnlocked && (
-                          <div className="flex items-center justify-center mt-1">
-                            <Badge 
-                              className="text-xs px-2 py-0.5 bg-green-100 text-green-700 border-green-200"
-                            >
-                              ✓ 달성완료
-                            </Badge>
-                          </div>
-                        )}
-                        
-                        {/* Rarity Badge */}
-                        <div className="absolute top-2 right-2">
-                          <Badge 
-                            className="text-xs px-1.5 py-0.5 text-white border-0"
-                            style={{ backgroundColor: achievement.rarity.color }}
-                          >
-                            {achievement.rarity.name}
-                          </Badge>
-                        </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 진행 중인 업적 */}
+                {achievementsData.filter(achievement => !achievement.isUnlocked).length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                      <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                        {achievementsData.filter(achievement => !achievement.isUnlocked).length}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      진행 중인 업적
+                    </h3>
+                    <div className="space-y-3">
+                      {achievementsData.filter(achievement => !achievement.isUnlocked).map((achievement) => (
+                        <Card
+                          key={achievement.id}
+                          className="border border-gray-200 bg-gray-50 transition-all duration-200"
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-3">
+                              {/* Achievement Icon */}
+                              <div className="size-12 rounded-2xl flex items-center justify-center text-xl bg-gray-100">
+                                {achievement.icon}
+                              </div>
+                              
+                              {/* Achievement Info */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                  <h4 className="font-semibold text-gray-500">
+                                    {achievement.name}
+                                  </h4>
+                                </div>
+                                
+                                <p className="text-sm text-gray-600 mb-2 line-clamp-1">
+                                  {achievement.description}
+                                </p>
+                                
+                                {/* Progress Bar */}
+                                {achievement.progress > 0 && (
+                                  <div className="mt-2">
+                                    <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                                      <span>진행률</span>
+                                      <span>{achievement.progress}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                      <div 
+                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                        style={{ width: `${achievement.progress}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+                                
+                                {/* Rarity */}
+                                <div className="mt-2">
+                                  <span 
+                                    className="text-xs px-2 py-1 rounded-full text-white font-medium"
+                                    style={{ backgroundColor: achievement.rarity.color }}
+                                  >
+                                    {achievement.rarity.name}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </TabsContent>
