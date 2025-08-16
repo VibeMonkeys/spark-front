@@ -37,7 +37,7 @@ function AppContent() {
   const { user, isLoading, login } = useAuth();
   const queryClient = useQueryClient();
   const [currentView, setCurrentView] = useState("main"); // "main", "mission-detail", "mission-verification", "mission-success", "profile-edit", "settings", "password-change", "help", "app-info"
-  const [selectedMissionId, setSelectedMissionId] = useState<string | null>(null);
+  const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null);
   const [missionResult, setMissionResult] = useState<{
     pointsEarned: number;
     streakCount: number;
@@ -100,7 +100,7 @@ function AppContent() {
 
   // 미션 시작 API 호출
   const startMissionMutation = useMutation({
-    mutationFn: ({ missionId, userId }: { missionId: string; userId: string }) => {
+    mutationFn: ({ missionId, userId }: { missionId: number; userId: number }) => {
       return missionApi.startMission(missionId, userId);
     },
     onSuccess: (data) => {
@@ -235,12 +235,12 @@ function AppContent() {
     setMissionResult(null);
   };
 
-  const handleMissionSelect = (missionId: string) => {
+  const handleMissionSelect = (missionId: number) => {
     setSelectedMissionId(missionId);
     setCurrentView("mission-detail");
   };
 
-  const handleMissionContinue = (missionId: string) => {
+  const handleMissionContinue = (missionId: number) => {
     setSelectedMissionId(missionId);
     setCurrentView("mission-verification");
   };

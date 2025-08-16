@@ -3,7 +3,7 @@ import { authApi, AuthResponse } from '../shared/api/authApi';
 import { userApi } from '../shared/api';
 
 interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
   avatar_url: string;
