@@ -8,7 +8,7 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { UserLevelProgress } from "../shared/api/levelApi";
 
 interface LevelProgressProps {
-  levelProgress: UserLevelProgress;
+  levelProgress?: UserLevelProgress;
   className?: string;
   showDetails?: boolean;
   onLevelInfoClick?: () => void;
@@ -20,17 +20,18 @@ export const LevelProgress: FC<LevelProgressProps> = ({
   showDetails = false,
   onLevelInfoClick
 }) => {
+  // Add null checks and default values to prevent undefined errors
   const {
-    current_level,
-    level_title_display,
-    current_points,
-    total_points,
-    points_to_next_level,
-    level_progress_percentage,
-    next_level_points,
-    icon,
-    color
-  } = levelProgress;
+    current_level = 1,
+    level_title_display = "BEGINNER",
+    current_points = 0,
+    total_points = 0,
+    points_to_next_level = 0,
+    level_progress_percentage = 0,
+    next_level_points = 1000,
+    icon = "🎯",
+    color = "#6366f1"
+  } = levelProgress || {};
 
   const isMaxLevel = next_level_points === null;
 

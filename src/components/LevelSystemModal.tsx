@@ -22,9 +22,17 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
 
   const { data: levelSystem, isLoading, error } = useQuery<LevelSystemResponse>({
     queryKey: ['level-system', user?.id],
-    queryFn: () => {
+    queryFn: async () => {
       if (!user?.id) throw new Error('User ID required');
-      return levelApi.getLevelSystem(user.id);
+      console.log('🔍 [LevelSystemModal] Calling levelApi.getLevelSystem with userId:', user.id);
+      try {
+        const result = await levelApi.getLevelSystem(user.id);
+        console.log('✅ [LevelSystemModal] Level system data:', result);
+        return result;
+      } catch (error) {
+        console.error('❌ [LevelSystemModal] Level system API error:', error);
+        throw error;
+      }
     },
     enabled: isOpen && !!user?.id,
   });
@@ -57,7 +65,12 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
           </div>
         ) : error || !levelSystem ? (
           <div className="p-6 text-center text-muted-foreground">
-            레벨 시스템 정보를 불러올 수 없습니다.
+            <p>레벨 시스템 정보를 불러올 수 없습니다.</p>
+            {error && (
+              <p className="text-xs text-red-500 mt-2">
+                에러: {error.message || String(error)}
+              </p>
+            )}
           </div>
         ) : (
           <div className="p-6 pt-0">
@@ -76,7 +89,7 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
                 />
 
                 {/* 다음 레벨 미리보기 */}
-                {levelSystem.user_progress.next_level_points && (
+                {levelSystem.user_progress?.next_level_points && (
                   <Card className="border-dashed border-2 border-blue-200 bg-blue-50/50">
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
@@ -86,8 +99,8 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
                     </CardHeader>
                     <CardContent>
                       {(() => {
-                        const nextLevel = levelSystem.all_levels.find(
-                          level => level.level === levelSystem.user_progress.current_level + 1
+                        const nextLevel = levelSystem.all_levels?.find(
+                          level => level.level === (levelSystem.user_progress?.current_level || 1) + 1
                         );
                         return nextLevel ? (
                           <div className="space-y-3">
@@ -124,10 +137,10 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
               <TabsContent value="levels" className="mt-4">
                 <ScrollArea className="h-96">
                   <div className="space-y-3">
-                    {levelSystem.all_levels.map((level) => {
-                      const isCurrentLevel = level.level === levelSystem.user_progress.current_level;
-                      const isCompleted = level.level < levelSystem.user_progress.current_level;
-                      const isLocked = level.level > levelSystem.user_progress.current_level + 1;
+                    {levelSystem.all_levels?.map((level) => {
+                      const isCurrentLevel = level.level === (levelSystem.user_progress?.current_level || 1);
+                      const isCompleted = level.level < (levelSystem.user_progress?.current_level || 1);
+                      const isLocked = level.level > (levelSystem.user_progress?.current_level || 1) + 1;
 
                       return (
                         <Card key={level.level} className={`
@@ -218,7 +231,7 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
               <TabsContent value="titles" className="mt-4">
                 <ScrollArea className="h-96">
                   <div className="space-y-4">
-                    {levelSystem.level_titles.map((titleGroup) => (
+                    {levelSystem.level_titles?.map((titleGroup) => (
                       <Card key={titleGroup.title}>
                         <CardHeader>
                           <CardTitle className="flex items-center gap-3">
@@ -237,8 +250,8 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
                         <CardContent>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {titleGroup.levels.map((level) => {
-                              const isCompleted = level.level < levelSystem.user_progress.current_level;
-                              const isCurrent = level.level === levelSystem.user_progress.current_level;
+                              const isCompleted = level.level < (levelSystem.user_progress?.current_level || 1);
+                              const isCurrent = level.level === (levelSystem.user_progress?.current_level || 1);
                               
                               return (
                                 <div 
