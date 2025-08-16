@@ -23,7 +23,10 @@ export function LoginPage() {
   const { data: demoUsers, isLoading: isDemoUsersLoading } = useQuery({
     queryKey: ['demo-users'],
     queryFn: authApi.getDemoUsers,
-    enabled: mode === 'demo'
+    enabled: mode === 'demo',
+    onSuccess: (data) => {
+      console.log('Demo users loaded:', data);
+    }
   });
   const [formData, setFormData] = useState({
     email: '',
@@ -83,6 +86,7 @@ export function LoginPage() {
 
   const handleDemoLogin = () => {
     if (selectedUserId) {
+      console.log('Attempting demo login with userId:', selectedUserId);
       demoLoginMutation.mutate(selectedUserId);
     }
   };
@@ -179,41 +183,42 @@ export function LoginPage() {
                 </div>
               ) : (
                 demoUsers?.map((user) => (
-                <div
-                  key={user.id}
-                  className={`p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${
-                    selectedUserId === user.id.toString()
-                      ? 'border-purple-400 bg-purple-50/50 shadow-lg'
-                      : 'border-gray-100 hover:border-purple-200 hover:bg-purple-50/20'
-                  }`}
-                  onClick={() => setSelectedUserId(user.id.toString())}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <img
-                        src={user.avatarUrl}
-                        alt={user.name}
-                        className="size-14 rounded-full object-cover ring-2 ring-purple-100"
-                      />
-                      {selectedUserId === user.id.toString() && (
-                        <div className="absolute -top-1 -right-1 size-6 bg-purple-500 rounded-full flex items-center justify-center">
-                          <ArrowRight className="size-3 text-white" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-gray-800">{user.name}</h3>
-                        <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
-                          LV.{user.level}
-                        </Badge>
+                  <div
+                    key={user.id}
+                    className={`p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${
+                      selectedUserId === user.id.toString()
+                        ? 'border-purple-400 bg-purple-50/50 shadow-lg'
+                        : 'border-gray-100 hover:border-purple-200 hover:bg-purple-50/20'
+                    }`}
+                    onClick={() => setSelectedUserId(user.id.toString())}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
+                        <img
+                          src={user.avatarUrl}
+                          alt={user.name}
+                          className="size-14 rounded-full object-cover ring-2 ring-purple-100"
+                        />
+                        {selectedUserId === user.id.toString() && (
+                          <div className="absolute -top-1 -right-1 size-6 bg-purple-500 rounded-full flex items-center justify-center">
+                            <ArrowRight className="size-3 text-white" />
+                          </div>
+                        )}
                       </div>
-                      <p className="text-sm text-gray-600">{user.email}</p>
-                      <p className="text-xs text-purple-600 font-medium">{user.levelTitle}</p>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-gray-800">{user.name}</h3>
+                          <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
+                            LV.{user.level}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600">{user.email}</p>
+                        <p className="text-xs text-purple-600 font-medium">{user.levelTitle}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )) || [])}
+                )) || []
+              )}
               </div>
 
               {/* Action Buttons */}
