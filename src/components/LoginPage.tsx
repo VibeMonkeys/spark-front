@@ -155,27 +155,27 @@ export function LoginPage() {
   // 데모 계정 선택 화면
   if (mode === 'demo') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-sm">
           {/* Unified Demo Card */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm mb-6">
-            <CardContent className="p-8">
+          <Card className="border-0 shadow-lg bg-white mb-6">
+            <CardContent className="p-6">
               {/* Header */}
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-3 mb-4">
-                  <div className="size-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                    <Sparkles className="size-5 text-white" />
+              <div className="text-center mb-6">
+                <div className="inline-flex items-center gap-2 mb-3">
+                  <div className="size-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                    <Sparkles className="size-6 text-white" />
                   </div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                     SPARK
                   </h1>
                 </div>
                 <h2 className="text-xl font-semibold text-gray-800 mb-2">데모 계정 선택</h2>
-                <p className="text-gray-600">체험해볼 계정을 선택해주세요</p>
+                <p className="text-base text-gray-600">체험해볼 계정을 선택해주세요</p>
               </div>
 
               {/* Demo Account Selection */}
-              <div className="space-y-6 mb-8">
+              <div className="space-y-4 mb-6">
               {isDemoUsersLoading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
@@ -251,22 +251,22 @@ export function LoginPage() {
 
   // 로그인/회원가입 화면
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-sm">
         {/* Unified Card */}
-        <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-          <CardContent className="p-8">
+        <Card className="border-0 shadow-lg bg-white">
+          <CardContent className="p-6">
             {/* Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-3 mb-2">
-                <div className="size-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                  <Sparkles className="size-5 text-white" />
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 mb-3">
+                <div className="size-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                  <Sparkles className="size-6 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                   SPARK
                 </h1>
               </div>
-              <p className="text-sm text-gray-500 font-medium">
+              <p className="text-base text-gray-600 font-medium">
                 일상을 특별하게 만드는 랜덤 미션
               </p>
             </div>
@@ -278,7 +278,7 @@ export function LoginPage() {
               </Alert>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {mode === 'signup' && (
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-sm font-medium text-gray-700">이름</Label>
@@ -290,7 +290,7 @@ export function LoginPage() {
                       placeholder="홍길동"
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
-                      className={`pl-10 h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 ${errors.name ? 'border-red-300 focus:border-red-400' : ''}`}
+                      className={`pl-10 h-12 text-base border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 rounded-xl ${errors.name ? 'border-red-300 focus:border-red-400' : ''}`}
                     />
                   </div>
                   {errors.name && <p className="text-sm text-red-600">{errors.name}</p>}
@@ -307,7 +307,7 @@ export function LoginPage() {
                     placeholder="your@email.com"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className={`pl-10 h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 ${errors.email ? 'border-red-300 focus:border-red-400' : ''}`}
+                    className={`pl-10 h-12 text-base border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 rounded-xl ${errors.email ? 'border-red-300 focus:border-red-400' : ''}`}
                   />
                 </div>
                 {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
@@ -323,7 +323,7 @@ export function LoginPage() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => handleInputChange('password', e.target.value)}
-                    className={`pl-10 pr-10 h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 ${errors.password ? 'border-red-300 focus:border-red-400' : ''}`}
+                    className={`pl-10 pr-10 h-12 text-base border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 rounded-xl ${errors.password ? 'border-red-300 focus:border-red-400' : ''}`}
                   />
                   <button
                     type="button"
@@ -347,7 +347,7 @@ export function LoginPage() {
                       placeholder="••••••••"
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className={`pl-10 h-11 border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 ${errors.confirmPassword ? 'border-red-300 focus:border-red-400' : ''}`}
+                      className={`pl-10 h-12 text-base border-gray-200 focus:border-purple-400 focus:ring-purple-400/20 rounded-xl ${errors.confirmPassword ? 'border-red-300 focus:border-red-400' : ''}`}
                     />
                   </div>
                   {errors.confirmPassword && <p className="text-sm text-red-600">{errors.confirmPassword}</p>}
@@ -356,15 +356,14 @@ export function LoginPage() {
 
               <Button
                 type="submit"
-                variant="outline"
                 disabled={loginMutation.isPending || signupMutation.isPending}
-                className="w-full h-11 font-medium border-gray-300 hover:bg-gray-50"
+                className="w-full h-12 font-semibold text-base bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 {(loginMutation.isPending || signupMutation.isPending) ? '처리 중...' : (mode === 'login' ? '로그인' : '회원가입')}
               </Button>
             </form>
 
-            <div className="relative my-6">
+            <div className="relative my-5">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-gray-200" />
               </div>
@@ -377,7 +376,7 @@ export function LoginPage() {
               <Button
                 variant="outline"
                 onClick={() => setMode('demo')}
-                className="w-full h-11 border-gray-200 hover:bg-purple-50 hover:border-purple-300 text-gray-700"
+                className="w-full h-12 text-base border-2 border-purple-200 hover:bg-purple-50 hover:border-purple-400 text-purple-700 font-semibold rounded-xl transition-all duration-200"
               >
                 <Sparkles className="size-4 mr-2 text-purple-500" />
                 데모 계정으로 체험하기
