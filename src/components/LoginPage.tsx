@@ -6,43 +6,11 @@ import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { Alert, AlertDescription } from './ui/alert';
 import { useAuth } from '../contexts/AuthContext';
-import { useMutation } from '@tanstack/react-query';
-import { authApi } from '../shared/api/authApi';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { authApi, DemoUser } from '../shared/api/authApi';
 import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowRight } from 'lucide-react';
 
-// 개발용 테스트 계정 (init_data.sql에서 생성된 사용자들)
-const availableUsers = [
-  { 
-    id: '5', 
-    name: '테스트유저1', 
-    email: 'testuser1@spark.com',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-    level: 5,
-    levelTitle: 'EXPLORER',
-    currentPoints: 450,
-    totalPoints: 1200
-  },
-  { 
-    id: '6', 
-    name: '테스트유저2', 
-    email: 'testuser2@spark.com',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9e6e3e7?w=150&h=150&fit=crop&crop=face',
-    level: 8,
-    levelTitle: 'EXPLORER',
-    currentPoints: 720,
-    totalPoints: 2500
-  },
-  { 
-    id: '7', 
-    name: '고급유저', 
-    email: 'premium@spark.com',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-    level: 15,
-    levelTitle: 'ADVENTURER',
-    currentPoints: 1800,
-    totalPoints: 8500
-  }
-];
+// 백엔드에서 동적으로 데모 사용자를 가져옵니다
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -50,6 +18,13 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // 데모 사용자 목록 조회
+  const { data: demoUsers, isLoading: isDemoUsersLoading } = useQuery({
+    queryKey: ['demo-users'],
+    queryFn: authApi.getDemoUsers,
+    enabled: mode === 'demo'
+  });
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -95,37 +70,20 @@ export function LoginPage() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const demoLoginMutation = useMutation({
+    mutationFn: (userId: string) => authApi.demoLogin(userId),
+    onSuccess: (response) => {
+      login(response);
+    },
+    onError: (error: any) => {
+      console.error('Demo login error:', error);
+      setErrors({ general: '데모 로그인에 실패했습니다.' });
+    }
+  });
+
   const handleDemoLogin = () => {
     if (selectedUserId) {
-      const user = availableUsers.find(u => u.id === selectedUserId);
-      if (user) {
-        login({
-          user: {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            avatar_url: user.avatar,
-            level: user.level,
-            level_title: user.levelTitle,
-            current_points: user.currentPoints,
-            total_points: user.totalPoints,
-            current_streak: user.level >= 15 ? 25 : user.level >= 8 ? 12 : 5,
-            longest_streak: user.level >= 15 ? 45 : user.level >= 8 ? 25 : 12,
-            completed_missions: user.level >= 15 ? 85 : user.level >= 8 ? 35 : 18,
-            total_days: user.level >= 15 ? 120 : user.level >= 8 ? 42 : 25,
-            join_date: '2024-01-01',
-            preferences: {},
-            statistics: {
-              category_stats: [],
-              this_month_points: user.currentPoints,
-              this_month_missions: user.level >= 15 ? 35 : user.level >= 8 ? 15 : 8,
-              average_rating: user.level >= 15 ? 4.8 : user.level >= 8 ? 4.2 : 4.5
-            }
-          },
-          token: 'demo_token',
-          refreshToken: 'demo_refresh_token'
-        });
-      }
+      demoLoginMutation.mutate(selectedUserId);
     }
   };
 
@@ -214,24 +172,30 @@ export function LoginPage() {
 
               {/* Demo Account Selection */}
               <div className="space-y-6 mb-8">
-              {availableUsers.map((user) => (
+              {isDemoUsersLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                  <p className="text-gray-600 mt-2">데모 계정을 불러오는 중...</p>
+                </div>
+              ) : (
+                demoUsers?.map((user) => (
                 <div
                   key={user.id}
                   className={`p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${
-                    selectedUserId === user.id
+                    selectedUserId === user.id.toString()
                       ? 'border-purple-400 bg-purple-50/50 shadow-lg'
                       : 'border-gray-100 hover:border-purple-200 hover:bg-purple-50/20'
                   }`}
-                  onClick={() => setSelectedUserId(user.id)}
+                  onClick={() => setSelectedUserId(user.id.toString())}
                 >
                   <div className="flex items-center gap-4">
                     <div className="relative">
                       <img
-                        src={user.avatar}
+                        src={user.avatarUrl}
                         alt={user.name}
                         className="size-14 rounded-full object-cover ring-2 ring-purple-100"
                       />
-                      {selectedUserId === user.id && (
+                      {selectedUserId === user.id.toString() && (
                         <div className="absolute -top-1 -right-1 size-6 bg-purple-500 rounded-full flex items-center justify-center">
                           <ArrowRight className="size-3 text-white" />
                         </div>
@@ -249,20 +213,20 @@ export function LoginPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )) || [])}
               </div>
 
               {/* Action Buttons */}
               <div className="space-y-3">
             <Button
               onClick={handleDemoLogin}
-              disabled={!selectedUserId}
+              disabled={!selectedUserId || demoLoginMutation.isPending}
               variant="outline"
               className="w-full h-11 font-medium border-gray-300 hover:bg-gray-50"
               size="lg"
             >
               <Sparkles className="size-4 mr-2" />
-              체험 시작하기
+              {demoLoginMutation.isPending ? '로그인 중...' : '체험 시작하기'}
             </Button>
             
             <Button
