@@ -14,7 +14,9 @@ import {
   Trophy, 
   Star,
   Target,
-  Zap
+  Zap,
+  User,
+  Gift
 } from "lucide-react";
 
 interface StatsSectionProps {
@@ -136,25 +138,33 @@ export function StatsSection({ className }: StatsSectionProps) {
     return (
       <div 
         key={statKey} 
-        className={`relative bg-white rounded-2xl p-3 border transition-all duration-200 ${
-          pendingPoints > 0 ? 'border-blue-300 bg-blue-50/30' : 'border-gray-200 hover:shadow-sm'
+        className={`relative rounded-2xl p-4 transition-all duration-200 ${
+          pendingPoints > 0 
+            ? 'bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 shadow-sm' 
+            : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
         }`}
       >
         <div className="flex items-center justify-between">
           {/* 스탯 정보 */}
-          <div className="flex items-center gap-2">
-            <div className="text-xl">{stat?.icon || '🎯'}</div>
-            <div>
-              <div className="text-xs font-medium text-gray-600">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className={`size-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${
+              pendingPoints > 0 ? 'bg-white border border-blue-200 shadow-sm' : 'bg-white border border-gray-200'
+            }`}>
+              {stat?.icon || '🎯'}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-medium text-gray-600 mb-0.5">
                 {stat?.displayName || 'Unknown'}
               </div>
-              <div className="flex items-baseline gap-1">
-                <div className="text-lg font-bold text-gray-900">
+              <div className="flex items-baseline gap-1 flex-wrap">
+                <div className={`text-xl font-bold ${
+                  pendingPoints > 0 ? 'text-blue-700' : 'text-gray-900'
+                }`}>
                   {(stat?.current || 0) + pendingPoints}
                 </div>
                 {pendingPoints > 0 && (
-                  <div className="text-xs text-blue-600 font-medium">
-                    (+{pendingPoints})
+                  <div className="text-xs text-blue-600 font-bold bg-blue-100 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                    +{pendingPoints}
                   </div>
                 )}
               </div>
@@ -162,15 +172,15 @@ export function StatsSection({ className }: StatsSectionProps) {
           </div>
           
           {/* +/- 버튼 */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             {pendingPoints > 0 && (
               <Button
                 size="sm"
                 variant="outline"
-                className="w-5 h-5 rounded-full p-0 border-gray-300 hover:border-red-500 hover:bg-red-50 transition-all"
+                className="w-6 h-6 rounded-xl p-0 border-red-200 bg-red-50 hover:border-red-400 hover:bg-red-100 transition-all flex-shrink-0"
                 onClick={() => handleStatDecrement(statKey)}
               >
-                <Minus className="size-2 text-red-600" />
+                <Minus className="size-3 text-red-600" />
               </Button>
             )}
             
@@ -178,15 +188,15 @@ export function StatsSection({ className }: StatsSectionProps) {
               <Button
                 size="sm"
                 variant="outline"
-                className="w-6 h-6 rounded-full p-0 border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-all"
+                className="w-7 h-7 rounded-xl p-0 border-blue-200 bg-blue-50 hover:border-blue-400 hover:bg-blue-100 transition-all flex-shrink-0"
                 onClick={() => handleStatIncrement(statKey)}
                 disabled={!canAllocate}
               >
-                <Plus className="size-3 text-blue-600" />
+                <Plus className="size-4 text-blue-600 font-bold" />
               </Button>
             ) : (
-              <div className="w-6 h-6 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center">
-                <Plus className="size-2 text-gray-300" />
+              <div className="w-7 h-7 rounded-xl border border-gray-200 bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <Plus className="size-3 text-gray-400" />
               </div>
             )}
           </div>
@@ -257,20 +267,23 @@ export function StatsSection({ className }: StatsSectionProps) {
   return (
     <>
       <Card className={`border-0 bg-white/60 backdrop-blur-sm ${className}`}>
-        <CardHeader className="pb-4">
+        <CardHeader className="pb-0">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-bold text-gray-900">
+              <CardTitle className="text-base font-bold text-gray-900 flex items-center gap-2 mb-2">
+                <div className="bg-purple-500 p-1.5 rounded-lg">
+                  <User className="size-3 text-white" />
+                </div>
                 능력치
               </CardTitle>
-              <CardDescription className="mt-1 text-gray-600">
+              <CardDescription className="-mt-1 text-gray-600 text-sm">
                 총 스탯: {userStats.totalStats}
               </CardDescription>
             </div>
             {userStats.availablePoints > 0 && (
               <div className="flex flex-col">
-                <div className="bg-blue-500 text-white px-3 py-2 rounded-2xl self-end">
-                  <div className="text-sm font-semibold">
+                <div className="bg-blue-500 text-white px-2.5 py-1.5 rounded-xl self-end">
+                  <div className="text-sm font-bold">
                     {userStats.availablePoints - getTotalPendingPoints()} SP
                   </div>
                 </div>
@@ -280,7 +293,7 @@ export function StatsSection({ className }: StatsSectionProps) {
           </div>
         </CardHeader>
         
-        <CardContent className="pt-0">
+        <CardContent className="p-0 px-6">
           {/* 스탯 그리드 */}
           <div className="grid grid-cols-2 gap-3">
             {STAT_TYPES.map(({ key }) => {
@@ -295,45 +308,51 @@ export function StatsSection({ className }: StatsSectionProps) {
           </div>
 
           {/* 보상 정보 카드 */}
-          <div className="mt-4 bg-gray-50 rounded-2xl p-3">
+          <div className="mt-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-4 border border-yellow-200">
             <div className="flex items-center gap-2 mb-3">
-              <div className="text-base">🎁</div>
-              <h4 className="font-semibold text-sm text-gray-900">미션 완료 보상</h4>
+              <div className="bg-yellow-500 p-1.5 rounded-lg">
+                <Gift className="size-3 text-white" />
+              </div>
+              <h4 className="font-bold text-sm text-gray-900">미션 완료 보상</h4>
             </div>
             
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-2 p-2 bg-white rounded-xl">
-                <div className="text-sm">⚡</div>
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-gray-900">자동 증가</p>
-                  <p className="text-xs text-gray-600">카테고리별 +1</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white rounded-xl p-3 border border-yellow-100 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="bg-green-100 p-1 rounded-lg">
+                    <Zap className="size-3 text-green-600" />
+                  </div>
+                  <p className="text-xs font-bold text-gray-900">자동 증가</p>
                 </div>
+                <p className="text-xs text-gray-600">카테고리별 +1</p>
               </div>
               
-              <div className="flex items-center gap-2 p-2 bg-white rounded-xl">
-                <div className="text-sm">🎯</div>
-                <div className="flex-1">
-                  <p className="text-xs font-medium text-gray-900">할당 포인트</p>
-                  <p className="text-xs text-gray-600">자유 배분 +2</p>
+              <div className="bg-white rounded-xl p-3 border border-yellow-100 shadow-sm">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="bg-blue-100 p-1 rounded-lg">
+                    <Target className="size-3 text-blue-600" />
+                  </div>
+                  <p className="text-xs font-bold text-gray-900">할당 포인트</p>
                 </div>
+                <p className="text-xs text-gray-600">자유 배분 +2</p>
               </div>
             </div>
           </div>
 
           {/* 적용/취소 버튼 */}
           {isApplyMode && (
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex gap-3">
               <Button
                 onClick={handleCancelAllocations}
                 variant="outline"
-                className="flex-1 rounded-2xl border-gray-300 hover:bg-gray-50"
+                className="flex-1 rounded-2xl border-gray-300 hover:bg-gray-50 font-medium"
               >
                 취소
               </Button>
               <Button
                 onClick={handleApplyAllocations}
                 disabled={allocatePointsMutation.isPending}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl"
+                className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-2xl font-bold shadow-md"
               >
                 {allocatePointsMutation.isPending ? '적용 중...' : `적용하기 (${getTotalPendingPoints()}SP)`}
               </Button>
@@ -342,11 +361,14 @@ export function StatsSection({ className }: StatsSectionProps) {
           
           {/* 하단 정보 */}
           {userStats.availablePoints === 0 && !isApplyMode && (
-            <div className="mt-3 text-center p-3 bg-blue-50 rounded-2xl">
-              <div className="flex items-center justify-center gap-2 text-blue-700">
-                <span>⚡</span>
-                <span className="text-sm font-medium">미션 클리어로 경험치를 획득하세요!</span>
+            <div className="mt-4 text-center p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-blue-200">
+              <div className="flex items-center justify-center gap-2 text-blue-700 mb-1">
+                <div className="bg-blue-500 p-1 rounded-lg">
+                  <Zap className="size-3 text-white" />
+                </div>
+                <span className="text-sm font-bold">미션 클리어로 경험치를 획득하세요!</span>
               </div>
+              <p className="text-xs text-blue-600">완료한 미션에 따라 스탯이 자동으로 증가합니다</p>
             </div>
           )}
         </CardContent>

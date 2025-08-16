@@ -42,20 +42,7 @@ export function MissionSuccess({
     refreshUser();
     // React Query 캐시도 무효화
     queryClient.invalidateQueries({ queryKey: ['user'] });
-  }, [refreshUser, queryClient]);
-  
-  // 디버깅용 로그
-  useEffect(() => {
-    if (freshUserData) {
-      console.log('🔄 [MissionSuccess] Fresh user data received:', freshUserData);
-      console.log('📊 [MissionSuccess] Completed missions:', freshUserData.completed_missions);
-      console.log('🔥 [MissionSuccess] Current streak:', freshUserData.current_streak);
-    }
-  }, [freshUserData]);
-  
-  useEffect(() => {
-    console.log('👤 [MissionSuccess] Context user data:', user);
-  }, [user]);
+  }, []); // 의존성 배열을 빈 배열로 변경하여 마운트 시에만 실행
   
   const handleViewProfile = () => {
     // 프로필 관련 모든 쿼리 무효화하여 최신 데이터 로드
