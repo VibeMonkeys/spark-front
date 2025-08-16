@@ -76,7 +76,7 @@ const getCategoryTheme = (category: string) => {
 };
 
 interface HomePageProps {
-  onMissionSelect: (missionId: string) => void;
+  onMissionSelect: (missionId: number) => void;
 }
 
 export function HomePage({ onMissionSelect }: HomePageProps) {

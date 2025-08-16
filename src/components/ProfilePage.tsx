@@ -248,13 +248,11 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
             </div>
 
             {/* Level Progress */}
-            {levelProgress && (
-              <LevelProgress 
-                levelProgress={levelProgress} 
-                showDetails={true}
-                onLevelInfoClick={() => setIsLevelModalOpen(true)}
-              />
-            )}
+            <LevelProgress 
+              levelProgress={levelProgress} 
+              showDetails={true}
+              onLevelInfoClick={() => setIsLevelModalOpen(true)}
+            />
           </TabsContent>
 
           <TabsContent value="stats" className="mt-4">
