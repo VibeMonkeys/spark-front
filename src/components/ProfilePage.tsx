@@ -158,11 +158,10 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-bold text-gray-900 mb-1">{userData.name}</h2>
-                  <p className="text-sm text-gray-600 mb-2 leading-relaxed">
-                    레벨 {userData.level} {userData.level_title} • 매일 성장하는 스파크 멤버 🌟
+                  <h2 className="text-xl font-bold text-gray-900 mb-2">{userData.name}</h2>
+                  <p className="text-sm text-gray-500">
+                    매일 성장하는 스파크 멤버 ✨
                   </p>
-                  
                 </div>
               </div>
             </CardContent>
