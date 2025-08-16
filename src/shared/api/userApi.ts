@@ -2,7 +2,7 @@ import { api } from './base';
 import { ApiResponse, User, CreateUserRequest } from './types';
 
 export interface UserStatisticsResponse {
-  userId: string;
+  userId: number;
   thisMonthPoints: number;
   thisMonthMissions: number;
   totalDays: number;
@@ -26,7 +26,7 @@ export interface ChangePasswordRequest {
 }
 
 export interface AchievementResponse {
-  id: string;
+  id: number;
   title: string;
   description: string;
   icon: string;
@@ -34,7 +34,7 @@ export interface AchievementResponse {
 }
 
 export interface RecentMissionResponse {
-  id: string;
+  id: number;
   title: string;
   category: string;
   completedAt: string;
@@ -51,7 +51,7 @@ export interface ProfilePageResponse {
 
 export interface LeaderboardUserResponse {
   rank: number;
-  userId: string;
+  userId: number;
   name: string;
   avatarUrl: string;
   level: number;
@@ -68,7 +68,7 @@ export const userApi = {
   },
 
   // 사용자 조회
-  getUser: async (userId: string): Promise<User> => {
+  getUser: async (userId: number): Promise<User> => {
     const response = await api.get(`/users/${userId}`);
     if (response.data.success) {
       return response.data.data;
@@ -78,7 +78,7 @@ export const userApi = {
   },
 
   // 프로필 페이지 데이터 조회
-  getProfilePage: async (userId: string): Promise<ProfilePageResponse> => {
+  getProfilePage: async (userId: number): Promise<ProfilePageResponse> => {
     const response = await api.get(`/users/${userId}/profile`);
     if (response.data.success) {
       return response.data.data;
@@ -88,13 +88,13 @@ export const userApi = {
   },
 
   // 프로필 업데이트
-  updateProfile: async (userId: string, request: UpdateProfileRequest): Promise<User> => {
+  updateProfile: async (userId: number, request: UpdateProfileRequest): Promise<User> => {
     const response = await api.put<ApiResponse<User>>(`/users/${userId}/profile`, request);
     return response.data;
   },
 
   // 비밀번호 변경
-  changePassword: async (userId: string, currentPassword: string, newPassword: string): Promise<string> => {
+  changePassword: async (userId: number, currentPassword: string, newPassword: string): Promise<string> => {
     const response = await api.post<ApiResponse<string>>(`/users/${userId}/change-password`, {
       currentPassword,
       newPassword
@@ -107,13 +107,13 @@ export const userApi = {
   },
 
   // 선호도 업데이트
-  updatePreferences: async (userId: string, request: UpdatePreferencesRequest): Promise<User> => {
+  updatePreferences: async (userId: number, request: UpdatePreferencesRequest): Promise<User> => {
     const response = await api.put<ApiResponse<User>>(`/users/${userId}/preferences`, request);
     return response.data;
   },
 
   // 사용자 통계 조회
-  getUserStatistics: async (userId: string): Promise<UserStatisticsResponse> => {
+  getUserStatistics: async (userId: number): Promise<UserStatisticsResponse> => {
     const response = await api.get<ApiResponse<UserStatisticsResponse>>(`/users/${userId}/statistics`);
     return response.data;
   },

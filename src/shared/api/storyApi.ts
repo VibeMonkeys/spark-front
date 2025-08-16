@@ -9,9 +9,9 @@ import {
 } from './types';
 
 export interface StoryComment {
-  id: string;
-  storyId: string;
-  userId: string;
+  id: number;
+  storyId: number;
+  userId: number;
   userName: string;
   userAvatarUrl: string;
   content: string;
@@ -41,7 +41,7 @@ export const storyApi = {
     page: number = 0,
     size: number = 20,
     category?: string,
-    userId?: string
+    userId?: number
   ): Promise<PagedResponse<StoryFeedItem>> => {
     const params = new URLSearchParams({
       sortBy,
@@ -49,7 +49,7 @@ export const storyApi = {
       size: size.toString(),
     });
     if (category) params.append('category', category);
-    if (userId) params.append('userId', userId);
+    if (userId) params.append('userId', userId.toString());
     
     const response = await api.get<ApiResponse<PagedResponse<any>>>(`/stories/feed?${params}`);
     if (!response.data.success) {
@@ -59,7 +59,7 @@ export const storyApi = {
   },
 
   // 스토리 상세 조회
-  getStory: async (storyId: string, userId?: string): Promise<Story> => {
+  getStory: async (storyId: number, userId?: number): Promise<Story> => {
     const params = userId ? `?userId=${userId}` : '';
     const response = await api.get<ApiResponse<Story>>(`/stories/${storyId}${params}`);
     return response.data;
@@ -67,23 +67,23 @@ export const storyApi = {
 
   // 사용자의 스토리 조회
   getUserStories: async (
-    targetUserId: string,
+    targetUserId: number,
     page: number = 0,
     size: number = 20,
-    currentUserId?: string
+    currentUserId?: number
   ): Promise<PagedResponse<Story>> => {
     const params = new URLSearchParams({
       page: page.toString(),
       size: size.toString(),
     });
-    if (currentUserId) params.append('currentUserId', currentUserId);
+    if (currentUserId) params.append('currentUserId', currentUserId.toString());
     
     const response = await api.get<ApiResponse<PagedResponse<Story>>>(`/stories/user/${targetUserId}?${params}`);
     return response.data;
   },
 
   // 스토리 좋아요
-  likeStory: async (storyId: string, userId: string): Promise<Story> => {
+  likeStory: async (storyId: number, userId: number): Promise<Story> => {
     const response = await api.post<ApiResponse<Story>>(`/stories/${storyId}/like?userId=${userId}`);
     if (!response.data.success) {
       throw new Error(response.data.error?.message || 'Failed to like story');
@@ -92,7 +92,7 @@ export const storyApi = {
   },
 
   // 스토리 좋아요 취소
-  unlikeStory: async (storyId: string, userId: string): Promise<Story> => {
+  unlikeStory: async (storyId: number, userId: number): Promise<Story> => {
     const response = await api.delete<ApiResponse<Story>>(`/stories/${storyId}/like?userId=${userId}`);
     if (!response.data.success) {
       throw new Error(response.data.error?.message || 'Failed to unlike story');
@@ -101,13 +101,13 @@ export const storyApi = {
   },
 
   // 스토리 댓글 조회
-  getStoryComments: async (storyId: string): Promise<StoryComment[]> => {
+  getStoryComments: async (storyId: number): Promise<StoryComment[]> => {
     const response = await api.get<ApiResponse<StoryComment[]>>(`/stories/${storyId}/comments`);
     return response.data;
   },
 
   // 스토리 댓글 추가
-  addComment: async (storyId: string, userId: string, request: AddCommentRequest): Promise<StoryComment> => {
+  addComment: async (storyId: number, userId: number, request: AddCommentRequest): Promise<StoryComment> => {
     const response = await api.post<ApiResponse<StoryComment>>(
       `/stories/${storyId}/comments?userId=${userId}`,
       request
@@ -116,13 +116,13 @@ export const storyApi = {
   },
 
   // 스토리 수정
-  updateStory: async (storyId: string, userId: string, request: UpdateStoryRequest): Promise<Story> => {
+  updateStory: async (storyId: number, userId: number, request: UpdateStoryRequest): Promise<Story> => {
     const response = await api.put<ApiResponse<Story>>(`/stories/${storyId}?userId=${userId}`, request);
     return response.data;
   },
 
   // 스토리 삭제
-  deleteStory: async (storyId: string, userId: string): Promise<void> => {
+  deleteStory: async (storyId: number, userId: number): Promise<void> => {
     await api.delete(`/stories/${storyId}?userId=${userId}`);
   },
 
@@ -134,7 +134,7 @@ export const storyApi = {
     location?: string,
     page: number = 0,
     size: number = 20,
-    userId?: string
+    userId?: number
   ): Promise<PagedResponse<Story>> => {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -144,7 +144,7 @@ export const storyApi = {
     if (hashTag) params.append('hashTag', hashTag);
     if (category) params.append('category', category);
     if (location) params.append('location', location);
-    if (userId) params.append('userId', userId);
+    if (userId) params.append('userId', userId.toString());
     
     const response = await api.get<ApiResponse<PagedResponse<Story>>>(`/stories/search?${params}`);
     return response.data;

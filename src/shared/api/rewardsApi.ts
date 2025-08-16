@@ -8,7 +8,7 @@ export interface UserPointsResponse {
 }
 
 export interface RewardResponse {
-  id: string;
+  id: number;
   title: string;
   description: string;
   category: string;
@@ -23,7 +23,7 @@ export interface RewardResponse {
 }
 
 export interface UserRewardResponse {
-  id: string;
+  id: number;
   title: string;
   brand: string;
   points: number;
@@ -41,7 +41,7 @@ export interface RewardsPageResponse {
 
 export const rewardsApi = {
   // 리워드 페이지 전체 데이터 조회
-  getRewardsPage: async (userId: string): Promise<RewardsPageResponse> => {
+  getRewardsPage: async (userId: number): Promise<RewardsPageResponse> => {
     try {
       const response = await api.get<ApiResponse<RewardsPageResponse>>(`/rewards/page?userId=${userId}`);
       if (!response.data.success) {
@@ -55,7 +55,7 @@ export const rewardsApi = {
   },
 
   // 사용자 포인트 정보 조회
-  getUserPoints: async (userId: string): Promise<UserPointsResponse> => {
+  getUserPoints: async (userId: number): Promise<UserPointsResponse> => {
     try {
       const response = await api.get<ApiResponse<UserPointsResponse>>(`/rewards/points?userId=${userId}`);
       if (!response.data.success) {
@@ -70,7 +70,7 @@ export const rewardsApi = {
 
   // 사용 가능한 리워드 조회
   getAvailableRewards: async (
-    userId: string,
+    userId: number,
     category?: string,
     maxPoints?: number,
     page: number = 0,
@@ -78,7 +78,7 @@ export const rewardsApi = {
   ): Promise<RewardResponse[]> => {
     try {
       const params = new URLSearchParams({
-        userId,
+        userId: userId.toString(),
         page: page.toString(),
         size: size.toString()
       });
@@ -98,7 +98,7 @@ export const rewardsApi = {
   },
 
   // 리워드 교환
-  exchangeReward: async (rewardId: string, userId: string): Promise<UserRewardResponse> => {
+  exchangeReward: async (rewardId: number, userId: number): Promise<UserRewardResponse> => {
     try {
       const response = await api.post<ApiResponse<UserRewardResponse>>(`/rewards/${rewardId}/exchange?userId=${userId}`);
       if (!response.data.success) {
@@ -113,14 +113,14 @@ export const rewardsApi = {
 
   // 사용자 리워드 내역 조회
   getUserRewards: async (
-    userId: string,
+    userId: number,
     status?: string,
     page: number = 0,
     size: number = 20
   ): Promise<UserRewardResponse[]> => {
     try {
       const params = new URLSearchParams({
-        userId,
+        userId: userId.toString(),
         page: page.toString(),
         size: size.toString()
       });
