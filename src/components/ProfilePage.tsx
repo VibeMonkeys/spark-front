@@ -267,25 +267,22 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                 {/* 완료된 업적 */}
                 {achievementsData.filter(achievement => achievement.isUnlocked).length > 0 && (
                   <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <div className="bg-green-500 text-white text-xs px-2.5 py-1 rounded-full font-medium">
-                        {achievementsData.filter(achievement => achievement.isUnlocked).length}
-                      </div>
-                      완료된 업적
+                    <h3 className="text-sm font-bold text-gray-900 mb-3">
+                      완료된 업적 ({achievementsData.filter(achievement => achievement.isUnlocked).length})
                     </h3>
                     <div className="space-y-2">
                       {achievementsData.filter(achievement => achievement.isUnlocked).map((achievement) => (
                         <div
                           key={achievement.id}
-                          className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-4 border border-green-100 shadow-sm hover:shadow-md transition-all duration-200"
+                          className="border-0 bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
                         >
                           <div className="flex items-center gap-4">
                             {/* Achievement Icon */}
                             <div className="relative">
-                              <div className="size-12 rounded-2xl flex items-center justify-center text-xl bg-white shadow-sm border border-green-200">
+                              <div className="size-12 rounded-2xl flex items-center justify-center text-xl bg-gray-50 border border-gray-200">
                                 {achievement.icon}
                               </div>
-                              <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-1">
+                              <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-1">
                                 <Trophy className="size-2 text-white" />
                               </div>
                             </div>
@@ -297,12 +294,12 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                                   <h4 className="font-bold text-gray-900 text-sm mb-1">
                                     {achievement.name}
                                   </h4>
-                                  <p className="text-xs text-gray-700">
+                                  <p className="text-xs text-gray-600">
                                     {achievement.description}
                                   </p>
                                 </div>
-                                <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium ml-2">
-                                  완료
+                                <div className="text-xs text-gray-500 font-medium ml-2">
+                                  ✓ 완료
                                 </div>
                               </div>
                               
@@ -326,30 +323,32 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                 {/* 진행 중인 업적 */}
                 {achievementsData.filter(achievement => !achievement.isUnlocked).length > 0 && (
                   <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                      <div className="bg-blue-500 text-white text-xs px-2.5 py-1 rounded-full font-medium">
-                        {achievementsData.filter(achievement => !achievement.isUnlocked).length}
-                      </div>
-                      진행 중인 업적
+                    <h3 className="text-sm font-bold text-gray-900 mb-3">
+                      진행 중인 업적 ({achievementsData.filter(achievement => !achievement.isUnlocked).length})
                     </h3>
                     <div className="space-y-2">
                       {achievementsData.filter(achievement => !achievement.isUnlocked).map((achievement) => (
                         <div
                           key={achievement.id}
-                          className="bg-gray-50 rounded-2xl p-4 border border-gray-200 hover:bg-gray-100 transition-all duration-200"
+                          className="border-0 bg-white/60 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/70 transition-all duration-200"
                         >
                           <div className="flex items-center gap-4">
                             {/* Achievement Icon */}
-                            <div className="size-12 rounded-2xl flex items-center justify-center text-xl bg-white border border-gray-200 opacity-60">
+                            <div className="size-12 rounded-2xl flex items-center justify-center text-xl bg-gray-50 border border-gray-200 opacity-70">
                               {achievement.icon}
                             </div>
                             
                             {/* Achievement Info */}
                             <div className="flex-1 min-w-0">
                               <div className="mb-2">
-                                <h4 className="font-bold text-gray-600 text-sm mb-1">
-                                  {achievement.name}
-                                </h4>
+                                <div className="flex items-start justify-between mb-1">
+                                  <h4 className="font-bold text-gray-700 text-sm">
+                                    {achievement.name}
+                                  </h4>
+                                  <div className="text-xs text-gray-500 font-medium ml-2">
+                                    진행중
+                                  </div>
+                                </div>
                                 <p className="text-xs text-gray-600">
                                   {achievement.description}
                                 </p>
@@ -379,9 +378,6 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                                 >
                                   {achievement.rarity.name}
                                 </span>
-                                <div className="bg-gray-400 text-white text-xs px-2 py-1 rounded-full font-medium">
-                                  진행중
-                                </div>
                               </div>
                             </div>
                           </div>

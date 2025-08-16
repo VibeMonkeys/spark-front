@@ -16,7 +16,8 @@ import {
   Target,
   Zap,
   User,
-  Gift
+  Gift,
+  Info
 } from "lucide-react";
 
 interface StatsSectionProps {
@@ -36,6 +37,7 @@ export function StatsSection({ className }: StatsSectionProps) {
   const queryClient = useQueryClient();
   const [pendingAllocations, setPendingAllocations] = useState<Record<string, number>>({});
   const [isApplyMode, setIsApplyMode] = useState(false);
+  const [isRewardInfoOpen, setIsRewardInfoOpen] = useState(false);
 
   // 사용자 스탯 데이터 조회
   const { data: statsResponse, isLoading, error } = useQuery({
@@ -307,36 +309,17 @@ export function StatsSection({ className }: StatsSectionProps) {
             }).filter(Boolean)}
           </div>
 
-          {/* 보상 정보 카드 */}
-          <div className="mt-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-4 border border-yellow-200">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="bg-yellow-500 p-1.5 rounded-lg">
-                <Gift className="size-3 text-white" />
-              </div>
-              <h4 className="font-bold text-sm text-gray-900">미션 완료 보상</h4>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white rounded-xl p-3 border border-yellow-100 shadow-sm">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="bg-green-100 p-1 rounded-lg">
-                    <Zap className="size-3 text-green-600" />
-                  </div>
-                  <p className="text-xs font-bold text-gray-900">자동 증가</p>
-                </div>
-                <p className="text-xs text-gray-600">카테고리별 +1</p>
-              </div>
-              
-              <div className="bg-white rounded-xl p-3 border border-yellow-100 shadow-sm">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="bg-blue-100 p-1 rounded-lg">
-                    <Target className="size-3 text-blue-600" />
-                  </div>
-                  <p className="text-xs font-bold text-gray-900">할당 포인트</p>
-                </div>
-                <p className="text-xs text-gray-600">자유 배분 +2</p>
-              </div>
-            </div>
+          {/* 보상 정보 버튼 */}
+          <div className="mt-4 flex justify-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsRewardInfoOpen(true)}
+              className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+            >
+              <Info className="size-4 mr-1" />
+              보상 정보
+            </Button>
           </div>
 
           {/* 적용/취소 버튼 */}
@@ -374,6 +357,39 @@ export function StatsSection({ className }: StatsSectionProps) {
         </CardContent>
       </Card>
 
+      {/* 보상 정보 모달 */}
+      <ConfirmModal
+        isOpen={isRewardInfoOpen}
+        onClose={() => setIsRewardInfoOpen(false)}
+        onConfirm={() => setIsRewardInfoOpen(false)}
+        type="info"
+        title="미션 완료 보상"
+        message={
+          <div className="space-y-3 text-left pt-4 pb-2">
+            <div className="bg-gray-50 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="size-4 text-blue-600" />
+                <h4 className="font-semibold text-gray-900 text-sm">자동 증가</h4>
+              </div>
+              <p className="text-xs text-gray-600">
+                미션을 완료하면 해당 카테고리의 스탯이 자동으로 +1 증가합니다.
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Target className="size-4 text-purple-600" />
+                <h4 className="font-semibold text-gray-900 text-sm">할당 포인트</h4>
+              </div>
+              <p className="text-xs text-gray-600">
+                미션을 완료하면 자유롭게 배분할 수 있는 스킬 포인트 +2를 획득합니다.
+              </p>
+            </div>
+          </div>
+        }
+        confirmText="확인"
+        showCancel={false}
+      />
     </>
   );
 }

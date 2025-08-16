@@ -147,7 +147,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-muted-foreground">미션 정보를 불러오는 중...</p>
+          <p className="text-gray-600">미션 정보를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -204,53 +204,45 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={onBack} className="p-2">
+          <Button variant="ghost" size="sm" onClick={onBack} className="p-2 hover:bg-gray-50">
             <ArrowLeft className="size-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="font-semibold">미션 인증</h1>
-            <p className="text-xs text-muted-foreground">경험을 공유해주세요</p>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">미션 인증</h1>
           </div>
         </div>
       </header>
 
       <div className="max-w-md mx-auto px-4 pb-20">
         {/* Mission Summary */}
-        <div className="py-4">
-          <Card className="border-0 bg-gradient-to-r from-green-400 to-blue-500 text-white shadow-xl">
-            <CardContent className="p-5">
-              <div className="flex items-center gap-4">
-                <div className="size-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <CheckCircle className="size-6 text-white" />
+        <div className="py-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border-0 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="size-12 bg-blue-500 rounded-2xl flex items-center justify-center">
+                <CheckCircle className="size-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">
+                    {getCategoryText(missionData.category)}
+                  </span>
+                  <span className="text-xs text-gray-500 font-medium">미션 완료!</span>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Badge className="bg-white/20 text-white border-white/30 text-xs">
-                      {getCategoryText(missionData.category)}
-                    </Badge>
-                    <span className="text-xs text-white/90 font-medium">미션 완료!</span>
-                  </div>
-                  <h3 className="font-bold text-lg">{missionData.title}</h3>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1 bg-white/20 rounded-full px-3 py-1">
-                    <Trophy className="size-4" />
-                    <span className="font-bold">+{missionData.reward_points}P</span>
-                  </div>
+                <h3 className="font-bold text-lg text-gray-900 mb-1">{missionData.title}</h3>
+                <div className="flex items-center gap-1 text-blue-600">
+                  <Trophy className="size-4" />
+                  <span className="font-bold text-sm">+{missionData.reward_points}P 획득</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Photo Upload Section */}
-        <section className="mb-6">
-          <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-            <Camera className="size-5 text-purple-500" />
-            사진 업로드
-          </h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            미션 완료를 위해 <span className="font-medium text-purple-600">사진을 업로드하거나</span> 아래 경험 스토리를 작성해주세요 (둘 중 하나만 해도 됩니다)
+        <section className="mb-8">
+          <h3 className="font-bold text-lg text-gray-900 mb-1">사진 업로드</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            사진을 업로드하거나 아래 경험 스토리를 작성해주세요
           </p>
           
           {selectedImages.length > 0 ? (
@@ -279,46 +271,43 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
             <Button
               variant="outline"
               onClick={handleImageUpload}
-              className="h-24 flex-col gap-2 bg-gradient-to-br from-purple-50 to-blue-50 backdrop-blur-sm border-dashed border-purple-300 hover:bg-gradient-to-br hover:from-purple-100 hover:to-blue-100 transition-all"
+              className="h-24 flex-col gap-2 bg-gray-50 border-gray-200 hover:bg-gray-100 transition-all"
             >
-              <Camera className="size-6 text-purple-500" />
-              <span className="text-sm font-medium text-purple-700">카메라</span>
+              <Camera className="size-6 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">카메라</span>
             </Button>
             <Button
               variant="outline"
               onClick={handleImageUpload}
-              className="h-24 flex-col gap-2 bg-gradient-to-br from-blue-50 to-green-50 backdrop-blur-sm border-dashed border-blue-300 hover:bg-gradient-to-br hover:from-blue-100 hover:to-green-100 transition-all"
+              className="h-24 flex-col gap-2 bg-gray-50 border-gray-200 hover:bg-gray-100 transition-all"
             >
-              <Upload className="size-6 text-blue-500" />
-              <span className="text-sm font-medium text-blue-700">갤러리</span>
+              <Upload className="size-6 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">갤러리</span>
             </Button>
           </div>
         </section>
 
         {/* Story Section */}
         <section className="mb-6">
-          <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-            <Sparkles className="size-5 text-yellow-500" />
-            경험 스토리 작성
-          </h3>
-          <p className="text-sm text-muted-foreground mb-4">
-            또는 <span className="font-medium text-yellow-600">10자 이상의 경험 스토리</span>를 작성해서 미션을 완료하세요
+          <h3 className="font-bold text-lg text-gray-900 mb-1">경험 스토리 작성</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            또는 <span className="font-medium text-blue-600">10자 이상의 경험 스토리</span>를 작성해서 미션을 완료하세요
           </p>
-          <Card className="border-0 bg-white/70 backdrop-blur-sm shadow-lg">
-            <CardContent className="p-4">
+          <div className="bg-white/80 backdrop-blur-sm border-0 shadow-sm rounded-2xl">
+            <div className="p-4">
               <Textarea
                 placeholder="어떤 경험을 하셨나요? 새롭게 발견한 것이나 느낀 점을 자유롭게 적어주세요! (최소 10자)"
                 value={story}
                 onChange={(e) => setStory(e.target.value)}
-                className="min-h-[120px] resize-none border-0 bg-transparent focus:ring-0 focus:border-0 p-0 placeholder:text-muted-foreground/60"
+                className="min-h-[120px] resize-none border-0 bg-transparent focus:ring-0 focus:border-0 p-0 placeholder:text-gray-400"
                 maxLength={500}
               />
-              <div className="flex justify-between items-center mt-3 pt-3 border-t">
-                <span className="text-xs text-muted-foreground">
+              <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+                <span className="text-xs text-gray-500">
                   {story.length}/500자
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-gray-500">
                     {isPublic ? "공개" : "비공개"}
                   </span>
                   <Switch
@@ -328,116 +317,109 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
                   />
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </section>
 
         {/* Auto Tags */}
         <section className="mb-6">
-          <Card className="border-0 bg-gradient-to-r from-indigo-50 to-pink-50 backdrop-blur-sm">
-            <CardContent className="p-4">
-              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                <MapPin className="size-5 text-indigo-500" />
-                자동 감지 태그
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors">
-                  <MapPin className="size-3 mr-1" />
-                  {location}
-                </Badge>
-                <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-200 transition-colors">
-                  <Clock className="size-3 mr-1" />
-                  저녁시간
-                </Badge>
-                <Badge variant="secondary" className="bg-orange-100 text-orange-700 hover:bg-orange-200 transition-colors">
-                  #새로운경험
-                </Badge>
-                <Badge variant="secondary" className="bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors">
-                  #{getCategoryText(missionData.category)}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-white/80 backdrop-blur-sm border-0 shadow-sm rounded-2xl p-4">
+            <h3 className="font-bold text-lg text-gray-900 mb-3 flex items-center gap-2">
+              <MapPin className="size-5 text-gray-600" />
+              자동 감지 태그
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors">
+                <MapPin className="size-3 mr-1" />
+                {location}
+              </Badge>
+              <Badge variant="secondary" className="bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors">
+                <Clock className="size-3 mr-1" />
+                저녁시간
+              </Badge>
+              <Badge variant="secondary" className="bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors">
+                #새로운경험
+              </Badge>
+              <Badge variant="secondary" className="bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors">
+                #{getCategoryText(missionData.category)}
+              </Badge>
+            </div>
+          </div>
         </section>
 
         {/* Progress Indicator */}
         <div className="mb-4">
-          <Card className="border-0 bg-white/50 backdrop-blur-sm">
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-muted-foreground">완료 조건</span>
-                <div className="flex items-center gap-1 font-medium">
-                  {story.trim().length >= 10 || selectedImages.length > 0 ? (
-                    <>
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-green-600">완료</span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                      <span className="text-orange-600">미완료</span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="text-xs text-muted-foreground mb-2">
-                {story.trim().length >= 10 && selectedImages.length > 0 ? (
-                  <div className="flex items-center gap-1">
+          <div className="bg-white/80 backdrop-blur-sm border-0 shadow-sm rounded-2xl p-4">
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-gray-600 font-medium">완료 조건</span>
+              <div className="flex items-center gap-1 font-medium">
+                {story.trim().length >= 10 || selectedImages.length > 0 ? (
+                  <>
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-green-600 font-medium">사진과 스토리 모두 완료! 훌륭해요!</span>
-                  </div>
-                ) : story.trim().length >= 10 ? (
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span className="text-green-600 font-medium">스토리 작성 완료 ({story.trim().length}자)</span>
-                  </div>
-                ) : selectedImages.length > 0 ? (
-                  <div className="flex items-center gap-1">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span className="text-green-600 font-medium">사진 업로드 완료 ({selectedImages.length}장)</span>
-                  </div>
+                    <span className="text-green-600">완료</span>
+                  </>
                 ) : (
-                  <div className="flex items-center gap-1">
+                  <>
                     <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                    <span className="text-orange-600">사진 업로드 또는 10자 이상 스토리 작성 필요</span>
-                  </div>
+                    <span className="text-orange-600">미완료</span>
+                  </>
                 )}
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                <div 
-                  className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full transition-all duration-300"
-                  style={{ 
-                    width: story.trim().length >= 10 || selectedImages.length > 0 ? "100%" : "0%" 
-                  }}
-                />
-              </div>
-              {(story.trim().length < 10 && selectedImages.length === 0) && (
-                <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg mb-4">
-                  <p className="text-sm text-orange-700 text-center">
-                    <span className="font-medium">미션을 완료하려면</span><br />
-                    사진을 업로드하거나 10자 이상의 스토리를 작성해주세요
-                  </p>
+            </div>
+            <div className="text-xs text-gray-600 mb-3">
+              {story.trim().length >= 10 && selectedImages.length > 0 ? (
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-green-600 font-medium">사진과 스토리 모두 완료! 훌륭해요!</span>
+                </div>
+              ) : story.trim().length >= 10 ? (
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-green-600 font-medium">스토리 작성 완료 ({story.trim().length}자)</span>
+                </div>
+              ) : selectedImages.length > 0 ? (
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span className="text-green-600 font-medium">사진 업로드 완료 ({selectedImages.length}장)</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
+                  <span className="text-orange-600">사진 업로드 또는 10자 이상 스토리 작성 필요</span>
                 </div>
               )}
-              
-              {/* Submit Button */}
-              <Button
-                onClick={handleSubmit}
-                disabled={(story.trim().length < 10 && selectedImages.length === 0) || verifyMissionMutation.isPending}
-                className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 border-0 disabled:opacity-50 shadow-lg transform hover:scale-105 transition-all duration-200 h-14"
-                size="lg"
-              >
-                <Send className="size-5 mr-2" />
-                <span className="font-bold">
-                  {verifyMissionMutation.isPending ? "미션 인증 중..." :
-                   (story.trim().length >= 10 || selectedImages.length > 0) ? "미션 완료 & 피드 공유" : "미션 완료하기"}
-                </span>
-                {(story.trim().length >= 10 || selectedImages.length > 0) && !verifyMissionMutation.isPending && (
-                  <span className="ml-2">→</span>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ 
+                  width: story.trim().length >= 10 || selectedImages.length > 0 ? "100%" : "0%" 
+                }}
+              />
+            </div>
+            {(story.trim().length < 10 && selectedImages.length === 0) && (
+              <div className="p-3 bg-orange-50 border border-orange-200 rounded-xl mb-4">
+                <p className="text-sm text-orange-700 text-center">
+                  <span className="font-medium">미션을 완료하려면</span><br />
+                  사진을 업로드하거나 10자 이상의 스토리를 작성해주세요
+                </p>
+              </div>
+            )}
+            
+            {/* Submit Button */}
+            <Button
+              onClick={handleSubmit}
+              disabled={(story.trim().length < 10 && selectedImages.length === 0) || verifyMissionMutation.isPending}
+              className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:text-gray-500 text-white font-semibold rounded-2xl h-14 transition-all duration-200"
+              size="lg"
+            >
+              <Send className="size-5 mr-2" />
+              <span className="font-semibold">
+                {verifyMissionMutation.isPending ? "미션 인증 중..." :
+                 (story.trim().length >= 10 || selectedImages.length > 0) ? "미션 완료 & 피드 공유" : "미션 완료하기"}
+              </span>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

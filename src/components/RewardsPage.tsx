@@ -100,11 +100,15 @@ export function RewardsPage() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             리워드
           </h1>
-          
-          {/* Points Summary */}
+        </div>
+      </header>
+
+      <div className="max-w-md mx-auto px-4 pb-20">
+        {/* Points Summary */}
+        <div className="py-4">
           <Card className="bg-gradient-to-r from-purple-500 to-blue-500 text-white border-0">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -140,10 +144,7 @@ export function RewardsPage() {
             </div>
           </div>
         </div>
-      </header>
-
-      <div className="max-w-md mx-auto px-4 pb-20">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="py-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
           <TabsList className="grid w-full grid-cols-2 bg-white/60 backdrop-blur-sm">
             <TabsTrigger value="shop">리워드 샵</TabsTrigger>
             <TabsTrigger value="history">사용 내역</TabsTrigger>
