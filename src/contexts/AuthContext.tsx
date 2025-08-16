@@ -38,6 +38,7 @@ interface AuthContextType {
   refreshToken: string | null;
   login: (authData: AuthResponse) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
@@ -131,6 +132,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('refresh_token');
   };
 
+  const refreshUser = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const updatedUserData = await userApi.getProfile(user.id);
+      setUser(updatedUserData);
+      localStorage.setItem('current_user', JSON.stringify(updatedUserData));
+    } catch (error) {
+      console.error('❌ [AuthContext] Failed to refresh user data:', error);
+    }
+  };
+
   const isAuthenticated = !!(user && token && refreshToken);
 
   return (
@@ -140,6 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshToken, 
       login, 
       logout, 
+      refreshUser,
       isLoading, 
       isAuthenticated 
     }}>
