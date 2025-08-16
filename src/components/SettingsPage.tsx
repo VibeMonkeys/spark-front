@@ -75,7 +75,7 @@ export function SettingsPage({ onBack, onNavigate }: SettingsPageProps) {
 
       <div className="max-w-md mx-auto px-4 py-6 pb-20">
         {/* User Info Card */}
-        <Card className="border-0 bg-white/60 backdrop-blur-sm mb-6">
+        <Card className="border-0 bg-white backdrop-blur-sm mb-6">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="size-12 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center text-white font-semibold">
@@ -97,7 +97,7 @@ export function SettingsPage({ onBack, onNavigate }: SettingsPageProps) {
           {settingsOptions.map((option) => (
             <Card 
               key={option.id}
-              className="border-0 bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all duration-200 cursor-pointer"
+              className="border-0 bg-white backdrop-blur-sm hover:bg-white/80 transition-all duration-200 cursor-pointer"
               onClick={() => onNavigate(option.id)}
             >
               <CardContent className="p-4">
