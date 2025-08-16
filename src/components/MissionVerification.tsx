@@ -213,10 +213,10 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
         </div>
       </header>
 
-      <div className="max-w-md mx-auto px-4 pb-20">
+      <div className="max-w-md mx-auto px-4 pb-4">
         {/* Mission Summary */}
-        <div className="py-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border-0 shadow-sm">
+        <div className="py-4">
+          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="size-12 bg-blue-500 rounded-2xl flex items-center justify-center">
                 <CheckCircle className="size-6 text-white" />
@@ -226,20 +226,19 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
                   <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">
                     {getCategoryText(missionData.category)}
                   </span>
-                  <span className="text-xs text-gray-500 font-medium">미션 완료!</span>
+                  <span className="text-xs text-blue-600 font-semibold">+{missionData.reward_points}P 획득</span>
                 </div>
-                <h3 className="font-bold text-lg text-gray-900 mb-1">{missionData.title}</h3>
-                <div className="flex items-center gap-1 text-blue-600">
-                  <Trophy className="size-4" />
-                  <span className="font-bold text-sm">+{missionData.reward_points}P 획득</span>
-                </div>
+                <h3 className="font-semibold text-lg text-gray-900 mb-1">{missionData.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {missionData.description}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Photo Upload Section */}
-        <section className="mb-8">
+        <section className="mb-4">
           <h3 className="font-bold text-lg text-gray-900 mb-1">사진 업로드</h3>
           <p className="text-sm text-gray-600 mb-4">
             사진을 업로드하거나 아래 경험 스토리를 작성해주세요
@@ -397,14 +396,6 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
                 }}
               />
             </div>
-            {(story.trim().length < 10 && selectedImages.length === 0) && (
-              <div className="p-3 bg-orange-50 border border-orange-200 rounded-xl mb-4">
-                <p className="text-sm text-orange-700 text-center">
-                  <span className="font-medium">미션을 완료하려면</span><br />
-                  사진을 업로드하거나 10자 이상의 스토리를 작성해주세요
-                </p>
-              </div>
-            )}
             
             {/* Submit Button */}
             <Button
