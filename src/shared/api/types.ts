@@ -28,7 +28,7 @@ export interface PagedResponse<T> {
 
 // 공통 타입들
 export interface User {
-  id: string;
+  id: number;
   email: string;
   name: string;
   avatarUrl: string;
@@ -45,8 +45,8 @@ export interface User {
 }
 
 export interface Mission {
-  id: string;
-  userId?: string;
+  id: number;
+  userId?: number;
   title: string;
   description: string;
   detailed_description?: string;
@@ -68,9 +68,9 @@ export interface Mission {
 }
 
 export interface Story {
-  id: string;
-  userId: string;
-  missionId: string;
+  id: number;
+  userId: number;
+  missionId: number;
   missionTitle: string;
   missionCategory: string;
   storyText: string;
@@ -86,16 +86,16 @@ export interface Story {
 }
 
 export interface StoryFeedItem {
-  storyId: string;
+  storyId: number;
   user: {
-    userId: string;
+    userId: number;
     name: string;
     avatarUrl: string;
     level: number;
     levelTitle: string;
   };
   mission: {
-    missionId: string;
+    missionId: number;
     title: string;
     category: string;
   };
@@ -114,7 +114,7 @@ export interface StoryFeedItem {
 }
 
 export interface Reward {
-  id: string;
+  id: number;
   title: string;
   description: string;
   category: string;
@@ -133,9 +133,9 @@ export interface Reward {
 }
 
 export interface UserReward {
-  id: string;
-  userId: string;
-  rewardId: string;
+  id: number;
+  userId: number;
+  rewardId: number;
   rewardTitle: string;
   rewardBrand: string;
   pointsUsed: number;
@@ -148,7 +148,7 @@ export interface UserReward {
 
 // 응답 DTO 타입들
 export interface UserSummaryResponse {
-  userId: string;
+  userId: number;
   name: string;
   avatarUrl: string;
   level: number;
@@ -167,7 +167,7 @@ export interface HomePageResponse {
 }
 
 export interface MissionDetailResponse {
-  id: string;
+  id: number;
   title: string;
   description: string;
   detailed_description: string;
@@ -181,7 +181,7 @@ export interface MissionDetailResponse {
   completed_by: number;
   average_rating: number;
   similar_missions: {
-    id: string;
+    id: number;
     title: string;
     difficulty: string;
     points: number;
@@ -209,7 +209,7 @@ export interface CategoryStatResponse {
 }
 
 export interface MissionVerificationResponse {
-  story_id: string;
+  story_id: number;
   points_earned: number;
   streak_count: number;
   level_up: boolean;
@@ -256,7 +256,7 @@ export interface CreateUserRequest {
 }
 
 export interface MissionVerificationRequest {
-  missionId: string;
+  missionId: number;
   story: string;
   images: string[];
   location: string;
@@ -292,7 +292,7 @@ export interface DominantStat {
 }
 
 export interface UserStats {
-  userId: string;
+  userId: number;
   strength: StatValue;
   intelligence: StatValue;
   creativity: StatValue;
@@ -310,7 +310,7 @@ export interface UserStats {
 
 export interface StatsRankingItem {
   rank: number;
-  userId: string;
+  userId: number;
   username: string;
   avatarUrl?: string;
   statValue: number;
@@ -319,7 +319,7 @@ export interface StatsRankingItem {
 }
 
 export interface UserRankingInfo {
-  userId: string;
+  userId: number;
   totalStatsRank: number;
   strengthRank: number;
   intelligenceRank: number;
