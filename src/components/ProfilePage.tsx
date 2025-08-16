@@ -144,7 +144,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
       <div className="max-w-md mx-auto px-4 pb-20">
         {/* Enhanced Profile Header */}
         <div className="py-4">
-          <Card className="border-0 bg-white/60 backdrop-blur-sm">
+          <Card className="border-0 bg-white backdrop-blur-sm">
             <CardContent className="p-5">
               <div className="flex items-start gap-4">
                 <div className="relative">
@@ -170,7 +170,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-white/60 backdrop-blur-sm h-16 rounded-xl p-1 border border-gray-200/50">
+          <TabsList className="grid w-full grid-cols-4 bg-white backdrop-blur-sm h-16 rounded-xl p-1 border border-gray-200/50">
             <TabsTrigger 
               value="overview" 
               className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
@@ -204,7 +204,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
           <TabsContent value="overview" className="mt-2 space-y-4">
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
-              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <Card className="border-0 bg-white backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center gap-1 mb-2">
                     <Star className="size-4 text-blue-500" />
@@ -214,7 +214,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                 </CardContent>
               </Card>
               
-              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <Card className="border-0 bg-white backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center gap-1 mb-2">
                     <Flame className="size-4 text-orange-500" />
@@ -224,7 +224,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                 </CardContent>
               </Card>
               
-              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <Card className="border-0 bg-white backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center gap-1 mb-2">
                     <Target className="size-4 text-green-500" />
@@ -234,7 +234,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                 </CardContent>
               </Card>
               
-              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <Card className="border-0 bg-white backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center gap-1 mb-2">
                     <Calendar className="size-4 text-purple-500" />
@@ -274,7 +274,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                       {achievementsData.filter(achievement => achievement.isUnlocked).map((achievement) => (
                         <div
                           key={achievement.id}
-                          className="border-0 bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
+                          className="border-0 bg-white backdrop-blur-sm rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
                         >
                           <div className="flex items-center gap-4">
                             {/* Achievement Icon */}
@@ -330,7 +330,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                       {achievementsData.filter(achievement => !achievement.isUnlocked).map((achievement) => (
                         <div
                           key={achievement.id}
-                          className="border-0 bg-white/60 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/70 transition-all duration-200"
+                          className="border-0 bg-white backdrop-blur-sm rounded-2xl p-4 hover:bg-white/70 transition-all duration-200"
                         >
                           <div className="flex items-center gap-4">
                             {/* Achievement Icon */}
@@ -392,7 +392,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
 
           <TabsContent value="activity" className="mt-2 space-y-4">
             {/* Category Stats */}
-            <Card className="border-0 bg-white/60 backdrop-blur-sm">
+            <Card className="border-0 bg-white backdrop-blur-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-bold text-gray-900 flex items-center gap-2">
                   <div className="bg-blue-500 p-1.5 rounded-lg">
@@ -430,7 +430,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
             </Card>
             
             {/* Recent Missions */}
-            <Card className="border-0 bg-white/60 backdrop-blur-sm">
+            <Card className="border-0 bg-white backdrop-blur-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-bold text-gray-900 flex items-center gap-2">

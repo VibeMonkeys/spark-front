@@ -36,7 +36,7 @@ export const LevelProgress: FC<LevelProgressProps> = ({
   const isMaxLevel = next_level_points === null;
 
   return (
-    <Card className={`border-0 bg-white/60 backdrop-blur-sm ${className}`}>
+    <Card className={`border-0 bg-white backdrop-blur-sm ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

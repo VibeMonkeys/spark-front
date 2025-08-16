@@ -145,9 +145,19 @@ export function RewardsPage() {
           </div>
         </div>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid w-full grid-cols-2 bg-white/60 backdrop-blur-sm">
-            <TabsTrigger value="shop">리워드 샵</TabsTrigger>
-            <TabsTrigger value="history">사용 내역</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-xl h-12">
+            <TabsTrigger 
+              value="shop" 
+              className="rounded-lg font-semibold text-sm transition-all data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm"
+            >
+              리워드 샵
+            </TabsTrigger>
+            <TabsTrigger 
+              value="history" 
+              className="rounded-lg font-semibold text-sm transition-all data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm"
+            >
+              사용 내역
+            </TabsTrigger>
           </TabsList>
 
           {/* Reward Shop */}
@@ -158,7 +168,7 @@ export function RewardsPage() {
                 variant={selectedCategory === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory("all")}
-                className={selectedCategory === "all" ? "bg-purple-500 hover:bg-purple-600" : "bg-white/60"}
+                className={selectedCategory === "all" ? "bg-purple-500 hover:bg-purple-600" : "bg-white"}
               >
                 전체
               </Button>
@@ -170,7 +180,7 @@ export function RewardsPage() {
                     variant={selectedCategory === category.id ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedCategory(category.id)}
-                    className={selectedCategory === category.id ? "bg-purple-500 hover:bg-purple-600" : "bg-white/60"}
+                    className={selectedCategory === category.id ? "bg-purple-500 hover:bg-purple-600" : "bg-white"}
                   >
                     <Icon className="size-4 mr-1" />
                     {category.name}
@@ -182,7 +192,7 @@ export function RewardsPage() {
             {/* Rewards Grid */}
             <div className="space-y-4">
               {filteredRewards.map((reward) => (
-                <Card key={reward.id} className="border-0 bg-white/60 backdrop-blur-sm overflow-hidden relative">
+                <Card key={reward.id} className="border-0 bg-white backdrop-blur-sm overflow-hidden relative">
                   {reward.popular && (
                     <div className="absolute top-3 left-3 z-10">
                       <Badge className="bg-red-500 text-white border-0">
@@ -209,14 +219,13 @@ export function RewardsPage() {
                     <CardContent className="p-4 flex-1">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs text-muted-foreground">{reward.brand}</span>
-                            {reward.discount && (
+                          {reward.discount && (
+                            <div className="flex items-center gap-2 mb-1">
                               <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
                                 {reward.discount}
                               </Badge>
-                            )}
-                          </div>
+                            </div>
+                          )}
                           <h3 className="font-semibold text-sm">{reward.title}</h3>
                           <p className="text-xs text-muted-foreground mb-2">{reward.description}</p>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -257,7 +266,7 @@ export function RewardsPage() {
             </div>
 
             {/* More Rewards Coming */}
-            <Card className="border-0 bg-white/60 backdrop-blur-sm">
+            <Card className="border-0 bg-white backdrop-blur-sm">
               <CardContent className="p-6 text-center">
                 <Gift className="size-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="font-semibold mb-2">더 많은 리워드가 준비 중이에요!</h3>
@@ -270,7 +279,7 @@ export function RewardsPage() {
           <TabsContent value="history" className="space-y-4 mt-4">
             <div className="space-y-3">
               {rewardHistory.map((item) => (
-                <Card key={item.id} className="border-0 bg-white/60 backdrop-blur-sm">
+                <Card key={item.id} className="border-0 bg-white backdrop-blur-sm">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-semibold text-sm">{item.title}</h3>
@@ -300,7 +309,7 @@ export function RewardsPage() {
             </div>
 
             {rewardHistory.length === 0 && (
-              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <Card className="border-0 bg-white backdrop-blur-sm">
                 <CardContent className="p-8 text-center">
                   <Gift className="size-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="font-semibold mb-2">아직 사용한 리워드가 없어요</h3>
@@ -317,7 +326,7 @@ export function RewardsPage() {
 
             {rewardHistory.length > 0 && (
               <div className="py-4 text-center">
-                <Button variant="outline" className="bg-white/60 backdrop-blur-sm">
+                <Button variant="outline" className="bg-white backdrop-blur-sm">
                   더 많은 내역 보기
                 </Button>
               </div>

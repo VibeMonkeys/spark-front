@@ -215,7 +215,7 @@ export function FeedPage() {
             </div>
           ) : (
             stories.map((story: StoryFeedItem) => (
-              <Card key={story.id} className="border-0 bg-white/60 backdrop-blur-sm overflow-hidden">
+              <Card key={story.id} className="border-0 bg-white backdrop-blur-sm overflow-hidden">
                 <CardContent className="p-0">
                   {/* User Header */}
                   <div className="p-4 pb-3">

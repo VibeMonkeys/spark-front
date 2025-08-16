@@ -209,7 +209,7 @@ export function StatsSection({ className }: StatsSectionProps) {
 
   if (isLoading) {
     return (
-      <Card className={`border-0 bg-white/60 backdrop-blur-sm ${className}`}>
+      <Card className={`border-0 bg-white backdrop-blur-sm ${className}`}>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <TrendingUp className="size-5" />
@@ -240,7 +240,7 @@ export function StatsSection({ className }: StatsSectionProps) {
     }
     
     return (
-      <Card className={`border-0 bg-white/60 backdrop-blur-sm ${className}`}>
+      <Card className={`border-0 bg-white backdrop-blur-sm ${className}`}>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <TrendingUp className="size-5" />
@@ -268,7 +268,7 @@ export function StatsSection({ className }: StatsSectionProps) {
 
   return (
     <>
-      <Card className={`border-0 bg-white/60 backdrop-blur-sm ${className}`}>
+      <Card className={`border-0 bg-white backdrop-blur-sm ${className}`}>
         <CardHeader className="pb-0">
           <div className="flex items-center justify-between">
             <div>

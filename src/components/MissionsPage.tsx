@@ -193,7 +193,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
 
       <div className="max-w-md mx-auto px-4 pb-20">
         <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="py-4">
-          <TabsList className="grid w-full grid-cols-2 bg-white/60 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-2 bg-white backdrop-blur-sm">
             <TabsTrigger value="ongoing" className="flex items-center gap-2">
               진행 중
               {ongoingMissions.length > 0 && (
@@ -220,7 +220,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
               </div>
             ) : ongoingMissions.length > 0 ? (
               ongoingMissions.map((mission) => (
-                <Card key={mission.id} className="border-0 bg-white/60 backdrop-blur-sm overflow-hidden">
+                <Card key={mission.id} className="border-0 bg-white backdrop-blur-sm overflow-hidden">
                   <div className="relative h-32">
                     <ImageWithFallback
                       src={mission.image_url}
@@ -293,7 +293,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                 </Card>
               ))
             ) : (
-              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <Card className="border-0 bg-white backdrop-blur-sm">
                 <CardContent className="p-8 text-center">
                   <Target className="size-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="font-semibold mb-2">진행 중인 미션이 없어요</h3>
@@ -312,7 +312,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
               </div>
             ) : completedMissions.length > 0 ? (
               completedMissions.map((mission) => (
-                <Card key={mission.id} className="border-0 bg-white/60 backdrop-blur-sm overflow-hidden">
+                <Card key={mission.id} className="border-0 bg-white backdrop-blur-sm overflow-hidden">
                   <div className="relative h-28">
                     <ImageWithFallback
                       src={mission.image_url}
@@ -369,7 +369,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                 </Card>
               ))
             ) : (
-              <Card className="border-0 bg-white/60 backdrop-blur-sm">
+              <Card className="border-0 bg-white backdrop-blur-sm">
                 <CardContent className="p-8 text-center">
                   <CheckCircle className="size-12 text-muted-foreground mx-auto mb-4" />
                   <h3 className="font-semibold mb-2">완료한 미션이 없어요</h3>
