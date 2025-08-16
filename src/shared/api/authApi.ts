@@ -51,6 +51,17 @@ export interface RefreshTokenRequest {
   refreshToken: string;
 }
 
+export interface DemoUser {
+  id: number;
+  name: string;
+  email: string;
+  level: number;
+  levelTitle: string;
+  currentPoints: number;
+  totalPoints: number;
+  avatarUrl: string;
+}
+
 export const authApi = {
   // 로그인
   login: async (request: LoginRequest): Promise<AuthResponse> => {
@@ -87,6 +98,26 @@ export const authApi = {
       return response.data.data;
     } else {
       throw new Error(response.data.error?.message || '토큰 갱신에 실패했습니다.');
+    }
+  },
+
+  // 데모 사용자 목록 조회
+  getDemoUsers: async (): Promise<DemoUser[]> => {
+    const response = await api.get('/auth/demo-users');
+    if (response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.error?.message || '데모 사용자 조회에 실패했습니다.');
+    }
+  },
+
+  // 데모 로그인
+  demoLogin: async (userId: string): Promise<AuthResponse> => {
+    const response = await api.post(`/auth/demo-login/${userId}`);
+    if (response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.error?.message || '데모 로그인에 실패했습니다.');
     }
   }
 };
