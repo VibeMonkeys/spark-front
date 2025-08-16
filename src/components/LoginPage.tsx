@@ -10,23 +10,37 @@ import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../shared/api/authApi';
 import { Eye, EyeOff, Mail, Lock, User, Sparkles, ArrowRight } from 'lucide-react';
 
-// 개발용 테스트 계정
+// 개발용 테스트 계정 (init_data.sql에서 생성된 사용자들)
 const availableUsers = [
   { 
-    id: 'user_01', 
-    name: '김철수', 
-    email: 'test@example.com',
+    id: '5', 
+    name: '테스트유저1', 
+    email: 'testuser1@spark.com',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-    level: 3,
-    levelTitle: 'EXPLORER'
+    level: 5,
+    levelTitle: 'EXPLORER',
+    currentPoints: 450,
+    totalPoints: 1200
   },
   { 
-    id: '2190d61c-379d-4452-b4da-655bf67b4b71', 
-    name: '지나니', 
-    email: 'jinani@example.com',
+    id: '6', 
+    name: '테스트유저2', 
+    email: 'testuser2@spark.com',
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b9e6e3e7?w=150&h=150&fit=crop&crop=face',
-    level: 1,
-    levelTitle: 'BEGINNER'
+    level: 8,
+    levelTitle: 'EXPLORER',
+    currentPoints: 720,
+    totalPoints: 2500
+  },
+  { 
+    id: '7', 
+    name: '고급유저', 
+    email: 'premium@spark.com',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    level: 15,
+    levelTitle: 'ADVENTURER',
+    currentPoints: 1800,
+    totalPoints: 8500
   }
 ];
 
@@ -93,19 +107,19 @@ export function LoginPage() {
             avatar_url: user.avatar,
             level: user.level,
             level_title: user.levelTitle,
-            current_points: user.level === 3 ? 1250 : 320,
-            total_points: user.level === 3 ? 3500 : 890,
-            current_streak: user.level === 3 ? 7 : 3,
-            longest_streak: user.level === 3 ? 15 : 8,
-            completed_missions: user.level === 3 ? 25 : 8,
-            total_days: user.level === 3 ? 45 : 12,
+            current_points: user.currentPoints,
+            total_points: user.totalPoints,
+            current_streak: user.level >= 15 ? 25 : user.level >= 8 ? 12 : 5,
+            longest_streak: user.level >= 15 ? 45 : user.level >= 8 ? 25 : 12,
+            completed_missions: user.level >= 15 ? 85 : user.level >= 8 ? 35 : 18,
+            total_days: user.level >= 15 ? 120 : user.level >= 8 ? 42 : 25,
             join_date: '2024-01-01',
             preferences: {},
             statistics: {
               category_stats: [],
-              this_month_points: user.level === 3 ? 850 : 320,
-              this_month_missions: user.level === 3 ? 12 : 8,
-              average_rating: user.level === 3 ? 4.2 : 3.8
+              this_month_points: user.currentPoints,
+              this_month_missions: user.level >= 15 ? 35 : user.level >= 8 ? 15 : 8,
+              average_rating: user.level >= 15 ? 4.8 : user.level >= 8 ? 4.2 : 4.5
             }
           },
           token: 'demo_token',
