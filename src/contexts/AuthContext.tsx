@@ -16,6 +16,7 @@ interface User {
   completed_missions: number;
   total_days: number;
   join_date: string;
+  bio?: string;
   preferences: Record<string, boolean>;
   statistics: {
     category_stats: Array<{

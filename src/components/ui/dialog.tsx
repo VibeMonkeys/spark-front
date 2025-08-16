@@ -78,7 +78,7 @@ export const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("flex flex-col space-y-1.5", className)}
+      className={cn("flex flex-col space-y-1.5 p-6 pb-2", className)}
       {...props}
     >
       {children}
@@ -115,3 +115,16 @@ export const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDe
 );
 
 DialogDescription.displayName = "DialogDescription";
+
+export const DialogTrigger = ({ children, ...props }: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) => {
+  const { onOpenChange } = React.useContext(DialogContext);
+  
+  return (
+    <div
+      onClick={() => onOpenChange(true)}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};

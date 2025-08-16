@@ -9,6 +9,11 @@ import { ConfirmModal } from "./components/ui/confirm-modal";
 const HomePage = lazy(() => import("./components/HomePage").then(module => ({ default: module.HomePage })));
 const FeedPage = lazy(() => import("./components/FeedPage").then(module => ({ default: module.FeedPage })));
 const ProfilePage = lazy(() => import("./components/ProfilePage").then(module => ({ default: module.ProfilePage })));
+const ProfileEditPage = lazy(() => import("./components/ProfileEditPage").then(module => ({ default: module.ProfileEditPage })));
+const SettingsPage = lazy(() => import("./components/SettingsPage").then(module => ({ default: module.SettingsPage })));
+const PasswordChangePage = lazy(() => import("./components/PasswordChangePage").then(module => ({ default: module.PasswordChangePage })));
+const HelpPage = lazy(() => import("./components/HelpPage").then(module => ({ default: module.HelpPage })));
+const AppInfoPage = lazy(() => import("./components/AppInfoPage").then(module => ({ default: module.AppInfoPage })));
 const MissionsPage = lazy(() => import("./components/MissionsPage").then(module => ({ default: module.MissionsPage })));
 const RewardsPage = lazy(() => import("./components/RewardsPage").then(module => ({ default: module.RewardsPage })));
 const MissionDetail = lazy(() => import("./components/MissionDetail").then(module => ({ default: module.MissionDetail })));
@@ -31,7 +36,7 @@ const queryClient = new QueryClient({
 function AppContent() {
   const { user, isLoading, login } = useAuth();
   const queryClient = useQueryClient();
-  const [currentView, setCurrentView] = useState("main"); // "main", "mission-detail", "mission-verification", "mission-success"
+  const [currentView, setCurrentView] = useState("main"); // "main", "mission-detail", "mission-verification", "mission-success", "profile-edit", "settings", "password-change", "help", "app-info"
   const [selectedMissionId, setSelectedMissionId] = useState<string | null>(null);
   const [missionResult, setMissionResult] = useState<{
     pointsEarned: number;
@@ -39,6 +44,7 @@ function AppContent() {
     levelUp?: boolean;
     newLevel?: number;
   } | null>(null);
+  const [selectedSettingsSection, setSelectedSettingsSection] = useState<string | null>(null);
 
   // 탭 상태를 localStorage에서 복원
   const [activeTab, setActiveTab] = useState(() => {
@@ -240,6 +246,64 @@ function AppContent() {
   };
 
   const renderCurrentView = () => {
+    if (currentView === "profile-edit") {
+      return <ProfileEditPage onBack={() => setCurrentView("settings")} />;
+    }
+
+    if (currentView === "settings") {
+      return (
+        <SettingsPage 
+          onBack={() => {
+            setCurrentView("main");
+            setActiveTab("profile");
+            setSelectedSettingsSection(null);
+          }}
+          onNavigate={(section: string) => {
+            setSelectedSettingsSection(section);
+            if (section === 'profile') {
+              setCurrentView("profile-edit");
+            } else if (section === 'password') {
+              setCurrentView("password-change");
+            } else if (section === 'help') {
+              setCurrentView("help");
+            } else if (section === 'about') {
+              setCurrentView("app-info");
+            } else {
+              // For now, just show a notification for other sections
+              showNotification('info', '준비 중', `${section} 기능은 준비 중입니다.`);
+            }
+          }}
+        />
+      );
+    }
+
+    if (currentView === "password-change") {
+      return (
+        <PasswordChangePage
+          onBack={() => setCurrentView("settings")}
+          onSuccess={() => setCurrentView("settings")}
+          onShowNotification={showNotification}
+        />
+      );
+    }
+
+    if (currentView === "help") {
+      return (
+        <HelpPage
+          onBack={() => setCurrentView("settings")}
+          onShowNotification={showNotification}
+        />
+      );
+    }
+
+    if (currentView === "app-info") {
+      return (
+        <AppInfoPage
+          onBack={() => setCurrentView("settings")}
+        />
+      );
+    }
+
     if (currentView === "mission-detail") {
       return (
         <MissionDetail
@@ -298,7 +362,7 @@ function AppContent() {
       case "rewards":
         return <RewardsPage />;
       case "profile":
-        return <ProfilePage />;
+        return <ProfilePage onEditProfile={() => setCurrentView("settings")} />;
       default:
         return <HomePage />;
     }

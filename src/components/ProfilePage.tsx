@@ -17,7 +17,7 @@ import { useState } from "react";
 
 
 
-export function ProfilePage() {
+export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
   const { user, logout } = useAuth();
   const [isLevelModalOpen, setIsLevelModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
@@ -126,7 +126,7 @@ export function ProfilePage() {
             내 프로필
           </h1>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={onEditProfile}>
               <Settings className="size-5" />
             </Button>
             <Button 

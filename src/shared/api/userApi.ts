@@ -20,6 +20,11 @@ export interface UpdatePreferencesRequest {
   preferences: Record<string, boolean>;
 }
 
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface AchievementResponse {
   id: string;
   title: string;
@@ -86,6 +91,19 @@ export const userApi = {
   updateProfile: async (userId: string, request: UpdateProfileRequest): Promise<User> => {
     const response = await api.put<ApiResponse<User>>(`/users/${userId}/profile`, request);
     return response.data;
+  },
+
+  // 비밀번호 변경
+  changePassword: async (userId: string, currentPassword: string, newPassword: string): Promise<string> => {
+    const response = await api.post<ApiResponse<string>>(`/users/${userId}/change-password`, {
+      currentPassword,
+      newPassword
+    });
+    if (response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.error?.message || '비밀번호 변경에 실패했습니다.');
+    }
   },
 
   // 선호도 업데이트
