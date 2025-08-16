@@ -109,14 +109,7 @@ export function MissionDetail({
       queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['missions'] }); // 모든 미션 관련 쿼리 무효화
       
-      // 성공 알림 표시
-      if (onShowNotification) {
-        onShowNotification(
-          'success',
-          '🎯 미션 시작!',
-          '미션이 시작되었습니다! 미션 탭에서 진행 중인 미션을 확인하고 인증해보세요.'
-        );
-      }
+      // 알림 없이 바로 미션 탭으로 이동
       
       // 미션 탭으로 이동
       if (onNavigateToMissions) {

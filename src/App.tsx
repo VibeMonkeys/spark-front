@@ -37,6 +37,7 @@ function AppContent() {
   const { user, isLoading, login } = useAuth();
   const queryClient = useQueryClient();
   const [currentView, setCurrentView] = useState("main"); // "main", "mission-detail", "mission-verification", "mission-success", "profile-edit", "settings", "password-change", "help", "app-info"
+  const [previousView, setPreviousView] = useState<string>("main"); // 이전 뷰 추적
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null);
   const [missionResult, setMissionResult] = useState<{
     pointsEarned: number;
@@ -76,7 +77,7 @@ function AppContent() {
     onConfirm?: () => void;
   }>({ isOpen: false, type: 'info', title: '', message: '' });
 
-  const showNotification = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string, autoClose = true, autoCloseDelay = 3000) => {
+  const showNotification = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string, autoClose = true, autoCloseDelay = 2000) => {
     setNotification({ isOpen: true, type, title, message, autoClose, autoCloseDelay });
   };
 
@@ -110,13 +111,7 @@ function AppContent() {
       queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] }); // 오늘의 미션
       queryClient.invalidateQueries({ queryKey: ['missions'] }); // 모든 미션 관련 쿼리 무효화
       
-      showNotification(
-        'success',
-        '🎯 미션 시작!',
-        '미션이 시작되었습니다! 미션 탭에서 진행 중인 미션을 확인하고 인증해보세요.',
-        true, // autoClose
-        3000  // 3초 후 자동 닫기
-      );
+      // 알림 없이 바로 미션 탭으로 이동
       
       // 미션 탭으로 이동
       setCurrentView("main");
@@ -204,8 +199,14 @@ function AppContent() {
     });
   };
 
+  // 뷰 변경 헬퍼 함수
+  const navigateToView = (newView: string) => {
+    setPreviousView(currentView);
+    setCurrentView(newView);
+  };
+
   const handleMissionVerify = () => {
-    setCurrentView("mission-verification");
+    navigateToView("mission-verification");
   };
 
   const handleMissionComplete = (result?: {
@@ -242,7 +243,21 @@ function AppContent() {
 
   const handleMissionContinue = (missionId: number) => {
     setSelectedMissionId(missionId);
-    setCurrentView("mission-verification");
+    navigateToView("mission-verification");
+  };
+
+  const handleBackFromVerification = () => {
+    // 이전 뷰로 돌아가면서 해당 탭도 설정
+    if (previousView === "main") {
+      setCurrentView("main");
+      setActiveTab("missions");
+    } else if (previousView === "mission-detail") {
+      setCurrentView("mission-detail");
+    } else {
+      // 기본적으로 미션 탭으로 이동
+      setCurrentView("main");
+      setActiveTab("missions");
+    }
   };
 
   const renderCurrentView = () => {
@@ -327,7 +342,7 @@ function AppContent() {
       return (
         <MissionVerification
           missionId={selectedMissionId}
-          onBack={handleBackToMain}
+          onBack={handleBackFromVerification}
           onSubmit={handleMissionComplete}
         />
       );

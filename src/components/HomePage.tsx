@@ -164,8 +164,8 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
               <span className="text-sm font-medium text-orange-700">{userSummary.current_streak}일</span>
             </div>
             <div className="flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-full">
-              <Star className="size-4 text-blue-500" />
-              <span className="text-sm font-medium text-blue-700">{userSummary.current_points.toLocaleString()}P</span>
+              <Star className="size-3 text-blue-500" />
+              <span className="text-xs font-medium text-blue-700">{userSummary.current_points.toLocaleString()}P</span>
             </div>
           </div>
         </div>
@@ -178,11 +178,11 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
             <CardContent className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold">레벨 {userSummary.level} {userSummary.level_title}</h3>
-                  <p className="text-sm opacity-90">이번달 {userSummary.current_points}P 획득</p>
+                  <h3 className="font-medium text-base">레벨 {userSummary.level} {userSummary.level_title}</h3>
+                  <p className="text-xs opacity-90">이번달 {userSummary.current_points}P 획득</p>
                 </div>
-                <div className="size-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <Target className="size-6" />
+                <div className="size-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <Target className="size-5" />
                 </div>
               </div>
               <Progress value={userSummary.progress_to_next_level} className="h-2 bg-white/20" />
@@ -256,11 +256,11 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
                       
                       {/* Right: Points */}
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 bg-gray-100 text-gray-700 rounded-lg px-3 py-1.5 border border-gray-200">
-                          <span className="text-sm font-semibold">+{mission.reward_points}P</span>
+                        <div className="flex items-center gap-1 bg-gray-100 text-gray-700 rounded-md px-2 py-1 border border-gray-200">
+                          <span className="text-xs font-medium">+{mission.reward_points}P</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-blue-100 text-blue-700 rounded-lg px-3 py-1.5 border border-blue-200">
-                          <span className="text-sm font-semibold">스탯+2</span>
+                        <div className="flex items-center gap-1 bg-blue-100 text-blue-700 rounded-md px-2 py-1 border border-blue-200">
+                          <span className="text-xs font-medium">스탯+2</span>
                         </div>
                       </div>
                     </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
+import { X, CheckCircle, AlertTriangle, Info, XCircle, Trophy, Sparkles, Zap, Target } from 'lucide-react';
 import { cn } from './utils';
 
 interface NotificationModalProps {
@@ -14,36 +14,44 @@ interface NotificationModalProps {
 
 const typeConfig = {
   success: {
-    icon: CheckCircle,
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
-    iconColor: 'text-green-500',
-    titleColor: 'text-green-800',
-    buttonColor: 'bg-green-100 hover:bg-green-200 text-green-800'
+    icon: Trophy,
+    bgGradient: 'bg-gradient-to-br from-green-400 via-blue-500 to-purple-600',
+    cardBg: 'bg-white/95',
+    iconBg: 'bg-gradient-to-br from-green-400 to-blue-500',
+    iconColor: 'text-white',
+    titleColor: 'text-gray-800',
+    progressColor: 'bg-gradient-to-r from-green-400 to-blue-500',
+    particles: true
   },
   error: {
     icon: XCircle,
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    iconColor: 'text-red-500',
-    titleColor: 'text-red-800',
-    buttonColor: 'bg-red-100 hover:bg-red-200 text-red-800'
+    bgGradient: 'bg-gradient-to-br from-red-400 via-pink-500 to-red-600',
+    cardBg: 'bg-white/95',
+    iconBg: 'bg-gradient-to-br from-red-400 to-pink-500',
+    iconColor: 'text-white',
+    titleColor: 'text-gray-800',
+    progressColor: 'bg-gradient-to-r from-red-400 to-pink-500',
+    particles: false
   },
   warning: {
     icon: AlertTriangle,
-    bgColor: 'bg-yellow-50',
-    borderColor: 'border-yellow-200',
-    iconColor: 'text-yellow-500',
-    titleColor: 'text-yellow-800',
-    buttonColor: 'bg-yellow-100 hover:bg-yellow-200 text-yellow-800'
+    bgGradient: 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500',
+    cardBg: 'bg-white/95',
+    iconBg: 'bg-gradient-to-br from-yellow-400 to-orange-500',
+    iconColor: 'text-white',
+    titleColor: 'text-gray-800',
+    progressColor: 'bg-gradient-to-r from-yellow-400 to-orange-500',
+    particles: false
   },
   info: {
     icon: Info,
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    iconColor: 'text-blue-500',
-    titleColor: 'text-blue-800',
-    buttonColor: 'bg-blue-100 hover:bg-blue-200 text-blue-800'
+    bgGradient: 'bg-gradient-to-br from-blue-400 via-cyan-500 to-blue-600',
+    cardBg: 'bg-white/95',
+    iconBg: 'bg-gradient-to-br from-blue-400 to-cyan-500',
+    iconColor: 'text-white',
+    titleColor: 'text-gray-800',
+    progressColor: 'bg-gradient-to-r from-blue-400 to-cyan-500',
+    particles: false
   }
 };
 
@@ -90,66 +98,114 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
+      {/* Animated Background */}
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+        className={cn(
+          "absolute inset-0 backdrop-blur-md transition-all duration-500",
+          config.bgGradient,
+          "opacity-90"
+        )}
         onClick={onClose}
       />
       
+      {/* Floating Particles for Success */}
+      {config.particles && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 2}s`,
+                animationDuration: `${3 + Math.random() * 2}s`
+              }}
+            >
+              <Sparkles 
+                className="w-4 h-4 text-white/40" 
+                style={{
+                  filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.5))'
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+      
       {/* Modal */}
       <div className={cn(
-        "relative w-full max-w-sm mx-auto transform transition-all duration-300 ease-out",
-        "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4"
+        "relative w-full max-w-sm mx-auto transform transition-all duration-500 ease-out",
+        "animate-in fade-in-0 zoom-in-90 slide-in-from-top-8",
+        "hover:scale-105"
       )}>
         <div className={cn(
-          "rounded-2xl border-2 shadow-xl",
-          config.bgColor,
-          config.borderColor
+          "rounded-3xl shadow-2xl border-0 overflow-hidden backdrop-blur-xl",
+          config.cardBg,
+          "ring-1 ring-white/20"
         )}>
-          {/* Header */}
-          <div className="flex items-start gap-4 p-6 pb-4">
+          {/* Animated Header */}
+          <div className="relative p-8 pb-6">
+            {/* Background Glow Effect */}
             <div className={cn(
-              "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
-              config.iconColor
-            )}>
-              <IconComponent className="w-5 h-5" />
-            </div>
+              "absolute top-0 left-0 right-0 h-32 opacity-10",
+              config.bgGradient
+            )} />
             
-            <div className="flex-1 min-w-0">
-              <h3 className={cn(
-                "text-lg font-semibold leading-6",
-                config.titleColor
-              )}>
-                {title}
-              </h3>
-              <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                {message}
-              </p>
-            </div>
+            <div className="relative flex items-start gap-6">
+              {/* Animated Icon */}
+              <div className="relative">
+                <div className={cn(
+                  "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg",
+                  config.iconBg,
+                  "animate-bounce"
+                )}>
+                  <IconComponent className={cn("w-8 h-8", config.iconColor)} />
+                </div>
+                
+                {/* Icon Glow Ring */}
+                <div className={cn(
+                  "absolute inset-0 w-16 h-16 rounded-2xl opacity-30 animate-ping",
+                  config.iconBg
+                )} />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <h3 className={cn(
+                  "text-xl font-bold leading-7 mb-3",
+                  config.titleColor
+                )}>
+                  {title}
+                </h3>
+                <p className="text-base text-gray-600 leading-relaxed">
+                  {message}
+                </p>
+              </div>
 
-            <button
-              onClick={onClose}
-              className={cn(
-                "flex-shrink-0 rounded-full p-1 transition-colors duration-200",
-                config.buttonColor
-              )}
-            >
-              <X className="w-4 h-4" />
-            </button>
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                className="flex-shrink-0 w-10 h-10 rounded-full bg-white/80 hover:bg-white transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
           </div>
 
-          {/* Footer with auto-close indicator */}
+          {/* Enhanced Progress Bar */}
           {autoClose && (
-            <div className="px-6 pb-6">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <div className="flex-1 bg-gray-200 rounded-full h-1 overflow-hidden">
+            <div className="px-8 pb-8">
+              <div className="relative">
+                <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                  <span>자동으로 닫힙니다</span>
+                  <span>{Math.ceil(autoCloseDelay / 1000)}초</span>
+                </div>
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div 
                     className={cn(
-                      "h-full rounded-full w-full origin-left",
-                      type === 'success' ? 'bg-green-400' :
-                      type === 'error' ? 'bg-red-400' :
-                      type === 'warning' ? 'bg-yellow-400' : 'bg-blue-400'
+                      "h-full rounded-full w-full origin-left shadow-sm",
+                      config.progressColor
                     )}
                     style={{
                       animation: `shrinkWidth ${autoCloseDelay}ms linear forwards`
@@ -170,6 +226,27 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           to {
             transform: scaleX(0);
           }
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          50% {
+            transform: translateY(-20px) rotate(180deg);
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+        }
+        
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
         }
       `}</style>
     </div>

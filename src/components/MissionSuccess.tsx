@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Star, Trophy, Flame, TrendingUp, ArrowRight, Home } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { userApi } from "../shared/api";
 
 interface MissionSuccessProps {
   pointsEarned: number;
@@ -26,12 +27,35 @@ export function MissionSuccess({
   const { user, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   
+  // 컴포넌트에서 직접 최신 사용자 데이터 조회
+  const { data: freshUserData, isLoading: isRefreshingUser } = useQuery({
+    queryKey: ['user', user?.id],
+    queryFn: () => userApi.getUser(user!.id),
+    enabled: !!user?.id,
+    staleTime: 0, // 항상 최신 데이터 가져오기
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+  });
+  
   // 컴포넌트 마운트 시 사용자 데이터 새로고침
   useEffect(() => {
     refreshUser();
-  }, [refreshUser]);
+    // React Query 캐시도 무효화
+    queryClient.invalidateQueries({ queryKey: ['user'] });
+  }, [refreshUser, queryClient]);
   
   // 디버깅용 로그
+  useEffect(() => {
+    if (freshUserData) {
+      console.log('🔄 [MissionSuccess] Fresh user data received:', freshUserData);
+      console.log('📊 [MissionSuccess] Completed missions:', freshUserData.completed_missions);
+      console.log('🔥 [MissionSuccess] Current streak:', freshUserData.current_streak);
+    }
+  }, [freshUserData]);
+  
+  useEffect(() => {
+    console.log('👤 [MissionSuccess] Context user data:', user);
+  }, [user]);
   
   const handleViewProfile = () => {
     // 프로필 관련 모든 쿼리 무효화하여 최신 데이터 로드
@@ -165,19 +189,29 @@ export function MissionSuccess({
           <CardContent className="p-4">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-lg font-bold text-blue-600">{user?.completed_missions || 0}</div>
+                <div className="text-lg font-bold text-blue-600">
+                  {isRefreshingUser ? '...' : (freshUserData?.completed_missions || user?.completed_missions || 0)}
+                </div>
                 <p className="text-xs text-muted-foreground">완료한 미션</p>
               </div>
               <div>
                 <div className="text-lg font-bold text-green-600">
-                  {user?.completed_missions && user.completed_missions > 0 
-                    ? Math.round((user.completed_missions / (user.completed_missions + 1)) * 100) 
-                    : 0}%
+                  {isRefreshingUser ? '...' : (() => {
+                    const currentUser = freshUserData || user;
+                    // 현재는 완료한 미션만 존재하므로 완료된 미션이 있으면 100% 성공률
+                    // 향후 실패한 미션 수 필드가 추가되면: 
+                    // (completed_missions / (completed_missions + failed_missions)) * 100
+                    return currentUser?.completed_missions && currentUser.completed_missions > 0 
+                      ? 100
+                      : 0;
+                  })()}%
                 </div>
                 <p className="text-xs text-muted-foreground">성공률</p>
               </div>
               <div>
-                <div className="text-lg font-bold text-purple-600">#{user?.current_streak || streakCount || 0}</div>
+                <div className="text-lg font-bold text-purple-600">
+                  #{isRefreshingUser ? '...' : (freshUserData?.current_streak || user?.current_streak || streakCount || 0)}
+                </div>
                 <p className="text-xs text-muted-foreground">연속 기록</p>
               </div>
             </div>

@@ -136,9 +136,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user?.id) return;
     
     try {
-      const updatedUserData = await userApi.getProfile(user.id);
+      const updatedUserData = await userApi.getUser(user.id);
       setUser(updatedUserData);
       localStorage.setItem('current_user', JSON.stringify(updatedUserData));
+      console.log('✅ [AuthContext] User data refreshed:', updatedUserData);
     } catch (error) {
       console.error('❌ [AuthContext] Failed to refresh user data:', error);
     }

@@ -5,7 +5,7 @@ import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Clock, Target, Star, CheckCircle, Calendar, TrendingUp, Filter, Play, X } from "lucide-react";
+import { Clock, Target, Star, CheckCircle, Calendar, TrendingUp, Filter, Play, X, Camera } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { missionApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -72,7 +72,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
       // 성공시 관련 쿼리들을 무효화하여 데이터 새로고침
       queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] }); // 오늘의 미션도 갱신
-      onNotification?.('success', '미션 포기 완료', '미션이 성공적으로 포기되었습니다.');
+      // 알림 없이 바로 포기 완료
     },
     onError: (error: any) => {
       console.error('미션 포기 실패:', error);
@@ -271,11 +271,11 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                       <div className="flex gap-2">
                         <Button 
                           size="sm" 
-                          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 flex-1"
+                          className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 flex-1 text-white"
                           onClick={() => onMissionContinue?.(mission.id)}
                         >
-                          <Play className="size-3 mr-1" />
-                          계속하기
+                          <Camera className="size-3 mr-1 text-white" />
+                          인증하기
                         </Button>
                         <Button 
                           size="sm" 

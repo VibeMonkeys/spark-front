@@ -18,34 +18,30 @@ interface ConfirmModalProps {
 const typeConfig = {
   success: {
     icon: CheckCircle,
-    bgColor: 'bg-green-50',
-    borderColor: 'border-green-200',
     iconColor: 'text-green-500',
-    titleColor: 'text-green-800',
+    iconBg: 'bg-green-100',
+    titleColor: 'text-gray-900',
     buttonColor: 'bg-green-600 hover:bg-green-700'
   },
   error: {
     icon: XCircle,
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
     iconColor: 'text-red-500',
-    titleColor: 'text-red-800',
+    iconBg: 'bg-red-100',
+    titleColor: 'text-gray-900',
     buttonColor: 'bg-red-600 hover:bg-red-700'
   },
   warning: {
     icon: AlertTriangle,
-    bgColor: 'bg-yellow-50',
-    borderColor: 'border-yellow-200',
     iconColor: 'text-yellow-500',
-    titleColor: 'text-yellow-800',
+    iconBg: 'bg-yellow-100',
+    titleColor: 'text-gray-900',
     buttonColor: 'bg-yellow-600 hover:bg-yellow-700'
   },
   info: {
     icon: Info,
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
     iconColor: 'text-blue-500',
-    titleColor: 'text-blue-800',
+    iconBg: 'bg-blue-100',
+    titleColor: 'text-gray-900',
     buttonColor: 'bg-blue-600 hover:bg-blue-700'
   }
 };
@@ -88,56 +84,56 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
+        className="absolute inset-0 bg-black/40 backdrop-blur-md transition-all duration-300"
         onClick={onClose}
       />
       
       {/* Modal */}
       <div className={cn(
         "relative w-full max-w-sm mx-auto transform transition-all duration-300 ease-out",
-        "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-4"
+        "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-6"
       )}>
-        <div className={cn(
-          "rounded-2xl border-2 shadow-xl bg-white",
-          config.bgColor,
-          config.borderColor
-        )}>
+        <div className="rounded-2xl shadow-2xl bg-white border-0 overflow-hidden">
           {/* Header */}
-          <div className="flex items-start gap-3 p-4 pb-3">
-            <div className={cn(
-              "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
-              config.bgColor
-            )}>
-              <IconComponent className={cn("w-5 h-5", config.iconColor)} />
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <h3 className={cn(
-                "text-lg font-bold leading-6 mb-1",
-                config.titleColor
+          <div className="p-5 pb-3">
+            <div className="flex items-start gap-3">
+              {/* Icon */}
+              <div className={cn(
+                "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-sm",
+                config.iconBg
               )}>
-                {title}
-              </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {message}
-              </p>
-            </div>
+                <IconComponent className={cn("w-5 h-5", config.iconColor)} />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <h3 className={cn(
+                  "text-lg font-bold leading-6 mb-2",
+                  config.titleColor
+                )}>
+                  {title}
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {message}
+                </p>
+              </div>
 
-            <button
-              onClick={onClose}
-              className="flex-shrink-0 rounded-full p-1 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-            >
-              <X className="w-5 h-5" />
-            </button>
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all duration-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 p-4 pt-2">
+          <div className="flex gap-2.5 p-5 pt-2 bg-gray-50/30">
             {showCancel && (
               <Button
                 variant="outline"
                 onClick={onClose}
-                className="flex-1"
+                className="flex-1 h-10 font-medium border-gray-300 hover:bg-gray-50 hover:border-gray-400"
               >
                 {cancelText}
               </Button>
@@ -148,7 +144,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                 onClose();
               }}
               className={cn(
-                "flex-1 text-white font-semibold",
+                "flex-1 h-10 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-200",
                 config.buttonColor
               )}
             >
