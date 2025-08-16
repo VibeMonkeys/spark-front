@@ -12,7 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 // Backend API 기대 형식에 맞춘 요청 타입
 interface StoryCreateRequest {
-  mission_id: string;
+  mission_id: number;
   story: string;
   images: string[];
   location: string;
@@ -21,7 +21,7 @@ interface StoryCreateRequest {
 }
 
 interface MissionVerificationProps {
-  missionId: string | null;
+  missionId: number | null;
   onBack: () => void;
   onSubmit: (result?: {
     pointsEarned: number;

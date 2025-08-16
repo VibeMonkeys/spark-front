@@ -10,11 +10,11 @@ import { useAuth } from "../contexts/AuthContext";
 import { MissionLimitIndicator, MissionLimitExceededModal } from "../shared/ui";
 
 interface MissionDetailProps {
-  missionId: string | null;
+  missionId: number | null;
   onBack: () => void;
   onStartMission: () => void;
   onVerifyMission: () => void;
-  onViewMissionDetail?: (missionId: string) => void;
+  onViewMissionDetail?: (missionId: number) => void;
   isStartingMission?: boolean;
   onShowNotification?: (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void;
   onNavigateToMissions?: () => void;
