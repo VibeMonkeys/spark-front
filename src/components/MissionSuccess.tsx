@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -22,8 +23,13 @@ export function MissionSuccess({
   onBackToHome,
   onViewProfile 
 }: MissionSuccessProps) {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const queryClient = useQueryClient();
+  
+  // 컴포넌트 마운트 시 사용자 데이터 새로고침
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
   
   // 디버깅용 로그
   
