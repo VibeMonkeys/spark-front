@@ -165,7 +165,7 @@ export const storyApi = {
     await api.delete(`/stories/${storyId}?userId=${userId}`);
   },
 
-  // 스토리 검색
+  // 스토리 검색 (기존)
   searchStories: async (
     keyword?: string,
     hashTag?: string,
@@ -187,5 +187,45 @@ export const storyApi = {
     
     const response = await api.get<ApiResponse<PagedResponse<Story>>>(`/stories/search?${params}`);
     return response.data;
+  },
+
+  // 스토리 타입별 텍스트 검색
+  searchStoriesByType: async (
+    query: string,
+    storyType: 'FREE_STORY' | 'MISSION_PROOF',
+    limit: number = 20
+  ): Promise<PagedResponse<StoryFeedItem>> => {
+    const params = new URLSearchParams({
+      query,
+      limit: limit.toString(),
+    });
+    
+    const response = await api.get<ApiResponse<PagedResponse<StoryFeedItem>>>(
+      `/stories/search/${storyType}?${params}`
+    );
+    if (!response.data.success) {
+      throw new Error(response.data.error?.message || 'Failed to search stories');
+    }
+    return response.data.data;
+  },
+
+  // 해시태그로 스토리 검색
+  searchStoriesByHashtag: async (
+    hashtag: string,
+    storyType: 'FREE_STORY' | 'MISSION_PROOF',
+    limit: number = 20
+  ): Promise<PagedResponse<StoryFeedItem>> => {
+    const params = new URLSearchParams({
+      hashtag,
+      limit: limit.toString(),
+    });
+    
+    const response = await api.get<ApiResponse<PagedResponse<StoryFeedItem>>>(
+      `/stories/search/${storyType}/hashtag?${params}`
+    );
+    if (!response.data.success) {
+      throw new Error(response.data.error?.message || 'Failed to search stories by hashtag');
+    }
+    return response.data.data;
   },
 };
