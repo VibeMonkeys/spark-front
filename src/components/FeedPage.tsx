@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Heart, MessageCircle, Share, Filter, TrendingUp, Loader2 } from "lucide-react";
+import { Heart, MessageCircle, Share, Filter, TrendingUp, Loader2, FileText, Target, Plus } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { storyApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
 import { NotificationBell } from "./ui/notification-bell";
+import { StoryCreateModal } from "./StoryCreateModal";
 
 interface StoryFeedItem {
   id: string;
@@ -20,7 +21,7 @@ interface StoryFeedItem {
     title: string;
     category: string;
     category_color: string;
-  };
+  } | null;
   story: string;
   images: string[];
   location: string;
@@ -34,13 +35,35 @@ interface StoryFeedItem {
 export function FeedPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [filter, setFilter] = useState("latest");
+  const [filter, setFilter] = useState<'FREE_STORY' | 'MISSION_PROOF'>(() => {
+    // localStorage에서 마지막 선택한 탭 복원
+    const savedTab = localStorage.getItem('story-feed-tab');
+    return savedTab === 'FREE_STORY' ? 'FREE_STORY' : 'MISSION_PROOF';
+  });
+  const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
 
-  // 스토리 피드 데이터 조회
+  // 탭 변경 시 localStorage에 저장
+  const handleFilterChange = (newFilter: 'FREE_STORY' | 'MISSION_PROOF') => {
+    setFilter(newFilter);
+    localStorage.setItem('story-feed-tab', newFilter);
+  };
+
+  // 스토리 피드 데이터 조회 (스토리 타입별)
   const { data: feedData, isLoading, error } = useQuery({
-    queryKey: ['story-feed', filter, user?.id],
-    queryFn: () => storyApi.getStoryFeed(filter, 0, 20, undefined, user?.id),
+    queryKey: ['story-feed-by-type', filter, user?.id],
+    queryFn: () => storyApi.getStoryFeedByType(filter, undefined, 20, 'NEXT', user?.id),
     enabled: !!user?.id,
+  });
+
+  // 진행 중인 미션 조회 (미션 인증 시 필요)
+  const { data: ongoingMissions } = useQuery({
+    queryKey: ['ongoing-missions', user?.id],
+    queryFn: () => fetch(`/api/v1/missions/ongoing?userId=${user?.id}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    }).then(res => res.json()).then(data => data.data),
+    enabled: !!user?.id && filter === 'MISSION_PROOF',
   });
 
   // 좋아요 토글 mutation (낙관적 업데이트 포함)
@@ -56,13 +79,13 @@ export function FeedPage() {
     },
     onMutate: async ({ storyId, isLiked }) => {
       // 진행 중인 쿼리를 취소하여 낙관적 업데이트가 덮어쓰이지 않도록 함
-      await queryClient.cancelQueries({ queryKey: ['story-feed', filter, user?.id] });
+      await queryClient.cancelQueries({ queryKey: ['story-feed-by-type', filter, user?.id] });
       
       // 이전 상태 저장 (롤백용)
-      const previousData = queryClient.getQueryData(['story-feed', filter, user?.id]);
+      const previousData = queryClient.getQueryData(['story-feed-by-type', filter, user?.id]);
       
       // 낙관적으로 피드 데이터 업데이트
-      queryClient.setQueryData(['story-feed', filter, user?.id], (old: any) => {
+      queryClient.setQueryData(['story-feed-by-type', filter, user?.id], (old: any) => {
         if (!old?.items) return old;
         
         return {
@@ -84,7 +107,7 @@ export function FeedPage() {
     },
     onSuccess: (data, variables) => {
       // 서버 응답으로 캐시를 정확히 업데이트
-      queryClient.setQueryData(['story-feed', filter, user?.id], (old: any) => {
+      queryClient.setQueryData(['story-feed-by-type', filter, user?.id], (old: any) => {
         if (!old?.items) return old;
         
         return {
@@ -105,7 +128,7 @@ export function FeedPage() {
     onError: (error: any, variables, context) => {
       // 오류 발생 시 이전 데이터로 롤백
       if (context?.previousData) {
-        queryClient.setQueryData(['story-feed', filter, user?.id], context.previousData);
+        queryClient.setQueryData(['story-feed-by-type', filter, user?.id], context.previousData);
       }
     }
   });
@@ -161,7 +184,7 @@ export function FeedPage() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">스토리를 불러오는 중 오류가 발생했습니다.</p>
-          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['story-feed'] })}>
+          <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['story-feed-by-type'] })}>
             다시 시도
           </Button>
         </div>
@@ -189,33 +212,44 @@ export function FeedPage() {
           </div>
           <div className="flex gap-2">
             <Button
-              variant={filter === "latest" ? "default" : "outline"}
+              variant={filter === "FREE_STORY" ? "default" : "outline"}
               size="sm"
-              onClick={() => setFilter("latest")}
-              className={filter === "latest" ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
+              onClick={() => handleFilterChange("FREE_STORY")}
+              className={filter === "FREE_STORY" ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
             >
-              최신순
+              <FileText className="size-4 mr-1" />
+              스토리
             </Button>
             <Button
-              variant={filter === "popular" ? "default" : "outline"}
+              variant={filter === "MISSION_PROOF" ? "default" : "outline"}
               size="sm"
-              onClick={() => setFilter("popular")}
-              className={filter === "popular" ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
+              onClick={() => handleFilterChange("MISSION_PROOF")}
+              className={filter === "MISSION_PROOF" ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
             >
-              <TrendingUp className="size-4 mr-1" />
-              인기순
+              <Target className="size-4 mr-1" />
+              미션인증
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-md mx-auto px-4 pb-20">
+      <div className="max-w-md mx-auto px-4 pb-20 relative">
         <div className="py-4 space-y-6">
           {stories.length === 0 ? (
             <div className="text-center py-12">
-              <MessageCircle className="size-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">아직 공유된 스토리가 없습니다</p>
-              <p className="text-sm text-gray-500">미션을 완료하고 첫 번째 스토리를 공유해보세요!</p>
+              {filter === "FREE_STORY" ? (
+                <>
+                  <FileText className="size-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-2">아직 공유된 자유 스토리가 없습니다</p>
+                  <p className="text-sm text-gray-500">일상을 공유하고 첫 번째 스토리를 만들어보세요!</p>
+                </>
+              ) : (
+                <>
+                  <Target className="size-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-2">아직 공유된 미션 인증이 없습니다</p>
+                  <p className="text-sm text-gray-500">미션을 완료하고 첫 번째 인증을 공유해보세요!</p>
+                </>
+              )}
             </div>
           ) : (
             stories.map((story: StoryFeedItem) => (
@@ -242,9 +276,11 @@ export function FeedPage() {
                       </div>
                     </div>
                     
-                    <Badge className={`${story.mission.category_color} text-white border-0 text-xs`}>
-                      {story.mission.category} • {story.mission.title}
-                    </Badge>
+                    {story.mission && (
+                      <Badge className={`${story.mission.category_color} text-white border-0 text-xs`}>
+                        {story.mission.category} • {story.mission.title}
+                      </Badge>
+                    )}
                   </div>
 
                   {/* Images */}
@@ -337,6 +373,39 @@ export function FeedPage() {
           </div>
         )}
       </div>
+
+      {/* 플로팅 액션 버튼 - 스토리 작성 (스토리 탭에서만 표시) */}
+      {filter === 'FREE_STORY' && (
+        <div className="fixed bottom-24 z-50" style={{ right: 'calc(50vw - 192px + 16px)' }}>
+          <div className="relative group">
+            <Button
+              size="lg"
+              className="h-12 w-12 md:h-10 md:w-10 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              onClick={() => {
+                setIsStoryModalOpen(true);
+              }}
+            >
+              <Plus className="h-5 w-5 md:h-4 md:w-4 text-white" />
+            </Button>
+            
+            {/* 툴팁 */}
+            <div className="absolute bottom-full right-0 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+              <div className="bg-gray-800 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap">
+                자유 스토리 작성
+                <div className="absolute top-full right-4 w-0 h-0 border-l-2 border-r-2 border-t-4 border-transparent border-t-gray-800"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 스토리 작성 모달 */}
+      <StoryCreateModal
+        isOpen={isStoryModalOpen}
+        onClose={() => setIsStoryModalOpen(false)}
+        storyType={filter}
+        ongoingMissions={ongoingMissions || []}
+      />
     </div>
   );
 }

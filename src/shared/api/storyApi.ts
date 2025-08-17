@@ -28,6 +28,14 @@ export interface UpdateStoryRequest {
   isPublic: boolean;
 }
 
+export interface CreateFreeStoryRequest {
+  story_text: string;
+  images: string[];
+  location: string;
+  is_public: boolean;
+  user_tags: string[];
+}
+
 export const storyApi = {
   // 미션 인증 스토리 생성
   createStory: async (request: MissionVerificationRequest): Promise<MissionVerificationResponse> => {
@@ -35,7 +43,16 @@ export const storyApi = {
     return response.data.data;
   },
 
-  // 스토리 피드 조회
+  // 자유 스토리 생성
+  createFreeStory: async (request: CreateFreeStoryRequest): Promise<Story> => {
+    const response = await api.post<ApiResponse<Story>>('/stories/free', request);
+    if (!response.data.success) {
+      throw new Error(response.data.error?.message || 'Failed to create free story');
+    }
+    return response.data.data;
+  },
+
+  // 스토리 피드 조회 (기존 - 호환성 유지)
   getStoryFeed: async (
     sortBy: string = 'latest',
     page: number = 0,
@@ -54,6 +71,28 @@ export const storyApi = {
     const response = await api.get<ApiResponse<PagedResponse<any>>>(`/stories/feed?${params}`);
     if (!response.data.success) {
       throw new Error(response.data.error?.message || 'Failed to fetch story feed');
+    }
+    return response.data.data;
+  },
+
+  // StoryType별 스토리 피드 조회 (새로운 API)
+  getStoryFeedByType: async (
+    storyType: 'FREE_STORY' | 'MISSION_PROOF',
+    cursor?: number,
+    size: number = 20,
+    direction: string = 'NEXT',
+    userId?: number
+  ): Promise<PagedResponse<StoryFeedItem>> => {
+    const params = new URLSearchParams({
+      size: size.toString(),
+      direction,
+    });
+    if (cursor) params.append('cursor', cursor.toString());
+    if (userId) params.append('userId', userId.toString());
+    
+    const response = await api.get<ApiResponse<PagedResponse<any>>>(`/stories/feed/${storyType}?${params}`);
+    if (!response.data.success) {
+      throw new Error(response.data.error?.message || 'Failed to fetch story feed by type');
     }
     return response.data.data;
   },
@@ -83,8 +122,8 @@ export const storyApi = {
   },
 
   // 스토리 좋아요
-  likeStory: async (storyId: number, userId: number): Promise<Story> => {
-    const response = await api.post<ApiResponse<Story>>(`/stories/${storyId}/like?userId=${userId}`);
+  likeStory: async (storyId: number, userId: number): Promise<StoryFeedItem> => {
+    const response = await api.post<ApiResponse<any>>(`/stories/${storyId}/like?userId=${userId}`);
     if (!response.data.success) {
       throw new Error(response.data.error?.message || 'Failed to like story');
     }
@@ -92,8 +131,8 @@ export const storyApi = {
   },
 
   // 스토리 좋아요 취소
-  unlikeStory: async (storyId: number, userId: number): Promise<Story> => {
-    const response = await api.delete<ApiResponse<Story>>(`/stories/${storyId}/like?userId=${userId}`);
+  unlikeStory: async (storyId: number, userId: number): Promise<StoryFeedItem> => {
+    const response = await api.delete<ApiResponse<any>>(`/stories/${storyId}/like?userId=${userId}`);
     if (!response.data.success) {
       throw new Error(response.data.error?.message || 'Failed to unlike story');
     }

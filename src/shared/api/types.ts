@@ -86,31 +86,25 @@ export interface Story {
 }
 
 export interface StoryFeedItem {
-  storyId: number;
+  id: string;
   user: {
-    userId: number;
     name: string;
-    avatarUrl: string;
-    level: number;
-    levelTitle: string;
+    avatar_url: string;
+    level: string;
   };
   mission: {
-    missionId: number;
     title: string;
     category: string;
-  };
-  content: {
-    storyText: string;
-    images: string[];
-    tags: string[];
-  };
-  interactions: {
-    likes: number;
-    comments: number;
-    isLikedByCurrentUser: boolean;
-  };
-  timeAgo: string;
+    category_color: string;
+  } | null;
+  story: string;
+  images: string[];
   location: string;
+  tags: string[];
+  likes: number;
+  comments: number;
+  time_ago: string;
+  is_liked: boolean;
 }
 
 export interface Reward {
