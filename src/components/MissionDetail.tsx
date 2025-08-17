@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { ArrowLeft, Clock, Star, MapPin, Users, Camera, Heart, Trophy, Zap, Calendar, Timer, CheckCircle, PlayCircle, Target } from "lucide-react";
+import { ArrowLeft, Clock, Star, MapPin, Users, Camera, Heart, Trophy, Zap, Calendar, Timer, CheckCircle, PlayCircle, Target, Mountain, MessageCircle, Palette, BookOpen, TrendingUp } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { missionApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
@@ -20,16 +20,35 @@ interface MissionDetailProps {
   onNavigateToMissions?: () => void;
 }
 
-// 카테고리별 색상 매핑
-const getCategoryColor = (category: string) => {
-  const colors: Record<string, string> = {
-    "ADVENTUROUS": "bg-orange-500",
-    "SOCIAL": "bg-blue-500", 
-    "HEALTHY": "bg-green-500",
-    "CREATIVE": "bg-purple-500",
-    "LEARNING": "bg-indigo-500",
+// 카테고리별 아이콘 반환
+const getCategoryIcon = (category: string) => {
+  const icons: Record<string, React.ComponentType<any>> = {
+    "ADVENTURE": Mountain,
+    "SOCIAL": MessageCircle,
+    "HEALTH": Heart,
+    "CREATIVE": Palette,
+    "LEARNING": BookOpen,
+    "ADVENTUROUS": Mountain,
+    "HEALTHY": Heart,
+    "모험적": Mountain,
+    "사교적": MessageCircle,
+    "건강": Heart,
+    "창의적": Palette,
+    "학습": BookOpen,
   };
-  return colors[category] || "bg-gray-500";
+  return icons[category] || Target;
+};
+
+// 토스 스타일 미니멀 테마
+const getCategoryTheme = (category: string) => {
+  return {
+    bg: "bg-white",
+    text: "text-gray-900",
+    accent: "bg-blue-500",
+    shadow: "shadow-sm hover:shadow-md",
+    iconBg: "bg-gray-100 border border-gray-200",
+    iconColor: "text-gray-600"
+  };
 };
 
 // 난이도 한글 변환
@@ -190,47 +209,47 @@ export function MissionDetail({
       </header>
 
       <div className="max-w-md mx-auto px-4 pb-20">
-        {/* Mission Hero Image */}
+        {/* Mission Header Card - 홈 스타일 */}
         <div className="py-4">
-          <Card className="overflow-hidden border-0 bg-white/80 backdrop-blur-sm shadow-xl">
-            <div className="relative">
-              <ImageWithFallback
-                src={missionData.image_url}
-                alt={missionData.title}
-                className="w-full h-56 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute top-4 left-4">
-                <Badge className={`${getCategoryColor(missionData.category)} text-white border-0 shadow-lg`}>
-                  {getCategoryText(missionData.category)}
-                </Badge>
-              </div>
-              <div className="absolute top-4 right-4 flex flex-col gap-2">
-                <div className="bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full px-3 py-1.5 shadow-lg">
-                  <span className="text-sm font-bold flex items-center gap-1">
+          <Card className={`overflow-hidden hover:shadow-lg transition-all duration-200 border border-gray-100 bg-white shadow-sm rounded-2xl`}>
+            <CardContent className="p-5">
+              <div className="flex items-start justify-between mb-4">
+                {/* Left: Icon + Title */}
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className={`size-11 bg-gray-100 border border-gray-200 rounded-xl flex items-center justify-center`}>
+                    {React.createElement(getCategoryIcon(missionData.category), { className: "size-5 text-gray-600" })}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h2 className={`font-semibold text-xl text-gray-900 leading-tight mb-2`}>
+                      {missionData.title}
+                    </h2>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm text-gray-700 bg-gray-100 px-2 py-1 rounded-md font-medium border border-gray-200">
+                        {getCategoryText(missionData.category)}
+                      </span>
+                      <span className="text-sm text-gray-600 font-medium">
+                        {getDifficultyText(missionData.difficulty)}
+                      </span>
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <Timer className="size-4" />
+                        <span>{missionData.duration}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Right: Points */}
+                <div className="flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-1 bg-gray-100 text-gray-700 rounded-md px-2 py-1 border border-gray-200">
                     <Trophy className="size-4" />
-                    +{missionData.reward_points}P
-                  </span>
-                </div>
-                <div className="bg-blue-500/90 text-white rounded-full px-3 py-1 shadow-lg">
-                  <span className="text-xs font-medium flex items-center gap-1">
-                    ⚡ {getCategoryText(missionData.category)} +1
-                  </span>
-                </div>
-              </div>
-              <div className="absolute bottom-4 left-4 right-4">
-                <h2 className="text-xl font-bold text-white mb-2">{missionData.title}</h2>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-white/20 text-white border-white/30">
-                    {getDifficultyText(missionData.difficulty)}
-                  </Badge>
-                  <div className="flex items-center gap-1 text-white/90 text-sm">
-                    <Timer className="size-4" />
-                    <span>{missionData.duration}</span>
+                    <span className="text-sm font-medium">+{missionData.reward_points}P</span>
+                  </div>
+                  <div className="flex items-center gap-1 bg-blue-100 text-blue-700 rounded-md px-2 py-1 border border-blue-200">
+                    <span className="text-sm font-medium">스탯+2</span>
                   </div>
                 </div>
               </div>
-            </div>
+            </CardContent>
           </Card>
         </div>
 
@@ -249,10 +268,10 @@ export function MissionDetail({
             <Card className="border-0 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-all">
               <CardContent className="p-4 text-center">
                 <div className="flex items-center justify-center mb-2">
-                  <Star className="size-5 text-yellow-500" />
+                  <TrendingUp className="size-5 text-green-500" />
                 </div>
-                <div className="text-lg font-bold text-yellow-600">{(missionDetail.average_rating || 0).toFixed(1)}</div>
-                <p className="text-xs text-muted-foreground">평점</p>
+                <div className="text-lg font-bold text-green-600">{missionDetail.success_rate || 0}%</div>
+                <p className="text-xs text-muted-foreground">성공률</p>
               </CardContent>
             </Card>
             <Card className="border-0 bg-white/70 backdrop-blur-sm hover:bg-white/80 transition-all">
@@ -280,17 +299,6 @@ export function MissionDetail({
           </Card>
         </section>
 
-        {/* Daily Limit Info */}
-        {dailyLimit && (
-          <div className="mb-4">
-            <MissionLimitIndicator 
-              limit={dailyLimit} 
-              compact={false}
-              showProgress={true}
-              showBadge={true}
-            />
-          </div>
-        )}
 
         {/* Mission Action Button */}
         <div className="mb-6">
