@@ -152,7 +152,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               내 미션
             </h1>
@@ -163,42 +163,45 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
               <NotificationBell />
             </div>
           </div>
-          
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <Target className="size-4 text-blue-500" />
-                <span className="text-lg font-bold text-blue-500">{ongoingMissions.length}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">진행 중</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <CheckCircle className="size-4 text-green-500" />
-                <span className="text-lg font-bold text-green-500">{completedMissions.length}</span>
-              </div>
-              <p className="text-xs text-muted-foreground">완료</p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <TrendingUp className="size-4 text-purple-500" />
-                <span className="text-lg font-bold text-purple-500">
-                  {completedMissions.length + ongoingMissions.length > 0 
-                    ? Math.round((completedMissions.length / (completedMissions.length + ongoingMissions.length)) * 100)
-                    : 0}%
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground">완료율</p>
-            </div>
-          </div>
         </div>
       </header>
 
       <div className="max-w-md mx-auto px-4 pb-20">
-        <Tabs value={activeSubTab} onValueChange={setActiveSubTab} className="py-4">
-          <TabsList className="grid w-full grid-cols-2 bg-white backdrop-blur-sm">
-            <TabsTrigger value="ongoing" className="flex items-center gap-2">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-3 py-4">
+          <div className="text-center bg-white backdrop-blur-sm rounded-lg p-3">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Target className="size-4 text-blue-500" />
+              <span className="text-lg font-bold text-blue-500">{ongoingMissions.length}</span>
+            </div>
+            <p className="text-xs text-muted-foreground">진행 중</p>
+          </div>
+          <div className="text-center bg-white backdrop-blur-sm rounded-lg p-3">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <CheckCircle className="size-4 text-green-500" />
+              <span className="text-lg font-bold text-green-500">{completedMissions.length}</span>
+            </div>
+            <p className="text-xs text-muted-foreground">완료</p>
+          </div>
+          <div className="text-center bg-white backdrop-blur-sm rounded-lg p-3">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <TrendingUp className="size-4 text-purple-500" />
+              <span className="text-lg font-bold text-purple-500">
+                {completedMissions.length + ongoingMissions.length > 0 
+                  ? Math.round((completedMissions.length / (completedMissions.length + ongoingMissions.length)) * 100)
+                  : 0}%
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">완료율</p>
+          </div>
+        </div>
+
+        <Tabs value={activeSubTab} onValueChange={setActiveSubTab}>
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-xl h-12">
+            <TabsTrigger 
+              value="ongoing" 
+              className="flex items-center gap-2 rounded-lg font-semibold text-sm transition-all data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm"
+            >
               진행 중
               {ongoingMissions.length > 0 && (
                 <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
@@ -206,7 +209,10 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="completed" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="completed" 
+              className="flex items-center gap-2 rounded-lg font-semibold text-sm transition-all data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm"
+            >
               완료됨
               {completedMissions.length > 0 && (
                 <span className="bg-green-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">

@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Star, Gift, Coffee, ShoppingBag, Ticket, Clock, Check, Crown, Zap, Palette, GraduationCap, Utensils } from "lucide-react";
+import { Star, Gift, Coffee, ShoppingBag, Ticket, Clock, Check, Crown, Zap, Palette, GraduationCap, Utensils, AlertTriangle, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { rewardsApi } from "../shared/api/rewardsApi";
 import { useAuth } from "../contexts/AuthContext";
 import { NotificationBell } from "./ui/notification-bell";
+import { Dialog, DialogContent } from "./ui/dialog";
 
 const rewardCategories = [
   { id: "카페", name: "카페", icon: Coffee },
@@ -37,6 +38,16 @@ export function RewardsPage() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("shop");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showDemoPopup, setShowDemoPopup] = useState(false);
+
+  // 매번 진입 시 데모 팝업 표시
+  useEffect(() => {
+    setShowDemoPopup(true);
+  }, []);
+
+  const handleCloseDemoPopup = () => {
+    setShowDemoPopup(false);
+  };
 
   // 리워드 페이지 전체 데이터 조회
   const { data: rewardsPageData, isLoading, error } = useQuery({
@@ -130,25 +141,8 @@ export function RewardsPage() {
               </div>
             </CardContent>
           </Card>
-          
-          {/* Demo Product Notice */}
-          <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <div className="flex items-start gap-2">
-              <div className="text-amber-600 mt-0.5">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-amber-800">데모 상품 안내</p>
-                <p className="text-xs text-amber-700 mt-1">
-                  현재 표시된 리워드는 모두 데모용 상품입니다. 추후 실제 상품이 적용될 예정입니다.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-xl h-12">
             <TabsTrigger 
               value="shop" 
@@ -165,7 +159,7 @@ export function RewardsPage() {
           </TabsList>
 
           {/* Reward Shop */}
-          <TabsContent value="shop" className="space-y-4 mt-4">
+          <TabsContent value="shop" className="space-y-4 mt-1">
             {/* Category Filter */}
             <div className="flex gap-2 overflow-x-auto pb-2">
               <Button
@@ -280,7 +274,7 @@ export function RewardsPage() {
           </TabsContent>
 
           {/* Reward History */}
-          <TabsContent value="history" className="space-y-4 mt-4">
+          <TabsContent value="history" className="space-y-4 mt-1">
             <div className="space-y-3">
               {rewardHistory.map((item) => (
                 <Card key={item.id} className="border-0 bg-white backdrop-blur-sm">
@@ -338,6 +332,41 @@ export function RewardsPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* 데모 상품 안내 팝업 */}
+      <Dialog open={showDemoPopup} onOpenChange={setShowDemoPopup}>
+        <DialogContent className="sm:max-w-sm w-[88vw]">
+          <div className="p-5">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="flex-shrink-0 w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-amber-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold text-gray-900 mb-2">데모 상품 안내</h3>
+                <p className="text-sm text-gray-600 leading-5">
+                  현재 표시된 리워드는 모두 데모용 상품입니다.<br />
+                  실제 브랜드 파트너십을 통한 다양한 혜택이 곧 추가될 예정입니다.
+                </p>
+              </div>
+              <button
+                onClick={handleCloseDemoPopup}
+                className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex justify-end pt-2">
+              <Button
+                onClick={handleCloseDemoPopup}
+                variant="outline"
+                className="px-6 border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                확인
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

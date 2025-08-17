@@ -170,34 +170,34 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
 
         {/* Tabbed Content */}
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-white backdrop-blur-sm h-16 rounded-xl p-1 border border-gray-200/50">
+          <TabsList className="grid w-full grid-cols-4 gap-1 p-1 bg-gray-100 rounded-xl h-14">
             <TabsTrigger 
               value="overview" 
-              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
+              className="flex flex-col items-center justify-center gap-1 rounded-lg font-semibold text-xs transition-all data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm text-gray-600"
             >
               <BarChart3 className="size-4" />
-              <span className="text-xs font-medium">개요</span>
+              개요
             </TabsTrigger>
             <TabsTrigger 
               value="stats" 
-              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
+              className="flex flex-col items-center justify-center gap-1 rounded-lg font-semibold text-xs transition-all data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm text-gray-600"
             >
               <User className="size-4" />
-              <span className="text-xs font-medium">스탯</span>
+              스탯
             </TabsTrigger>
             <TabsTrigger 
               value="achievements" 
-              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
+              className="flex flex-col items-center justify-center gap-1 rounded-lg font-semibold text-xs transition-all data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm text-gray-600"
             >
               <Award className="size-4" />
-              <span className="text-xs font-medium">업적</span>
+              업적
             </TabsTrigger>
             <TabsTrigger 
               value="activity" 
-              className="flex flex-col items-center justify-center gap-1 p-2 h-full transition-all duration-200 hover:text-gray-700 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-md data-[state=active]:shadow-blue-100/50 rounded-lg border-0"
+              className="flex flex-col items-center justify-center gap-1 rounded-lg font-semibold text-xs transition-all data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm text-gray-600"
             >
               <Activity className="size-4" />
-              <span className="text-xs font-medium">활동</span>
+              활동
             </TabsTrigger>
           </TabsList>
 

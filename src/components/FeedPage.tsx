@@ -199,7 +199,7 @@ export function FeedPage() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               스토리 피드
             </h1>
@@ -210,31 +210,43 @@ export function FeedPage() {
               <NotificationBell />
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant={filter === "FREE_STORY" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleFilterChange("FREE_STORY")}
-              className={filter === "FREE_STORY" ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
-            >
-              <FileText className="size-4 mr-1" />
-              스토리
-            </Button>
-            <Button
-              variant={filter === "MISSION_PROOF" ? "default" : "outline"}
-              size="sm"
-              onClick={() => handleFilterChange("MISSION_PROOF")}
-              className={filter === "MISSION_PROOF" ? "bg-purple-500 hover:bg-purple-600 text-white" : ""}
-            >
-              <Target className="size-4 mr-1" />
-              미션인증
-            </Button>
-          </div>
         </div>
       </header>
 
       <div className="max-w-md mx-auto px-4 pb-20 relative">
-        <div className="py-4 space-y-6">
+        {/* Story Type Filter */}
+        <div className="py-4">
+          <div className="grid grid-cols-2 gap-1 p-1 bg-gray-100 rounded-xl mb-4">
+            <button
+              onClick={() => handleFilterChange("FREE_STORY")}
+              className={`
+                flex items-center justify-center gap-2 rounded-lg font-semibold text-sm py-3 transition-all
+                ${filter === "FREE_STORY" 
+                  ? "bg-white text-purple-600 shadow-sm" 
+                  : "text-gray-600 hover:text-gray-800"
+                }
+              `}
+            >
+              <FileText className="size-4" />
+              스토리
+            </button>
+            <button
+              onClick={() => handleFilterChange("MISSION_PROOF")}
+              className={`
+                flex items-center justify-center gap-2 rounded-lg font-semibold text-sm py-3 transition-all
+                ${filter === "MISSION_PROOF" 
+                  ? "bg-white text-purple-600 shadow-sm" 
+                  : "text-gray-600 hover:text-gray-800"
+                }
+              `}
+            >
+              <Target className="size-4" />
+              미션인증
+            </button>
+          </div>
+        </div>
+        
+        <div className="space-y-6">
           {stories.length === 0 ? (
             <div className="text-center py-12">
               {filter === "FREE_STORY" ? (
