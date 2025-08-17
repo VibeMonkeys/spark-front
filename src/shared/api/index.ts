@@ -10,6 +10,7 @@ export * from './userApi';
 export * from './levelApi';
 export * from './statsApi';
 export * from './achievement';
+export * from './hashtagApi';
 
 // 편의를 위한 통합 객체
 export { authApi } from './authApi';
@@ -21,3 +22,4 @@ export { userApi } from './userApi';
 export { levelApi } from './levelApi';
 export { statsApi } from './statsApi';
 export { achievementApi } from './achievement';
+export { hashtagApi } from './hashtagApi';
