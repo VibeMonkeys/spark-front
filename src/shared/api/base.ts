@@ -17,6 +17,7 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // 디버깅용 URL 로깅
+    console.log(`🚀 [API] Requesting: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
     
     // 인증 토큰이 있다면 헤더에 추가
     const token = localStorage.getItem('auth_token');
