@@ -69,10 +69,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
   const markAsRead = useCallback(async (notificationId: number) => {
     if (!user?.id || isNaN(notificationId)) {
-      console.log('markAsRead: Invalid user or notificationId');
       return;
     }
-    
     
     // 낙관적 업데이트
     setNotifications(prev => {
@@ -157,8 +155,9 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     // 삭제할 알림을 백업하고 UI에서 먼저 제거
     let deletedNotification: WebSocketNotification | null = null;
     setNotifications(prev => {
-      deletedNotification = prev.find(n => n.id === notificationId.toString()) || null;
-      return prev.filter(notification => notification.id !== notificationId.toString());
+      deletedNotification = prev.find(n => n.id === notificationId.toString() || n.id == notificationId) || null;
+      const filtered = prev.filter(notification => notification.id !== notificationId.toString() && notification.id != notificationId);
+      return filtered;
     });
     
     // API 호출로 서버에서 삭제
