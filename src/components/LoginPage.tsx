@@ -86,7 +86,8 @@ export function LoginPage() {
 
   const handleDemoLogin = () => {
     if (selectedUserId) {
-      console.log('Attempting demo login with userId:', selectedUserId);
+      console.log('Attempting demo login with userId:', selectedUserId, 'type:', typeof selectedUserId);
+      console.log('Selected user from list:', demoUsers?.find(u => u.id.toString() === selectedUserId));
       demoLoginMutation.mutate(selectedUserId);
     }
   };
