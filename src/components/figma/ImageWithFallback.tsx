@@ -46,7 +46,7 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
   // 항상 첫 글자 아바타를 사용
   return (
     <div
-      className={`inline-flex items-center justify-center text-white font-semibold ${bgColor} ${className ?? ''}`}
+      className={`inline-flex items-center justify-center text-white font-bold text-lg ${bgColor} ${className ?? ''}`}
       style={style}
       {...rest}
     >

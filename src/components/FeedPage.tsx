@@ -445,7 +445,7 @@ export function FeedPage() {
         )}
 
         {/* Search Results or Regular Feed */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {isSearchActive ? (
             // Search Results
             !searchQuery.trim() ? (
@@ -498,7 +498,7 @@ export function FeedPage() {
                               {result.story_type === 'FREE_STORY' ? '스토리' : '미션인증'}
                             </Badge>
                           </div>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-400 mt-1">
                             {result.time_ago} • {result.location || '위치 미정'}
                           </p>
                         </div>
@@ -523,14 +523,14 @@ export function FeedPage() {
                     )}
 
                     {/* Content */}
-                    <div className="p-4">
-                      <p className="text-sm text-foreground/90 leading-relaxed mb-2">
+                    <div className="px-4 pt-3 pb-0">
+                      <p className="text-sm text-foreground/90 leading-relaxed mb-3">
                         {result.story}
                       </p>
                       
                       {/* Hash Tags */}
                       {result.tags && result.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-4">
+                        <div className="flex flex-wrap gap-1 mb-3">
                           {result.tags.map((tag, index) => (
                             <button
                               key={index}
@@ -544,7 +544,7 @@ export function FeedPage() {
                       )}
 
                       {/* Actions */}
-                      <div className="flex items-center justify-between">
+                      <div className={`flex items-center justify-between ${result.tags && result.tags.length > 0 ? '' : 'mt-4'}`}>
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-1 text-sm text-gray-500">
                             <Heart className="w-4 h-4" />
@@ -606,7 +606,7 @@ export function FeedPage() {
                             {story.user.level}
                           </Badge>
                         </div>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-400 mt-1">
                           {story.time_ago} • {story.location || '위치 미정'}
                         </p>
                       </div>
@@ -631,14 +631,14 @@ export function FeedPage() {
                   )}
 
                   {/* Content */}
-                  <div className="p-4">
-                    <p className="text-sm text-foreground/90 leading-relaxed mb-2">
+                  <div className="px-4 pt-3 pb-0">
+                    <p className="text-sm text-foreground/90 leading-relaxed mb-3">
                       {story.story}
                     </p>
                     
                     {/* Hash Tags */}
                     {story.tags && story.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-4">
+                      <div className="flex flex-wrap gap-1 mb-3">
                         {story.tags.map((tag, index) => (
                           <button
                             key={index}
@@ -652,7 +652,7 @@ export function FeedPage() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex items-center justify-between">
+                    <div className={`flex items-center justify-between ${story.tags && story.tags.length > 0 ? '' : 'mt-4'}`}>
                       <div className="flex items-center gap-4">
                         <button
                           onClick={() => handleLike(story.id, story.is_liked)}

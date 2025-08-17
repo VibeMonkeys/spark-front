@@ -157,7 +157,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                     <span className="text-xs text-white font-bold">✓</span>
                   </div>
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 mt-1">
                   <h2 className="text-xl font-bold text-gray-900 mb-2">{userData.name}</h2>
                   <p className="text-sm text-gray-500">
                     매일 성장하는 스파크 멤버 ✨
