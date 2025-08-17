@@ -64,7 +64,9 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   autoClose = true,
   autoCloseDelay = 3000
 }) => {
-  const config = typeConfig[type];
+  // type 유효성 검사 및 기본값 설정
+  const validType = type && typeConfig[type] ? type : 'info';
+  const config = typeConfig[validType];
   const IconComponent = config.icon;
 
   React.useEffect(() => {
