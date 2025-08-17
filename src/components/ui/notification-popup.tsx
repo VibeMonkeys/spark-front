@@ -160,7 +160,7 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="p-1 h-6 w-6 rounded-full hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="p-1 h-6 w-6 rounded-full hover:bg-red-50 hover:text-red-600 text-gray-400 transition-colors"
                             onClick={(e) => {
                               e.stopPropagation();
                               deleteNotification(parseInt(notification.id));
