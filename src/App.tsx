@@ -36,9 +36,10 @@ const queryClient = new QueryClient({
 
 interface AppContentProps {
   onSetShowNotification?: (fn: (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void) => void;
+  onSetNavigateFunction?: (fn: (view: string, tab?: string) => void) => void;
 }
 
-function AppContent({ onSetShowNotification }: AppContentProps) {
+function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContentProps) {
   const { user, isLoading, login } = useAuth();
   const queryClient = useQueryClient();
   const [currentView, setCurrentView] = useState("main"); // "main", "mission-detail", "mission-verification", "mission-success", "profile-edit", "settings", "password-change", "help", "app-info"
@@ -92,6 +93,21 @@ function AppContent({ onSetShowNotification }: AppContentProps) {
       onSetShowNotification(showNotification);
     }
   }, [onSetShowNotification, showNotification]);
+
+  // 네비게이션 함수 생성
+  const handleNavigateFromNotification = useCallback((view: string, tab?: string) => {
+    setCurrentView(view);
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, []);
+
+  // 네비게이션 함수를 상위 컴포넌트에 전달
+  useEffect(() => {
+    if (onSetNavigateFunction) {
+      onSetNavigateFunction(handleNavigateFromNotification);
+    }
+  }, [onSetNavigateFunction, handleNavigateFromNotification]);
 
   const closeNotification = () => {
     setNotification(prev => ({ ...prev, isOpen: false }));
@@ -448,14 +464,25 @@ function AppContent({ onSetShowNotification }: AppContentProps) {
 // AppContent를 감싸는 컴포넌트
 function AppWithNotifications() {
   const [showNotificationRef, setShowNotificationRef] = useState<((type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void) | null>(null);
+  const [navigateRef, setNavigateRef] = useState<((view: string, tab?: string) => void) | null>(null);
 
   const handleShowNotification = useCallback((showNotificationFn: (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void) => {
     setShowNotificationRef(() => showNotificationFn);
   }, []);
 
+  const handleSetNavigateFunction = useCallback((navigateFn: (view: string, tab?: string) => void) => {
+    setNavigateRef(() => navigateFn);
+  }, []);
+
   return (
-    <NotificationProvider onShowNotification={showNotificationRef || undefined}>
-      <AppContent onSetShowNotification={handleShowNotification} />
+    <NotificationProvider 
+      onShowNotification={showNotificationRef || undefined}
+      onNavigate={navigateRef || undefined}
+    >
+      <AppContent 
+        onSetShowNotification={handleShowNotification} 
+        onSetNavigateFunction={handleSetNavigateFunction}
+      />
     </NotificationProvider>
   );
 }

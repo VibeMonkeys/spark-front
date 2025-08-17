@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { webSocketClient, WebSocketNotification } from '../shared/api/websocket';
 import { useAuth } from './AuthContext';
 
@@ -6,10 +6,15 @@ interface NotificationContextType {
   notifications: WebSocketNotification[];
   unreadCount: number;
   isConnected: boolean;
+  isLoading: boolean;
+  error: string | null;
   markAsRead: (notificationId: number) => void;
   markAllAsRead: () => void;
+  deleteNotification: (notificationId: number) => void;
+  deleteAllNotifications: () => void;
   clearNotifications: () => void;
   showNotification: (notification: Omit<WebSocketNotification, 'id' | 'isRead' | 'createdAt'>) => void;
+  navigateFromNotification: (actionUrl: string) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -25,15 +30,30 @@ export const useNotifications = () => {
 interface NotificationProviderProps {
   children: React.ReactNode;
   onShowNotification?: (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void;
+  onNavigate?: (view: string, tab?: string) => void;
 }
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ 
   children, 
-  onShowNotification 
+  onShowNotification,
+  onNavigate 
 }) => {
   const { user, token } = useAuth();
   const [notifications, setNotifications] = useState<WebSocketNotification[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 에러 상태를 자동으로 클리어
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 5000); // 5초 후 에러 메시지 제거
+
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   const addNotification = useCallback((notification: WebSocketNotification) => {
     setNotifications(prev => [notification, ...prev.slice(0, 49)]); // 최대 50개 유지
@@ -47,56 +67,188 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     }
   }, [onShowNotification]);
 
-  const markAsRead = useCallback((notificationId: number) => {
+  const markAsRead = useCallback(async (notificationId: number) => {
     if (!user?.id || isNaN(notificationId)) {
+      console.log('markAsRead: Invalid user or notificationId');
       return;
     }
     
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === notificationId.toString()
+    
+    // 낙관적 업데이트
+    setNotifications(prev => {
+      const updated = prev.map(notification =>
+        notification.id == notificationId || notification.id === notificationId.toString()
           ? { ...notification, isRead: true }
           : notification
-      )
-    );
+      );
+      return updated;
+    });
     
     // API 호출로 서버에 읽음 상태 업데이트
-    fetch(`/api/v1/notifications/${notificationId}/read?userId=${parseInt(user.id)}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-    .catch(error => {
-      console.error('Failed to mark notification as read:', error);
-    });
-  }, [user?.id, token]);
-
-  const markAllAsRead = useCallback(async () => {
-    if (!user?.id) return;
-    
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, isRead: true }))
-    );
-    
-    // API 호출로 서버에 모든 알림 읽음 처리
     try {
-      await fetch(`/api/v1/notifications/read-all?userId=${parseInt(user.id)}`, {
+      const response = await fetch(`/api/v1/notifications/${notificationId}/read?userId=${parseInt(user.id)}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
+      
+      if (!response.ok) {
+        throw new Error('읽음 처리에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+      setError('알림 읽음 처리에 실패했습니다.');
+      // 실패 시 상태를 원상복구
+      setNotifications(prev => 
+        prev.map(notification =>
+          notification.id == notificationId || notification.id === notificationId.toString()
+            ? { ...notification, isRead: false }
+            : notification
+        )
+      );
+    }
+  }, [user?.id, token]);
+
+  const markAllAsRead = useCallback(async () => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    // 낙관적 업데이트
+    setNotifications(prev =>
+      prev.map(notification => ({ ...notification, isRead: true }))
+    );
+    
+    // API 호출로 서버에 모든 알림 읽음 처리
+    try {
+      const response = await fetch(`/api/v1/notifications/read-all?userId=${parseInt(user.id)}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('모든 알림 읽음 처리에 실패했습니다.');
+      }
     } catch (error) {
       console.error('Failed to mark all notifications as read:', error);
+      setError('모든 알림 읽음 처리에 실패했습니다.');
+      // 실패 시 원래 상태로 복원 (읽지 않은 상태로 되돌리기)
+      setNotifications(prev =>
+        prev.map(notification => ({ ...notification, isRead: false }))
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user?.id, token]);
+
+  const deleteNotification = useCallback(async (notificationId: number) => {
+    if (!user?.id || isNaN(notificationId)) {
+      return;
+    }
+    
+    setError(null);
+    
+    // 삭제할 알림을 백업하고 UI에서 먼저 제거
+    let deletedNotification: WebSocketNotification | null = null;
+    setNotifications(prev => {
+      deletedNotification = prev.find(n => n.id === notificationId.toString()) || null;
+      return prev.filter(notification => notification.id !== notificationId.toString());
+    });
+    
+    // API 호출로 서버에서 삭제
+    try {
+      const response = await fetch(`/api/v1/notifications/${notificationId}?userId=${parseInt(user.id)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('알림 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to delete notification:', error);
+      setError('알림 삭제에 실패했습니다.');
+      // 실패 시 삭제된 알림을 다시 복원
+      if (deletedNotification) {
+        setNotifications(prev => [deletedNotification!, ...prev]);
+      }
+    }
+  }, [user?.id, token]);
+
+  const deleteAllNotifications = useCallback(async () => {
+    if (!user?.id) return;
+    
+    setIsLoading(true);
+    setError(null);
+    
+    // 모든 알림을 백업하고 UI에서 먼저 제거
+    let previousNotifications: WebSocketNotification[] = [];
+    setNotifications(prev => {
+      previousNotifications = [...prev];
+      return [];
+    });
+    
+    // API 호출로 서버에서 모든 알림 삭제
+    try {
+      const response = await fetch(`/api/v1/notifications/all?userId=${parseInt(user.id)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('모든 알림 삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to delete all notifications:', error);
+      setError('모든 알림 삭제에 실패했습니다.');
+      // 실패 시 백업된 알림들을 복원
+      setNotifications(previousNotifications);
+    } finally {
+      setIsLoading(false);
     }
   }, [user?.id, token]);
 
   const clearNotifications = useCallback(() => {
     setNotifications([]);
   }, []);
+
+  const navigateFromNotification = useCallback((actionUrl: string) => {
+    if (!onNavigate) return;
+    
+    // 외부 URL인 경우
+    if (actionUrl.startsWith('http://') || actionUrl.startsWith('https://')) {
+      window.open(actionUrl, '_blank');
+      return;
+    }
+    
+    // 내부 라우트 매핑
+    switch (actionUrl) {
+      case '/missions/current':
+        onNavigate('main', 'missions');
+        break;
+      case '/profile':
+        onNavigate('main', 'profile');
+        break;
+      case '/achievements':
+        onNavigate('main', 'profile'); // 일단 프로필 탭으로
+        break;
+      default:
+        onNavigate('main', 'home');
+        break;
+    }
+  }, [onNavigate]);
 
   const showNotification = useCallback((notification: Omit<WebSocketNotification, 'id' | 'isRead' | 'createdAt'>) => {
     const fullNotification: WebSocketNotification = {
@@ -108,11 +260,16 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     addNotification(fullNotification);
   }, [addNotification]);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = useMemo(() => {
+    return notifications.filter(n => !n.isRead).length;
+  }, [notifications]);
 
   // 서버에서 기존 알림 목록 로드
   const loadNotifications = useCallback(async () => {
     if (!user?.id || !token) return;
+
+    setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch(`/api/v1/notifications?userId=${parseInt(user.id)}`, {
@@ -122,22 +279,29 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         },
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data) {
-          const existingNotifications = result.data.map((item: any) => ({
-            id: item.id.toString(),
-            type: item.type,
-            title: item.title,
-            message: item.message,
-            isRead: item.isRead,
-            createdAt: item.createdAt,
-          }));
-          setNotifications(existingNotifications);
-        }
+      if (!response.ok) {
+        throw new Error('알림 목록 로드에 실패했습니다.');
+      }
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        const existingNotifications = result.data.map((item: any) => ({
+          id: item.id.toString(),
+          type: item.type,
+          title: item.title,
+          message: item.message,
+          actionUrl: item.actionUrl,
+          imageUrl: item.imageUrl,
+          isRead: item.isRead,
+          createdAt: item.createdAt,
+        }));
+        setNotifications(existingNotifications);
       }
     } catch (error) {
       console.error('Failed to load notifications:', error);
+      setError('알림 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
     }
   }, [user?.id, token]);
 
@@ -175,7 +339,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       setIsConnected(false);
       setNotifications([]);
     }
-  }, [user, token, addNotification, loadNotifications]);
+  }, [user, token, addNotification]);
 
   // 컴포넌트 언마운트 시 연결 해제
   useEffect(() => {
@@ -188,10 +352,15 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     notifications,
     unreadCount,
     isConnected,
+    isLoading,
+    error,
     markAsRead,
     markAllAsRead,
+    deleteNotification,
+    deleteAllNotifications,
     clearNotifications,
     showNotification,
+    navigateFromNotification,
   };
 
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Check, X, Clock, Star } from 'lucide-react';
+import { Bell, Check, X, Clock, Star, Trash2, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from './button';
 import { cn } from './utils';
 import { useNotifications } from '../../contexts/NotificationContext';
@@ -13,7 +13,7 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
   isOpen,
   onClose
 }) => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, isConnected } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, isConnected, isLoading, error, navigateFromNotification } = useNotifications();
 
   if (!isOpen) return null;
 
@@ -80,9 +80,24 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
             </div>
           </div>
 
+          {/* 에러 메시지 */}
+          {error && (
+            <div className="px-4 py-3 bg-red-50 border-b border-red-100">
+              <div className="flex items-center gap-2 text-red-700">
+                <AlertCircle className="size-4 flex-shrink-0" />
+                <p className="text-sm">{error}</p>
+              </div>
+            </div>
+          )}
+
           {/* 알림 리스트 */}
           <div className="max-h-96 overflow-y-auto">
-            {notifications.length === 0 ? (
+            {isLoading && notifications.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <Loader2 className="size-8 mx-auto mb-3 text-gray-400 animate-spin" />
+                <p className="text-sm">알림을 불러오는 중...</p>
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <Bell className="size-12 mx-auto mb-3 text-gray-300" />
                 <p className="text-sm">알림이 없습니다</p>
@@ -93,13 +108,21 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
                   <div
                     key={notification.id}
                     className={cn(
-                      "p-4 hover:bg-gray-50 transition-colors cursor-pointer",
+                      "group p-4 hover:bg-gray-50 transition-colors cursor-pointer",
                       !notification.isRead && "bg-blue-50/50"
                     )}
-                    onClick={() => {
+                    onClick={async () => {
                       if (!notification.isRead) {
-                        markAsRead(parseInt(notification.id));
+                        await markAsRead(parseInt(notification.id));
                       }
+                      
+                      // actionUrl이 있으면 해당 페이지로 이동
+                      if (notification.actionUrl) {
+                        navigateFromNotification(notification.actionUrl);
+                      }
+                      
+                      // 항상 알림 팝업 닫기
+                      onClose();
                     }}
                   >
                     <div className="flex items-start gap-3">
@@ -108,12 +131,17 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <h4 className={cn(
-                            "text-sm font-medium leading-5",
-                            notification.isRead ? "text-gray-700" : "text-gray-900"
-                          )}>
-                            {notification.title}
-                          </h4>
+                          <div className="flex items-center gap-2 flex-1">
+                            <h4 className={cn(
+                              "text-sm font-medium leading-5",
+                              notification.isRead ? "text-gray-700" : "text-gray-900"
+                            )}>
+                              {notification.title}
+                            </h4>
+                            {notification.actionUrl && (
+                              <ExternalLink className="size-3 text-gray-400 flex-shrink-0" />
+                            )}
+                          </div>
                           {!notification.isRead && (
                             <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1.5" />
                           )}
@@ -124,11 +152,22 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
                         )}>
                           {notification.message}
                         </p>
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center justify-between mt-2">
                           <div className="flex items-center gap-1 text-xs text-gray-400">
                             <Clock className="size-3" />
                             {formatTimeAgo(notification.createdAt)}
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="p-1 h-6 w-6 rounded-full hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteNotification(parseInt(notification.id));
+                            }}
+                          >
+                            <Trash2 className="size-3" />
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -139,19 +178,46 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
           </div>
 
           {/* 푸터 */}
-          {notifications.length > 0 && unreadCount > 0 && (
+          {notifications.length > 0 && (
             <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                onClick={() => {
-                  markAllAsRead();
-                }}
-              >
-                <Check className="size-4 mr-1" />
-                모두 읽음으로 표시
-              </Button>
+              <div className="flex gap-2">
+                {unreadCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    disabled={isLoading}
+                    onClick={() => {
+                      markAllAsRead();
+                    }}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="size-4 mr-1 animate-spin" />
+                    ) : (
+                      <Check className="size-4 mr-1" />
+                    )}
+                    모두 읽음
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  disabled={isLoading}
+                  onClick={() => {
+                    if (confirm('모든 알림을 삭제하시겠습니까?')) {
+                      deleteAllNotifications();
+                    }
+                  }}
+                >
+                  {isLoading ? (
+                    <Loader2 className="size-4 mr-1 animate-spin" />
+                  ) : (
+                    <Trash2 className="size-4 mr-1" />
+                  )}
+                  모두 삭제
+                </Button>
+              </div>
             </div>
           )}
         </div>
