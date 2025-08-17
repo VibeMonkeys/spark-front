@@ -165,8 +165,8 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
               <span className="text-sm font-medium text-orange-700">{userSummary.current_streak}일</span>
             </div>
             <div className="flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-full">
-              <Star className="size-3 text-blue-500" />
-              <span className="text-xs font-medium text-blue-700">{userSummary.current_points.toLocaleString()}P</span>
+              <Star className="size-4 text-blue-500" />
+              <span className="text-sm font-medium text-blue-700">{userSummary.current_points.toLocaleString()}P</span>
             </div>
             {/* 알림 종 아이콘 */}
             <NotificationBell />
