@@ -282,13 +282,20 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
                       
                       <Button 
                         size="sm" 
-                        className={`${theme.accent} hover:bg-blue-600 text-white border-0 font-medium text-sm px-6 py-2 rounded-lg transition-colors duration-200`}
+                        disabled={!dailyLimit?.can_start}
+                        className={`${
+                          dailyLimit?.can_start 
+                            ? `${theme.accent} hover:bg-blue-600 text-white` 
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        } border-0 font-medium text-sm px-6 py-2 rounded-lg transition-colors duration-200`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          onMissionSelect(mission.id);
+                          if (dailyLimit?.can_start) {
+                            onMissionSelect(mission.id);
+                          }
                         }}
                       >
-                        시작하기
+                        {dailyLimit?.can_start ? '시작하기' : '제한 도달'}
                       </Button>
                     </div>
                   </CardContent>
