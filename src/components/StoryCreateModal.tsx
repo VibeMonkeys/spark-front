@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
@@ -8,7 +8,7 @@ import { Badge } from "./ui/badge";
 import { ImageIcon, MapPin, Hash, X, FileText, Target } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { storyApi } from "../shared/api";
+import { storyApi, hashtagApi, AutocompleteResult } from "../shared/api";
 
 interface Mission {
   id: number;
@@ -47,6 +47,10 @@ export function StoryCreateModal({
   const [userTags, setUserTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
   const [isPublic, setIsPublic] = useState(true);
+  
+  // 해시태그 자동완성 상태
+  const [autocompleteResults, setAutocompleteResults] = useState<AutocompleteResult[]>([]);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
 
   // 스토리 생성 mutation
   const createStoryMutation = useMutation({
@@ -77,6 +81,38 @@ export function StoryCreateModal({
     }
   });
 
+  // 해시태그 자동완성 디바운스
+  const debouncedGetAutocomplete = useCallback(
+    debounce(async (prefix: string) => {
+      if (prefix.length >= 2) {
+        try {
+          const response = await hashtagApi.getAutocomplete(prefix, 5);
+          if (response.success && response.data) {
+            setAutocompleteResults(response.data);
+            setShowAutocomplete(true);
+          }
+        } catch (error) {
+          console.error('Failed to get autocomplete:', error);
+          setAutocompleteResults([]);
+        }
+      } else {
+        setAutocompleteResults([]);
+        setShowAutocomplete(false);
+      }
+    }, 300),
+    []
+  );
+
+  // 해시태그 입력 변경 시 자동완성
+  useEffect(() => {
+    if (newTag.trim()) {
+      debouncedGetAutocomplete(newTag.trim());
+    } else {
+      setAutocompleteResults([]);
+      setShowAutocomplete(false);
+    }
+  }, [newTag, debouncedGetAutocomplete]);
+
   const resetForm = () => {
     setSelectedMissionId(missionId || null);
     setStoryText("");
@@ -85,12 +121,17 @@ export function StoryCreateModal({
     setUserTags([]);
     setNewTag("");
     setIsPublic(true);
+    setAutocompleteResults([]);
+    setShowAutocomplete(false);
   };
 
-  const handleAddTag = () => {
-    if (newTag.trim() && !userTags.includes(newTag.trim())) {
-      setUserTags([...userTags, newTag.trim()]);
+  const handleAddTag = (tag?: string) => {
+    const tagToAdd = tag || newTag.trim();
+    if (tagToAdd && !userTags.includes(tagToAdd)) {
+      setUserTags([...userTags, tagToAdd]);
       setNewTag("");
+      setShowAutocomplete(false);
+      setAutocompleteResults([]);
     }
   };
 
@@ -103,6 +144,10 @@ export function StoryCreateModal({
       e.preventDefault();
       handleAddTag();
     }
+  };
+
+  const handleAutocompleteSelect = (hashtag: string) => {
+    handleAddTag(hashtag);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -164,23 +209,45 @@ export function StoryCreateModal({
               <Hash className="h-4 w-4" />
               해시태그
             </Label>
-            <div className="flex gap-3">
-              <Input
-                placeholder="태그 추가..."
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="flex-1 text-sm"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleAddTag}
-                disabled={!newTag.trim()}
-                className="px-4 text-sm"
-              >
-                추가
-              </Button>
+            <div className="relative">
+              <div className="flex gap-3">
+                <Input
+                  placeholder="태그 추가..."
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="flex-1 text-sm"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleAddTag()}
+                  disabled={!newTag.trim()}
+                  className="px-4 text-sm"
+                >
+                  추가
+                </Button>
+              </div>
+              
+              {/* 자동완성 드롭다운 */}
+              {showAutocomplete && autocompleteResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto">
+                  {autocompleteResults.map((result, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleAutocompleteSelect(result.hashtag)}
+                      className="w-full px-3 py-2 text-left hover:bg-gray-50 transition-colors flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Hash className="w-3 h-3 text-gray-400" />
+                        <span className="text-sm">{result.hashtag}</span>
+                      </div>
+                      <span className="text-xs text-gray-500">{result.count}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             {userTags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
@@ -250,4 +317,16 @@ export function StoryCreateModal({
       </DialogContent>
     </Dialog>
   );
+}
+
+// 디바운스 유틸리티 함수
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 }
