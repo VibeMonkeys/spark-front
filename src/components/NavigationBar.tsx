@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Home, Search, Target, Gift, User } from "lucide-react";
+import { Home, FileText, Target, Gift, User } from "lucide-react";
 
 interface NavigationBarProps {
   activeTab: string;
@@ -8,7 +8,7 @@ interface NavigationBarProps {
 
 const navItems = [
   { id: "home", icon: Home, label: "홈" },
-  { id: "explore", icon: Search, label: "탐색" },
+  { id: "explore", icon: FileText, label: "스토리" },
   { id: "missions", icon: Target, label: "미션" },
   { id: "rewards", icon: Gift, label: "리워드" },
   { id: "profile", icon: User, label: "프로필" }
