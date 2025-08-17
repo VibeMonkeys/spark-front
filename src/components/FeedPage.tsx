@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { Input } from "./ui/input";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Heart, MessageCircle, Share, Filter, TrendingUp, Loader2, FileText, Target, Plus } from "lucide-react";
+import { Heart, MessageCircle, Share, Filter, TrendingUp, Loader2, FileText, Target, Plus, Search, Hash, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { storyApi } from "../shared/api";
+import { storyApi, hashtagApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
 import { NotificationBell } from "./ui/notification-bell";
 import { StoryCreateModal } from "./StoryCreateModal";
@@ -32,6 +33,10 @@ interface StoryFeedItem {
   is_liked: boolean;
 }
 
+interface StorySearchResult extends StoryFeedItem {
+  story_type: 'FREE_STORY' | 'MISSION_PROOF';
+}
+
 export function FeedPage() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -41,6 +46,12 @@ export function FeedPage() {
     return savedTab === 'FREE_STORY' ? 'FREE_STORY' : 'MISSION_PROOF';
   });
   const [isStoryModalOpen, setIsStoryModalOpen] = useState(false);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<StorySearchResult[]>([]);
+  const [hashtagSuggestions, setHashtagSuggestions] = useState<any[]>([]);
+  const [isSearchLoading, setIsSearchLoading] = useState(false);
+  const [searchActiveTab, setSearchActiveTab] = useState<'all' | 'stories' | 'missions'>('all');
 
   // 탭 변경 시 localStorage에 저장
   const handleFilterChange = (newFilter: 'FREE_STORY' | 'MISSION_PROOF') => {
@@ -153,6 +164,104 @@ export function FeedPage() {
     }
   };
 
+  // 통합 검색 함수
+  const performSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setHashtagSuggestions([]);
+      return;
+    }
+
+    setIsSearchLoading(true);
+    try {
+      // 해시태그로 시작하는 경우
+      if (query.startsWith('#')) {
+        const hashtag = query.slice(1);
+        
+        // 해시태그가 포함된 스토리 검색
+        const [freeStories, missionProofs] = await Promise.all([
+          storyApi.searchStoriesByHashtag(hashtag, 'FREE_STORY', 10),
+          storyApi.searchStoriesByHashtag(hashtag, 'MISSION_PROOF', 10)
+        ]);
+
+        const allResults = [
+          ...(freeStories.items || []).map((item: any) => ({ ...item, story_type: 'FREE_STORY' as const })),
+          ...(missionProofs.items || []).map((item: any) => ({ ...item, story_type: 'MISSION_PROOF' as const }))
+        ];
+
+        setSearchResults(allResults);
+      } else {
+        // 일반 텍스트 검색 (스토리 내용 + 해시태그 검색)
+        const [freeStories, missionProofs, hashtags] = await Promise.all([
+          storyApi.searchStoriesByType(query, 'FREE_STORY', 10),
+          storyApi.searchStoriesByType(query, 'MISSION_PROOF', 10),
+          hashtagApi.searchHashtags(query, 5)
+        ]);
+
+        const allResults = [
+          ...(freeStories.items || []).map((item: any) => ({ ...item, story_type: 'FREE_STORY' as const })),
+          ...(missionProofs.items || []).map((item: any) => ({ ...item, story_type: 'MISSION_PROOF' as const }))
+        ];
+
+        setSearchResults(allResults);
+        
+        // 해시태그 제안
+        if (hashtags.success && hashtags.data) {
+          const suggestions = (hashtags.data as any).hashtags || [];
+          setHashtagSuggestions(suggestions);
+        }
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+      setSearchResults([]);
+      setHashtagSuggestions([]);
+    } finally {
+      setIsSearchLoading(false);
+    }
+  };
+
+  // 디바운스된 검색
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      performSearch(query);
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      debouncedSearch(searchQuery);
+    } else {
+      setSearchResults([]);
+      setHashtagSuggestions([]);
+    }
+  }, [searchQuery, debouncedSearch]);
+
+  const handleSearchClick = () => {
+    setIsSearchActive(true);
+  };
+
+  const handleSearchClose = () => {
+    setIsSearchActive(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setHashtagSuggestions([]);
+    setSearchActiveTab('all');
+  };
+
+  const handleHashtagClick = (hashtag: string) => {
+    const formattedHashtag = hashtag.startsWith('#') ? hashtag : `#${hashtag}`;
+    setSearchQuery(formattedHashtag);
+    setIsSearchActive(true);
+    performSearch(formattedHashtag);
+  };
+
+  const handleHashtagSearchClick = (hashtag: string) => {
+    const formattedHashtag = hashtag.startsWith('#') ? hashtag : `#${hashtag}`;
+    setSearchQuery(formattedHashtag);
+    performSearch(formattedHashtag);
+  };
+
   // getCategoryDisplayName 함수는 더 이상 사용하지 않음 (백엔드에서 한글 카테고리명 직접 제공)
 
   const formatTimeAgo = (dateString: string) => {
@@ -204,8 +313,13 @@ export function FeedPage() {
               스토리 피드
             </h1>
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm">
-                <Filter className="size-4" />
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleSearchClick}
+                className="hover:bg-purple-50"
+              >
+                <Search className="size-4" />
               </Button>
               <NotificationBell />
             </div>
@@ -213,10 +327,94 @@ export function FeedPage() {
         </div>
       </header>
 
+      {/* Inline Search Interface */}
+      {isSearchActive && (
+        <div className="max-w-md mx-auto px-4 mt-3 mb-2">
+          <div className="bg-gradient-to-b from-gray-50 to-white border border-gray-200 shadow-lg px-4 py-4 space-y-3 rounded-xl">
+            {/* Search Input */}
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
+                <Search className="w-4 h-4 text-gray-400" />
+              </div>
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="스토리 내용, 해시태그 검색... (예: #카페, 운동, 독서)"
+                className="pl-10 pr-10 py-2 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors duration-200"
+                autoFocus
+              />
+              <button
+                onClick={handleSearchClose}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Hashtag Suggestions */}
+            {hashtagSuggestions.length > 0 && searchQuery.trim() && !searchQuery.startsWith('#') && (
+              <div className="bg-gray-50 rounded-xl p-2">
+                <div className="text-sm font-medium text-gray-700 mb-1">관련 해시태그</div>
+                <div className="flex flex-wrap gap-2">
+                  {hashtagSuggestions.map((hashtag, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleHashtagSearchClick(hashtag.hashtag)}
+                      className="flex items-center gap-1 bg-white hover:bg-blue-50 border border-gray-200 rounded-lg px-3 py-1 text-sm transition-colors duration-150"
+                    >
+                      <Hash className="w-3 h-3 text-blue-500" />
+                      <span>{hashtag.hashtag}</span>
+                      <span className="text-xs text-gray-500">({hashtag.totalCount})</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Search Results Tabs */}
+            {searchQuery.trim() && (
+            <div className="flex gap-1 p-1 bg-gray-100 rounded-xl">
+              <button
+                onClick={() => setSearchActiveTab('all')}
+                className={`flex-1 rounded-lg py-1.5 px-3 text-sm font-medium transition-all duration-150 ${
+                  searchActiveTab === 'all'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                전체 ({searchResults.length})
+              </button>
+              <button
+                onClick={() => setSearchActiveTab('stories')}
+                className={`flex-1 rounded-lg py-1.5 px-3 text-sm font-medium transition-all duration-150 ${
+                  searchActiveTab === 'stories'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                스토리 ({searchResults.filter(r => r.story_type === 'FREE_STORY').length})
+              </button>
+              <button
+                onClick={() => setSearchActiveTab('missions')}
+                className={`flex-1 rounded-lg py-1.5 px-3 text-sm font-medium transition-all duration-150 ${
+                  searchActiveTab === 'missions'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                미션인증 ({searchResults.filter(r => r.story_type === 'MISSION_PROOF').length})
+              </button>
+            </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="max-w-md mx-auto px-4 pb-20 relative">
-        {/* Story Type Filter */}
+        {/* Story Type Filter - only show when search is not active */}
+        {!isSearchActive && (
         <div className="py-4">
-          <div className="grid grid-cols-2 gap-1 p-1 bg-gray-100 rounded-xl mb-4">
+          <div className="grid grid-cols-2 gap-1 p-1 bg-gray-100 rounded-xl mb-2">
             <button
               onClick={() => handleFilterChange("FREE_STORY")}
               className={`
@@ -245,26 +443,153 @@ export function FeedPage() {
             </button>
           </div>
         </div>
-        
+        )}
+
+        {/* Search Results or Regular Feed */}
         <div className="space-y-6">
-          {stories.length === 0 ? (
-            <div className="text-center py-12">
-              {filter === "FREE_STORY" ? (
-                <>
-                  <FileText className="size-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">아직 공유된 자유 스토리가 없습니다</p>
-                  <p className="text-sm text-gray-500">일상을 공유하고 첫 번째 스토리를 만들어보세요!</p>
-                </>
-              ) : (
-                <>
-                  <Target className="size-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">아직 공유된 미션 인증이 없습니다</p>
-                  <p className="text-sm text-gray-500">미션을 완료하고 첫 번째 인증을 공유해보세요!</p>
-                </>
-              )}
-            </div>
+          {isSearchActive ? (
+            // Search Results
+            !searchQuery.trim() ? (
+              <div className="text-center py-16">
+                <div className="p-4 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl w-fit mx-auto mb-4">
+                  <Search className="w-8 h-8 text-blue-500" />
+                </div>
+                <div className="text-gray-900 font-semibold mb-2">스토리와 미션을 검색해보세요</div>
+                <div className="text-gray-500 text-sm">
+                  텍스트나 해시태그로 원하는 내용을 찾을 수 있어요
+                </div>
+              </div>
+            ) : isSearchLoading ? (
+              <div className="flex items-center justify-center py-16 gap-3">
+                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                <div className="text-gray-600 font-medium">검색 중...</div>
+              </div>
+            ) : searchResults.filter(result => {
+              if (searchActiveTab === 'all') return true;
+              if (searchActiveTab === 'stories') return result.story_type === 'FREE_STORY';
+              if (searchActiveTab === 'missions') return result.story_type === 'MISSION_PROOF';
+              return true;
+            }).length > 0 ? (
+              searchResults.filter(result => {
+                if (searchActiveTab === 'all') return true;
+                if (searchActiveTab === 'stories') return result.story_type === 'FREE_STORY';
+                if (searchActiveTab === 'missions') return result.story_type === 'MISSION_PROOF';
+                return true;
+              }).map((result) => (
+                <Card key={result.id} className="border-0 bg-white backdrop-blur-sm overflow-hidden">
+                  <CardContent className="p-0">
+                    {/* User Header */}
+                    <div className="p-4 pb-3">
+                      <div className="flex items-center gap-3 mb-3">
+                        <ImageWithFallback
+                          src={result.user.avatar_url}
+                          alt={result.user.name}
+                          className="size-10 rounded-full object-cover"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-sm">{result.user.name}</span>
+                            <Badge variant="secondary" className="text-xs border border-gray-200 bg-gray-50">
+                              {result.user.level}
+                            </Badge>
+                            <Badge 
+                              variant={result.story_type === 'FREE_STORY' ? 'default' : 'destructive'}
+                              className="text-xs"
+                            >
+                              {result.story_type === 'FREE_STORY' ? '스토리' : '미션인증'}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-gray-400">
+                            {result.time_ago} • {result.location || '위치 미정'}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {result.mission && (
+                        <Badge className={`${result.mission.category_color} text-white border-0 text-xs`}>
+                          {result.mission.category} • {result.mission.title}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Images */}
+                    {result.images && result.images.length > 0 && (
+                      <div className="aspect-square relative">
+                        <ImageWithFallback
+                          src={result.images[0]}
+                          alt="미션 인증 사진"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+
+                    {/* Content */}
+                    <div className="p-4">
+                      <p className="text-sm text-foreground/90 leading-relaxed mb-2">
+                        {result.story}
+                      </p>
+                      
+                      {/* Hash Tags */}
+                      {result.tags && result.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-4">
+                          {result.tags.map((tag, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleHashtagClick(tag.startsWith('#') ? tag : `#${tag}`)}
+                              className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-1 py-0.5 rounded transition-colors cursor-pointer"
+                            >
+                              {tag.startsWith('#') ? tag : `#${tag}`}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1 text-sm text-gray-500">
+                            <Heart className="w-4 h-4" />
+                            <span>{result.likes}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-sm text-gray-500">
+                            <MessageCircle className="w-4 h-4" />
+                            <span>{result.comments}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="text-center py-16">
+                <div className="p-4 bg-gray-100 rounded-2xl w-fit mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <div className="text-gray-900 font-semibold mb-2">검색 결과가 없습니다</div>
+                <div className="text-gray-500 text-sm">다른 키워드로 검색해보세요</div>
+              </div>
+            )
           ) : (
-            stories.map((story: StoryFeedItem) => (
+            // Regular Feed
+            stories.length === 0 ? (
+              <div className="text-center py-12">
+                {filter === "FREE_STORY" ? (
+                  <>
+                    <FileText className="size-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 mb-2">아직 공유된 자유 스토리가 없습니다</p>
+                    <p className="text-sm text-gray-500">일상을 공유하고 첫 번째 스토리를 만들어보세요!</p>
+                  </>
+                ) : (
+                  <>
+                    <Target className="size-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 mb-2">아직 공유된 미션 인증이 없습니다</p>
+                    <p className="text-sm text-gray-500">미션을 완료하고 첫 번째 인증을 공유해보세요!</p>
+                  </>
+                )}
+              </div>
+            ) : (
+              stories.map((story: StoryFeedItem) => (
               <Card key={story.id} className="border-0 bg-white backdrop-blur-sm overflow-hidden">
                 <CardContent className="p-0">
                   {/* User Header */}
@@ -316,9 +641,13 @@ export function FeedPage() {
                     {story.tags && story.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mb-4">
                         {story.tags.map((tag, index) => (
-                          <span key={index} className="text-xs text-blue-600 hover:text-blue-700">
-                            #{tag}
-                          </span>
+                          <button
+                            key={index}
+                            onClick={() => handleHashtagClick(tag.startsWith('#') ? tag : `#${tag}`)}
+                            className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-1 py-0.5 rounded transition-colors cursor-pointer"
+                          >
+                            {tag.startsWith('#') ? tag : `#${tag}`}
+                          </button>
                         ))}
                       </div>
                     )}
@@ -367,11 +696,12 @@ export function FeedPage() {
                   </div>
                 </CardContent>
               </Card>
-            ))
+              ))
+            )
           )}
         </div>
 
-        {stories.length > 0 && (
+        {!isSearchActive && stories.length > 0 && (
           <div className="py-8 text-center">
             <Button
               variant="outline"
@@ -386,8 +716,8 @@ export function FeedPage() {
         )}
       </div>
 
-      {/* 플로팅 액션 버튼 - 스토리 작성 (스토리 탭에서만 표시) */}
-      {filter === 'FREE_STORY' && (
+      {/* 플로팅 액션 버튼 - 스토리 작성 (스토리 탭에서만 표시, 검색 중이 아닐 때만) */}
+      {!isSearchActive && filter === 'FREE_STORY' && (
         <div className="fixed bottom-24 z-50" style={{ right: 'calc(50vw - 192px + 16px)' }}>
           <div className="relative group">
             <Button
@@ -418,6 +748,19 @@ export function FeedPage() {
         storyType={filter}
         ongoingMissions={ongoingMissions || []}
       />
+
     </div>
   );
+}
+
+// 디바운스 유틸리티 함수
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
+  };
 }
