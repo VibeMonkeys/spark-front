@@ -8,6 +8,7 @@ import { Star, Gift, Coffee, ShoppingBag, Ticket, Clock, Check, Crown, Zap, Pale
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { rewardsApi } from "../shared/api/rewardsApi";
 import { useAuth } from "../contexts/AuthContext";
+import { NotificationBell } from "./ui/notification-bell";
 
 const rewardCategories = [
   { id: "카페", name: "카페", icon: Coffee },
@@ -100,9 +101,12 @@ export function RewardsPage() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            리워드
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              리워드
+            </h1>
+            <NotificationBell />
+          </div>
         </div>
       </header>
 

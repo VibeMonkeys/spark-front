@@ -7,6 +7,7 @@ import { Heart, MessageCircle, Share, Filter, TrendingUp, Loader2 } from "lucide
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { storyApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
+import { NotificationBell } from "./ui/notification-bell";
 
 interface StoryFeedItem {
   id: string;
@@ -179,9 +180,12 @@ export function FeedPage() {
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               스토리 피드
             </h1>
-            <Button variant="ghost" size="sm">
-              <Filter className="size-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm">
+                <Filter className="size-4" />
+              </Button>
+              <NotificationBell />
+            </div>
           </div>
           <div className="flex gap-2">
             <Button

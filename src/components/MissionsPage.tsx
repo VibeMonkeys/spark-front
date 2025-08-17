@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { missionApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
 import { ConfirmModal } from "./ui/confirm-modal";
+import { NotificationBell } from "./ui/notification-bell";
 
 // 카테고리별 색상 매핑
 const getCategoryColor = (category: string) => {
@@ -155,9 +156,12 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               내 미션
             </h1>
-            <Button variant="ghost" size="sm">
-              <Filter className="size-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm">
+                <Filter className="size-4" />
+              </Button>
+              <NotificationBell />
+            </div>
           </div>
           
           {/* Quick Stats */}

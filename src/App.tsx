@@ -1,6 +1,7 @@
-import { useState, lazy, Suspense, useEffect } from "react";
+import { useState, lazy, Suspense, useEffect, useCallback } from "react";
 import { QueryClient, QueryClientProvider, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import { missionApi } from "./shared/api";
 import { NotificationModal } from "./components/ui/notification-modal";
 import { ConfirmModal } from "./components/ui/confirm-modal";
@@ -33,7 +34,11 @@ const queryClient = new QueryClient({
   },
 });
 
-function AppContent() {
+interface AppContentProps {
+  onSetShowNotification?: (fn: (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void) => void;
+}
+
+function AppContent({ onSetShowNotification }: AppContentProps) {
   const { user, isLoading, login } = useAuth();
   const queryClient = useQueryClient();
   const [currentView, setCurrentView] = useState("main"); // "main", "mission-detail", "mission-verification", "mission-success", "profile-edit", "settings", "password-change", "help", "app-info"
@@ -77,9 +82,16 @@ function AppContent() {
     onConfirm?: () => void;
   }>({ isOpen: false, type: 'info', title: '', message: '' });
 
-  const showNotification = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string, autoClose = true, autoCloseDelay = 2000) => {
+  const showNotification = useCallback((type: 'success' | 'error' | 'warning' | 'info', title: string, message: string, autoClose = true, autoCloseDelay = 2000) => {
     setNotification({ isOpen: true, type, title, message, autoClose, autoCloseDelay });
-  };
+  }, []);
+
+  // showNotification 함수를 상위 컴포넌트에 전달
+  useEffect(() => {
+    if (onSetShowNotification) {
+      onSetShowNotification(showNotification);
+    }
+  }, [onSetShowNotification, showNotification]);
 
   const closeNotification = () => {
     setNotification(prev => ({ ...prev, isOpen: false }));
@@ -433,11 +445,26 @@ function AppContent() {
   );
 }
 
+// AppContent를 감싸는 컴포넌트
+function AppWithNotifications() {
+  const [showNotificationRef, setShowNotificationRef] = useState<((type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void) | null>(null);
+
+  const handleShowNotification = useCallback((showNotificationFn: (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => void) => {
+    setShowNotificationRef(() => showNotificationFn);
+  }, []);
+
+  return (
+    <NotificationProvider onShowNotification={showNotificationRef || undefined}>
+      <AppContent onSetShowNotification={handleShowNotification} />
+    </NotificationProvider>
+  );
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <AppContent />
+        <AppWithNotifications />
       </AuthProvider>
     </QueryClientProvider>
   );

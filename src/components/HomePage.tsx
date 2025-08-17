@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
-import { Clock, Users, Star, Flame, Target, RefreshCw, Mountain, MessageCircle, Heart, Palette, BookOpen, Trophy } from "lucide-react";
+import { Clock, Users, Star, Flame, Target, RefreshCw, Mountain, MessageCircle, Heart, Palette, BookOpen, Trophy, Bell } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { homeApi, missionApi, levelApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
 import { MissionLimitIndicator } from "../shared/ui";
+import { NotificationBell } from "./ui/notification-bell";
 
 // 카테고리별 색상 매핑
 const getCategoryColor = (category: string) => {
@@ -167,6 +168,8 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
               <Star className="size-3 text-blue-500" />
               <span className="text-xs font-medium text-blue-700">{userSummary.current_points.toLocaleString()}P</span>
             </div>
+            {/* 알림 종 아이콘 */}
+            <NotificationBell />
           </div>
         </div>
       </header>
@@ -295,6 +298,7 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
           </div>
         </section>
       </div>
+      
     </div>
   );
 }
