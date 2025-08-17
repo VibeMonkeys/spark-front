@@ -519,7 +519,10 @@ export function FeedPage() {
                           src={result.images[0]}
                           alt="미션 인증 사진"
                           className="w-full h-full object-cover"
+                          onError={() => console.error('검색결과 이미지 로딩 실패:', result.images[0])}
                         />
+                        {/* 디버깅용 로그 */}
+                        {console.log('검색결과 이미지 URL:', result.images[0], 'result id:', result.id)}
                       </div>
                     )}
 
@@ -627,7 +630,10 @@ export function FeedPage() {
                         src={story.images[0]}
                         alt="미션 인증 사진"
                         className="w-full h-full object-cover"
+                        onError={() => console.error('이미지 로딩 실패:', story.images[0])}
                       />
+                      {/* 디버깅용 로그 */}
+                      {console.log('스토리 이미지 URL:', story.images[0], 'story id:', story.id)}
                     </div>
                   )}
 
