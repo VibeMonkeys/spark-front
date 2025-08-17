@@ -16,9 +16,6 @@ export const api = axios.create({
 // 요청 인터셉터 - JWT 토큰 자동 추가
 api.interceptors.request.use(
   (config) => {
-    // 디버깅용 URL 로깅
-    console.log(`🚀 [API] Requesting: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
-    
     // 인증 토큰이 있다면 헤더에 추가
     const token = localStorage.getItem('auth_token');
     if (token) {
@@ -27,7 +24,6 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error('🚨 [API] Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -109,8 +105,6 @@ api.interceptors.response.use(
             throw new Error('Token refresh failed');
           }
         } catch (refreshError) {
-          console.error('❌ [API] Token refresh failed:', refreshError);
-          
           // 토큰 갱신 실패 시 로그아웃 처리
           localStorage.removeItem('auth_token');
           localStorage.removeItem('refresh_token');
@@ -127,7 +121,6 @@ api.interceptors.response.use(
         }
       } else {
         // refresh token이 없으면 바로 로그아웃 처리
-        console.warn('⚠️ [API] No refresh token available');
         localStorage.removeItem('auth_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('current_user');
@@ -138,13 +131,10 @@ api.interceptors.response.use(
 
     // 기타 에러 처리
     if (error.response) {
-      console.error('🚨 [API] Response error:', error.response.data);
       return Promise.reject(error.response.data);
     } else if (error.request) {
-      console.error('🚨 [API] Network error:', error.request);
       return Promise.reject({ message: '네트워크 오류가 발생했습니다.' });
     } else {
-      console.error('🚨 [API] Request error:', error.message);
       return Promise.reject({ message: '요청 처리 중 오류가 발생했습니다.' });
     }
   }
