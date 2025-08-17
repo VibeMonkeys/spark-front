@@ -29,8 +29,10 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
           </div>
         )}
       </Button>
-      {/* 연결 상태 표시 */}
-      <div className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-white ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
+      {/* 연결 상태 표시 - 읽지 않은 알림이 있을 때만 표시 */}
+      {unreadCount > 0 && (
+        <div className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-white ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
+      )}
       
       {/* 알림 팝업 */}
       <NotificationPopup
