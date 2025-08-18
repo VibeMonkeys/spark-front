@@ -195,11 +195,10 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
       
       // 알림 없이 바로 미션 탭으로 이동
       
-      // 이전 탭으로 복원하거나 기본적으로 missions 탭으로 이동
+      // 미션 시작 후에는 무조건 missions 탭으로 이동
       setCurrentView("main");
       localStorage.setItem('currentView', 'main');
-      const lastTab = localStorage.getItem('lastActiveTab') || 'missions';
-      setActiveTab(lastTab);
+      setActiveTab('missions');
       setSelectedMissionId(null);
       localStorage.removeItem('selectedMissionId');
     },
@@ -230,8 +229,7 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
             '미션 확인하기',
             () => {
               setCurrentView("main");
-              const lastTab = localStorage.getItem('lastActiveTab') || 'missions';
-              setActiveTab(lastTab);
+              setActiveTab('missions');
               setSelectedMissionId(null);
             }
           );
@@ -428,8 +426,7 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
           onShowNotification={showNotification}
           onNavigateToMissions={() => {
             setCurrentView("main");
-            const lastTab = localStorage.getItem('lastActiveTab') || 'missions';
-            setActiveTab(lastTab);
+            setActiveTab('missions');
             setSelectedMissionId(null);
           }}
         />
