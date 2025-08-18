@@ -76,8 +76,6 @@ export function StoryCreateModal({
       onClose();
     },
     onError: (error) => {
-      console.error('스토리 생성 실패:', error);
-      // TODO: 에러 토스트 표시
     }
   });
 
@@ -92,7 +90,6 @@ export function StoryCreateModal({
             setShowAutocomplete(true);
           }
         } catch (error) {
-          console.error('Failed to get autocomplete:', error);
           setAutocompleteResults([]);
         }
       } else {

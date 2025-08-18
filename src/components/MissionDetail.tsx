@@ -235,7 +235,6 @@ export function MissionDetail({
       }
     },
     onError: (error: any) => {
-      console.error('❌ [MissionDetail] 미션 시작 실패:', error);
       // 제한 초과 오류인 경우에만 모달 표시
       if (error?.response?.data?.error?.code === 'DAILY_LIMIT_EXCEEDED') {
         setShowLimitModal(true);
@@ -291,8 +290,6 @@ export function MissionDetail({
   const tips = missionDetail.tips || [];
   const similarMissions = missionDetail.similar_missions || [];
 
-  // TODO: 실제로는 백엔드에서 사용자의 미션 상태를 가져와야 함
-  // 현재는 임시로 로컬 상태로 관리
   const isInProgress = false; // 미션이 시작되었는지 여부
 
   return (

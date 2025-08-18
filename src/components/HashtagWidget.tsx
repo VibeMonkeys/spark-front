@@ -192,8 +192,7 @@ export const HashtagWidget: React.FC<HashtagWidgetProps> = ({
               size="sm"
               className="w-full text-sm text-gray-600 hover:text-gray-800"
               onClick={() => {
-                // TODO: 전체 해시태그 목록 페이지로 이동 또는 모달 열기
-                console.log(`Show all ${type} hashtags`);
+                // 추후 전체 해시태그 목록 페이지로 이동 또는 모달 열기 예정
               }}
             >
               더 보기

@@ -180,7 +180,6 @@ export function FeedPage() {
     } else {
       // 클립보드에 URL 복사
       navigator.clipboard.writeText(`${window.location.origin}/story/${storyId}`);
-      // TODO: 토스트 알림 표시
     }
   };
 
@@ -292,7 +291,6 @@ export function FeedPage() {
       setNextCursor(moreData.next_cursor);
       setHasMore(moreData.has_next || false);
     } catch (error) {
-      console.error('더 많은 스토리 로드 실패:', error);
     } finally {
       setIsLoadingMore(false);
     }
@@ -316,7 +314,6 @@ export function FeedPage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, isLoadingMore, nextCursor, user?.id, filter, isSearchActive]);
 
-  // getCategoryDisplayName 함수는 더 이상 사용하지 않음 (백엔드에서 한글 카테고리명 직접 제공)
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);

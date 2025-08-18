@@ -26,15 +26,6 @@ export function LoginPage() {
     enabled: mode === 'demo',
   });
 
-  // 데모 사용자 로딩 상태 로그
-  useEffect(() => {
-    if (mode === 'demo') {
-      console.log('Demo mode activated, loading users...');
-      console.log('isDemoUsersLoading:', isDemoUsersLoading);
-      console.log('demoUsers:', demoUsers);
-      console.log('demoUsersError:', demoUsersError);
-    }
-  }, [mode, isDemoUsersLoading, demoUsers, demoUsersError]);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -48,7 +39,6 @@ export function LoginPage() {
       login(response);
     },
     onError: (error: any) => {
-      console.error('Login error:', error);
       
       let errorMessage = '로그인에 실패했습니다.';
       if (error.message) {
@@ -65,7 +55,6 @@ export function LoginPage() {
       login(response);
     },
     onError: (error: any) => {
-      console.error('Signup error:', error);
       
       let errorMessage = '회원가입에 실패했습니다.';
       if (error.message) {
@@ -86,15 +75,12 @@ export function LoginPage() {
       login(response);
     },
     onError: (error: any) => {
-      console.error('Demo login error:', error);
       setErrors({ general: '데모 로그인에 실패했습니다.' });
     }
   });
 
   const handleDemoLogin = () => {
     if (selectedUserId) {
-      console.log('Attempting demo login with userId:', selectedUserId, 'type:', typeof selectedUserId);
-      console.log('Selected user from list:', demoUsers?.find(u => u.id.toString() === selectedUserId));
       demoLoginMutation.mutate(selectedUserId);
     }
   };

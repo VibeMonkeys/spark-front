@@ -24,15 +24,7 @@ export const LevelSystemModal: FC<LevelSystemModalProps> = ({ isOpen, onClose })
     queryKey: ['level-system', user?.id],
     queryFn: async () => {
       if (!user?.id) throw new Error('User ID required');
-      console.log('🔍 [LevelSystemModal] Calling levelApi.getLevelSystem with userId:', user.id);
-      try {
-        const result = await levelApi.getLevelSystem(user.id);
-        console.log('✅ [LevelSystemModal] Level system data:', result);
-        return result;
-      } catch (error) {
-        console.error('❌ [LevelSystemModal] Level system API error:', error);
-        throw error;
-      }
+      return await levelApi.getLevelSystem(user.id);
     },
     enabled: isOpen && !!user?.id,
   });

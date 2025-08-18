@@ -146,7 +146,6 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
     points_to_next_level: levelProgress?.points_to_next_level || 0
   };
 
-  // 디버깅 로그
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50">
