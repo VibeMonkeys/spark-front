@@ -83,18 +83,39 @@ export const storyApi = {
     direction: string = 'NEXT',
     userId?: number
   ): Promise<PagedResponse<StoryFeedItem>> => {
-    const params = new URLSearchParams({
-      size: size.toString(),
-      direction,
-    });
-    if (cursor) params.append('cursor', cursor.toString());
-    if (userId) params.append('userId', userId.toString());
-    
-    const response = await api.get<ApiResponse<PagedResponse<any>>>(`/stories/feed/${storyType}?${params}`);
-    if (!response.data.success) {
-      throw new Error(response.data.error?.message || 'Failed to fetch story feed by type');
+    try {
+      const params = new URLSearchParams({
+        size: size.toString(),
+        direction,
+      });
+      if (cursor) params.append('cursor', cursor.toString());
+      if (userId) params.append('userId', userId.toString());
+      
+      const response = await api.get<ApiResponse<PagedResponse<any>>>(`/stories/feed/${storyType}?${params}`);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.error?.message || 'Failed to fetch story feed by type');
+      }
+      
+      // 백엔드 응답 구조를 프론트엔드 기대 형식으로 변환
+      const backendData = response.data.data;
+      return {
+        items: backendData.items || [],
+        has_next: backendData.page_info?.has_next || false,
+        next_cursor: backendData.page_info?.next_cursor || null,
+        has_prev: backendData.page_info?.has_previous || false,
+        prev_cursor: backendData.page_info?.prev_cursor || null
+      };
+    } catch (error) {
+      // React Query에서 undefined 반환을 방지하기 위해 기본값 반환
+      return {
+        items: [],
+        has_next: false,
+        next_cursor: null,
+        has_prev: false,
+        prev_cursor: null
+      };
     }
-    return response.data.data;
   },
 
   // 스토리 상세 조회

@@ -57,6 +57,8 @@ export function FeedPage() {
   const handleFilterChange = (newFilter: 'FREE_STORY' | 'MISSION_PROOF') => {
     setFilter(newFilter);
     localStorage.setItem('story-feed-tab', newFilter);
+    // 명시적으로 쿼리 무효화하여 새 데이터 로드 강제
+    queryClient.invalidateQueries({ queryKey: ['story-feed-by-type', newFilter, user?.id] });
   };
 
   // 무한 스크롤 상태
@@ -68,8 +70,13 @@ export function FeedPage() {
   // 스토리 피드 데이터 조회 (스토리 타입별)
   const { data: feedData, isLoading, error } = useQuery({
     queryKey: ['story-feed-by-type', filter, user?.id],
-    queryFn: () => storyApi.getStoryFeedByType(filter, undefined, 20, 'NEXT', user?.id),
+    queryFn: () => {
+      return storyApi.getStoryFeedByType(filter, undefined, 20, 'NEXT', user?.id);
+    },
     enabled: !!user?.id,
+    staleTime: 0, // 캐시를 즉시 stale로 간주
+    gcTime: 0, // React Query v5: cacheTime -> gcTime
+    refetchOnMount: true, // 컴포넌트 마운트 시 refetch
   });
 
   // 초기 데이터 로드 시 상태 설정
