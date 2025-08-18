@@ -3,6 +3,14 @@ import axios from 'axios';
 // 환경변수에서 API URL 가져오기 (개발환경에서는 프록시 사용)
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
+// AuthContext를 사용하기 위한 변수 (런타임에 설정됨)
+let forceLogoutCallback: ((reason?: string) => void) | null = null;
+
+// AuthContext의 forceLogout 함수를 등록하는 함수
+export const setForceLogoutCallback = (callback: (reason?: string) => void) => {
+  forceLogoutCallback = callback;
+};
+
 
 // API 기본 설정
 export const api = axios.create({
@@ -105,26 +113,34 @@ api.interceptors.response.use(
             throw new Error('Token refresh failed');
           }
         } catch (refreshError) {
-          // 토큰 갱신 실패 시 로그아웃 처리
-          localStorage.removeItem('auth_token');
-          localStorage.removeItem('refresh_token');
-          localStorage.removeItem('current_user');
+          // 토큰 갱신 실패 시 강제 로그아웃 처리
+          if (forceLogoutCallback) {
+            forceLogoutCallback('토큰 갱신 실패');
+          } else {
+            // fallback: 직접 로컬 스토리지 정리
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('current_user');
+            window.location.href = '/login';
+          }
           
           processQueue(refreshError, null);
-          
-          // 로그인 페이지로 리다이렉트 (필요 시)
-          window.location.href = '/login';
           
           return Promise.reject(refreshError);
         } finally {
           isRefreshing = false;
         }
       } else {
-        // refresh token이 없으면 바로 로그아웃 처리
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('current_user');
-        window.location.href = '/login';
+        // refresh token이 없으면 바로 강제 로그아웃 처리
+        if (forceLogoutCallback) {
+          forceLogoutCallback('리프레시 토큰 없음');
+        } else {
+          // fallback: 직접 로컬 스토리지 정리
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('refresh_token');
+          localStorage.removeItem('current_user');
+          window.location.href = '/login';
+        }
         return Promise.reject(error);
       }
     }

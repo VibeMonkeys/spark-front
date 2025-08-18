@@ -38,6 +38,7 @@ interface AuthContextType {
   refreshToken: string | null;
   login: (authData: AuthResponse) => void;
   logout: () => void;
+  forceLogout: (reason?: string) => void; // 토큰 에러 등으로 인한 강제 로그아웃
   refreshUser: () => Promise<void>;
   isLoading: boolean;
   isAuthenticated: boolean;
@@ -132,6 +133,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('refresh_token');
   };
 
+  const forceLogout = (reason?: string) => {
+    console.warn('⚠️ [AuthContext] Force logout triggered:', reason);
+    
+    // 로컬 상태 및 저장소 정리 (서버 호출 없이)
+    setUser(null);
+    setToken(null);
+    setRefreshToken(null);
+    localStorage.removeItem('current_user');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('refresh_token');
+    
+    // 관련 상태 정리
+    localStorage.removeItem('currentView');
+    localStorage.removeItem('activeTab');
+    localStorage.removeItem('selectedMissionId');
+    localStorage.removeItem('lastActiveTab');
+    localStorage.removeItem('scrollPositions');
+  };
+
   const refreshUser = async () => {
     if (!user?.id) return;
     
@@ -154,6 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshToken, 
       login, 
       logout, 
+      forceLogout,
       refreshUser,
       isLoading, 
       isAuthenticated 

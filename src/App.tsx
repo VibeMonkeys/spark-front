@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider, useMutation, useQueryClient } from "@
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { missionApi } from "./shared/api";
+import { setForceLogoutCallback } from "./shared/api/base";
 import { NotificationModal } from "./components/ui/notification-modal";
 import { ConfirmModal } from "./components/ui/confirm-modal";
 import { usePullToRefresh } from "./hooks/usePullToRefresh";
@@ -42,7 +43,12 @@ interface AppContentProps {
 }
 
 function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContentProps) {
-  const { user, isLoading, login } = useAuth();
+  const { user, isLoading, login, forceLogout } = useAuth();
+
+  // API 에러 시 자동 로그아웃 콜백 등록
+  useEffect(() => {
+    setForceLogoutCallback(forceLogout);
+  }, [forceLogout]);
   const queryClient = useQueryClient();
   // 새로고침 시에도 현재 뷰 상태 복원
   const [currentView, setCurrentView] = useState(() => {
