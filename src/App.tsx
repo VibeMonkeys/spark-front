@@ -199,8 +199,10 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
       setCurrentView("main");
       localStorage.setItem('currentView', 'main');
       setActiveTab('missions');
+      localStorage.setItem('activeTab', 'missions'); // 새로고침 시에도 미션 탭 유지
       setSelectedMissionId(null);
       localStorage.removeItem('selectedMissionId');
+      localStorage.removeItem('lastActiveTab'); // 이전 탭 정보 제거
     },
     onError: (error: any) => {
       console.error('❌ [App] Mission start failed:', error);
@@ -229,8 +231,12 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
             '미션 확인하기',
             () => {
               setCurrentView("main");
+              localStorage.setItem('currentView', 'main');
               setActiveTab('missions');
+              localStorage.setItem('activeTab', 'missions');
               setSelectedMissionId(null);
+              localStorage.removeItem('selectedMissionId');
+              localStorage.removeItem('lastActiveTab');
             }
           );
           return; // showNotification을 호출하지 않고 바로 리턴
@@ -342,17 +348,13 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
   };
 
   const handleBackFromVerification = () => {
-    // 이전 뷰로 돌아가면서 해당 탭도 설정
-    if (previousView === "main") {
-      setCurrentView("main");
-      setActiveTab("missions");
-    } else if (previousView === "mission-detail") {
-      setCurrentView("mission-detail");
-    } else {
-      // 기본적으로 미션 탭으로 이동
-      setCurrentView("main");
-      setActiveTab("missions");
-    }
+    // 인증 후에는 항상 미션 탭으로 이동
+    setCurrentView("main");
+    localStorage.setItem('currentView', 'main');
+    setActiveTab("missions");
+    localStorage.setItem('activeTab', 'missions');
+    localStorage.removeItem('selectedMissionId');
+    localStorage.removeItem('lastActiveTab');
   };
 
   const renderCurrentView = () => {
@@ -426,8 +428,12 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
           onShowNotification={showNotification}
           onNavigateToMissions={() => {
             setCurrentView("main");
+            localStorage.setItem('currentView', 'main');
             setActiveTab('missions');
+            localStorage.setItem('activeTab', 'missions');
             setSelectedMissionId(null);
+            localStorage.removeItem('selectedMissionId');
+            localStorage.removeItem('lastActiveTab');
           }}
         />
       );
@@ -453,9 +459,13 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
           onBackToHome={handleBackToMain}
           onViewProfile={() => {
             setCurrentView("main");
+            localStorage.setItem('currentView', 'main');
             setActiveTab("profile");
+            localStorage.setItem('activeTab', 'profile');
             setSelectedMissionId(null);
             setMissionResult(null);
+            localStorage.removeItem('selectedMissionId');
+            localStorage.removeItem('lastActiveTab');
           }}
         />
       );
