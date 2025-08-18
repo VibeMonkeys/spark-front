@@ -49,8 +49,8 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // API 응답을 임시 캐시에 저장 (10분)
-          if (response.ok) {
+          // GET 요청만 캐시 (PUT, POST, DELETE 등은 캐시 불가)
+          if (response.ok && event.request.method === 'GET') {
             const responseClone = response.clone();
             caches.open('spark-api-cache').then(cache => {
               cache.put(event.request, responseClone);
@@ -63,8 +63,11 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => {
-          // 오프라인일 때 캐시된 API 응답 반환
-          return caches.match(event.request);
+          // 오프라인일 때 캐시된 API 응답 반환 (GET 요청만)
+          if (event.request.method === 'GET') {
+            return caches.match(event.request);
+          }
+          return new Response('Network error', { status: 503 });
         })
     );
     return;

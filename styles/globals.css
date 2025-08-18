@@ -10,6 +10,12 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  /* iOS 오버스크롤 배경색 제어 */
+  background-color: #ffffff;
+  /* 오버스크롤 동작 제어 */
+  overscroll-behavior: none;
+  /* iOS Safe Area 지원 */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 #root {
