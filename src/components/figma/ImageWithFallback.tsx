@@ -6,33 +6,10 @@ const getInitial = (name?: string) => {
   return name.trim().charAt(0).toUpperCase()
 }
 
-// 일관된 색상을 생성하는 함수
+// 연한 회색으로 고정된 색상을 반환하는 함수
 const getConsistentColor = (name?: string) => {
-  if (!name) return 'bg-gray-500'
-  
-  const colors = [
-    'bg-blue-500',
-    'bg-green-500', 
-    'bg-purple-500',
-    'bg-pink-500',
-    'bg-yellow-500',
-    'bg-indigo-500',
-    'bg-red-500',
-    'bg-orange-500',
-    'bg-teal-500',
-    'bg-cyan-500'
-  ]
-  
-  // 이름을 기반으로 해시값 생성
-  let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    const char = name.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // Convert to 32bit integer
-  }
-  
-  const index = Math.abs(hash) % colors.length
-  return colors[index]
+  // 모든 경우에 연한 회색으로 통일
+  return 'bg-gray-200'
 }
 
 export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElement>) {
@@ -46,7 +23,7 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
   // 항상 첫 글자 아바타를 사용
   return (
     <div
-      className={`inline-flex items-center justify-center text-white font-bold text-lg ${bgColor} ${className ?? ''}`}
+      className={`inline-flex items-center justify-center text-gray-600 font-bold text-lg ${bgColor} ${className ?? ''}`}
       style={style}
       {...rest}
     >
