@@ -54,12 +54,25 @@ export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
     return Math.min((pullDistance - startThreshold) / (threshold - startThreshold), 1);
   };
 
-  // 회전 각도 계산 (드래그할수록 180도까지 회전)
+  // 회전 각도 계산 - 더 자연스러운 회전
   const getSpinnerRotation = () => {
-    if (isRefreshing) return 0; // 새로고침 중엔 회전 리셋
+    if (isRefreshing) {
+      // 새로고침 중엔 CSS 애니메이션으로 처리하므로 0 반환
+      return 0;
+    }
     if (!isPulling) return 0;
+    
     const progress = Math.min(pullDistance / threshold, 1);
-    return canRefresh ? 180 : progress * 180;
+    // easeOutQuart 함수를 적용한 부드러운 회전
+    const easedProgress = 1 - Math.pow(1 - progress, 4);
+    
+    if (canRefresh) {
+      // 새로고침 가능 상태에서는 180도 고정
+      return 180;
+    } else {
+      // 드래그 중에는 0도에서 170도까지 부드럽게
+      return easedProgress * 170;
+    }
   };
 
   const spinnerPosition = getSpinnerPosition();
@@ -83,11 +96,11 @@ export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
       >
         <RefreshCw 
           className={cn(
-            "w-5 h-5 text-purple-600 transition-transform duration-200",
-            isRefreshing && "animate-spin"
+            "w-5 h-5 text-purple-600",
+            isRefreshing ? "animate-spin" : "transition-transform duration-100 ease-out"
           )}
           style={{
-            transform: `rotate(${spinnerRotation}deg)`
+            transform: isRefreshing ? undefined : `rotate(${spinnerRotation}deg)`
           }}
         />
       </div>

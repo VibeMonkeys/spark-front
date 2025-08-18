@@ -85,7 +85,7 @@ export const usePullToRefresh = ({
           console.error('Pull to refresh failed:', error);
         }
         
-        // 새로고침 완료 후 잠깐 기다렸다가 상태 초기화
+        // 새로고침 완료 후 부드러운 사라짐을 위해 딜레이
         setTimeout(() => {
           setState({
             isPulling: false,
@@ -93,7 +93,7 @@ export const usePullToRefresh = ({
             isRefreshing: false,
             canRefresh: false
           });
-        }, 300); // 300ms 후 스피너 사라짐
+        }, 500); // 500ms 후 스피너 사라짐 (더 여유있게)
       } else {
         // 새로고침 조건 미달성 시 즉시 상태 초기화
         setState({
