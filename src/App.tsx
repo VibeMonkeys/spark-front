@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense, useEffect, useCallback } from "react";
+import { useState, lazy, Suspense, useEffect, useCallback, useRef } from "react";
 import { QueryClient, QueryClientProvider, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -58,10 +58,57 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
     return localStorage.getItem('activeTab') || 'home';
   });
 
-  // activeTab 변경시 localStorage에 저장
+  // 스크롤 위치 저장을 위한 ref
+  const scrollPositions = useRef<Record<string, number>>(() => {
+    try {
+      const saved = localStorage.getItem('scrollPositions');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // 이전 활성 탭 추적
+  const [previousActiveTab, setPreviousActiveTab] = useState(activeTab);
+
+  // 스크롤 위치 저장 함수
+  const saveScrollPosition = useCallback((tab: string) => {
+    const scrollY = window.scrollY;
+    scrollPositions.current[tab] = scrollY;
+    localStorage.setItem('scrollPositions', JSON.stringify(scrollPositions.current));
+  }, []);
+
+  // 스크롤 위치 복원 함수
+  const restoreScrollPosition = useCallback((tab: string, isNewTab: boolean = false) => {
+    if (isNewTab) {
+      // 새 탭으로 이동하는 경우 최상단으로
+      window.scrollTo(0, 0);
+    } else {
+      // 기존 탭으로 복귀하는 경우 저장된 위치로
+      const savedPosition = scrollPositions.current[tab] || 0;
+      setTimeout(() => {
+        window.scrollTo(0, savedPosition);
+      }, 0);
+    }
+  }, []);
+
+  // activeTab 변경시 스크롤 위치 관리
   useEffect(() => {
+    // 이전 탭의 스크롤 위치 저장
+    if (previousActiveTab && previousActiveTab !== activeTab) {
+      saveScrollPosition(previousActiveTab);
+    }
+
+    // 새 탭인지 확인 (localStorage에 저장된 위치가 없으면 새 탭)
+    const isNewTab = !(activeTab in scrollPositions.current);
+    
+    // 현재 탭의 스크롤 위치 복원
+    restoreScrollPosition(activeTab, isNewTab);
+
+    // localStorage에 activeTab 저장
     localStorage.setItem('activeTab', activeTab);
-  }, [activeTab]);
+    setPreviousActiveTab(activeTab);
+  }, [activeTab, previousActiveTab, saveScrollPosition, restoreScrollPosition]);
 
   // 알림 모달 상태
   const [notification, setNotification] = useState<{

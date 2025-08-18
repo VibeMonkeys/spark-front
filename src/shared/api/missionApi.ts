@@ -13,8 +13,31 @@ import {
 export const missionApi = {
   // 오늘의 미션 조회 (제한 정보 포함)
   getTodaysMissions: async (userId: number): Promise<TodaysMissionsResponse> => {
-    const response = await api.get<ApiResponse<TodaysMissionsResponse>>(`/missions/today?userId=${userId}`);
-    return response.data.data;
+    try {
+      const response = await api.get<ApiResponse<TodaysMissionsResponse>>(`/missions/today?userId=${userId}`);
+      if (response.data.success && response.data.data) {
+        return response.data.data;
+      } else {
+        // 기본값 반환
+        return {
+          dailyMissions: [],
+          canStartNew: false,
+          remainingSlots: 0,
+          totalSlots: 3,
+          nextResetTime: new Date().toISOString()
+        };
+      }
+    } catch (error) {
+      console.error('Failed to fetch today missions:', error);
+      // 기본값 반환
+      return {
+        dailyMissions: [],
+        canStartNew: false,
+        remainingSlots: 0,
+        totalSlots: 3,
+        nextResetTime: new Date().toISOString()
+      };
+    }
   },
 
   // 일일 미션 시작 제한 정보 조회

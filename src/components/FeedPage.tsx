@@ -59,6 +59,12 @@ export function FeedPage() {
     localStorage.setItem('story-feed-tab', newFilter);
   };
 
+  // 무한 스크롤 상태
+  const [allStories, setAllStories] = useState<StoryFeedItem[]>([]);
+  const [nextCursor, setNextCursor] = useState<number | undefined>(undefined);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
   // 스토리 피드 데이터 조회 (스토리 타입별)
   const { data: feedData, isLoading, error } = useQuery({
     queryKey: ['story-feed-by-type', filter, user?.id],
@@ -66,10 +72,27 @@ export function FeedPage() {
     enabled: !!user?.id,
   });
 
+  // 초기 데이터 로드 시 상태 설정
+  useEffect(() => {
+    if (feedData) {
+      setAllStories(feedData.items || []);
+      setNextCursor(feedData.next_cursor);
+      setHasMore(feedData.has_next || false);
+    }
+  }, [feedData]);
+
+  // 필터 변경 시 상태 초기화
+  useEffect(() => {
+    setAllStories([]);
+    setNextCursor(undefined);
+    setHasMore(true);
+    setIsLoadingMore(false);
+  }, [filter]);
+
   // 진행 중인 미션 조회 (미션 인증 시 필요)
   const { data: ongoingMissions } = useQuery({
     queryKey: ['ongoing-missions', user?.id],
-    queryFn: () => fetch(`/api/v1/missions/ongoing?userId=${user?.id}`, {
+    queryFn: () => fetch(`/missions/ongoing?userId=${user?.id}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
       }
@@ -94,50 +117,40 @@ export function FeedPage() {
       
       // 이전 상태 저장 (롤백용)
       const previousData = queryClient.getQueryData(['story-feed-by-type', filter, user?.id]);
+      const previousAllStories = allStories;
       
-      // 낙관적으로 피드 데이터 업데이트
-      queryClient.setQueryData(['story-feed-by-type', filter, user?.id], (old: any) => {
-        if (!old?.items) return old;
-        
-        return {
-          ...old,
-          items: old.items.map((story: StoryFeedItem) => {
-            if (story.id === storyId) {
-              return {
-                ...story,
-                is_liked: !isLiked,
-                likes: isLiked ? story.likes - 1 : story.likes + 1
-              };
-            }
-            return story;
-          })
-        };
-      });
+      // 낙관적으로 로컬 상태 업데이트
+      setAllStories(prev => prev.map(story => {
+        if (story.id === storyId) {
+          return {
+            ...story,
+            is_liked: !isLiked,
+            likes: isLiked ? story.likes - 1 : story.likes + 1
+          };
+        }
+        return story;
+      }));
       
-      return { previousData };
+      return { previousData, previousAllStories };
     },
     onSuccess: (data, variables) => {
-      // 서버 응답으로 캐시를 정확히 업데이트
-      queryClient.setQueryData(['story-feed-by-type', filter, user?.id], (old: any) => {
-        if (!old?.items) return old;
-        
-        return {
-          ...old,
-          items: old.items.map((story: StoryFeedItem) => {
-            if (story.id === variables.storyId) {
-              return {
-                ...story,
-                likes: data.likes,
-                is_liked: data.is_liked
-              };
-            }
-            return story;
-          })
-        };
-      });
+      // 서버 응답으로 로컬 상태를 정확히 업데이트
+      setAllStories(prev => prev.map(story => {
+        if (story.id === variables.storyId) {
+          return {
+            ...story,
+            likes: data.likes,
+            is_liked: data.is_liked
+          };
+        }
+        return story;
+      }));
     },
     onError: (error: any, variables, context) => {
       // 오류 발생 시 이전 데이터로 롤백
+      if (context?.previousAllStories) {
+        setAllStories(context.previousAllStories);
+      }
       if (context?.previousData) {
         queryClient.setQueryData(['story-feed-by-type', filter, user?.id], context.previousData);
       }
@@ -261,6 +274,41 @@ export function FeedPage() {
     performSearch(formattedHashtag);
   };
 
+  // 더 많은 스토리 로드
+  const loadMoreStories = async () => {
+    if (!hasMore || isLoadingMore || !nextCursor || !user?.id) return;
+
+    setIsLoadingMore(true);
+    try {
+      const moreData = await storyApi.getStoryFeedByType(filter, nextCursor, 20, 'NEXT', user.id);
+      setAllStories(prev => [...prev, ...(moreData.items || [])]);
+      setNextCursor(moreData.next_cursor);
+      setHasMore(moreData.has_next || false);
+    } catch (error) {
+      console.error('더 많은 스토리 로드 실패:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
+
+  // 무한 스크롤 감지
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isSearchActive) return; // 검색 중에는 무한 스크롤 비활성화
+      
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const documentHeight = document.documentElement.offsetHeight;
+      
+      // 문서 하단에서 200px 전에 다음 페이지 로드
+      if (scrollPosition >= documentHeight - 200) {
+        loadMoreStories();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, isLoadingMore, nextCursor, user?.id, filter, isSearchActive]);
+
   // getCategoryDisplayName 함수는 더 이상 사용하지 않음 (백엔드에서 한글 카테고리명 직접 제공)
 
   const formatTimeAgo = (dateString: string) => {
@@ -300,7 +348,7 @@ export function FeedPage() {
     );
   }
 
-  const stories = feedData?.items || [];
+  const stories = allStories;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50">
@@ -700,17 +748,28 @@ export function FeedPage() {
           )}
         </div>
 
+        {/* 무한 스크롤 로딩 인디케이터 & 수동 로드 버튼 */}
         {!isSearchActive && stories.length > 0 && (
           <div className="py-8 text-center">
-            <Button
-              variant="outline"
-              className="bg-white/60 backdrop-blur-sm"
-              onClick={() => {
-                // TODO: 다음 페이지 로드 기능 구현
-              }}
-            >
-              더 많은 스토리 보기
-            </Button>
+            {isLoadingMore ? (
+              <div className="flex items-center justify-center gap-3">
+                <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+                <span className="text-gray-600 font-medium">더 많은 스토리 로딩 중...</span>
+              </div>
+            ) : hasMore ? (
+              <Button
+                variant="outline"
+                className="bg-white/60 backdrop-blur-sm hover:bg-white/80 transition-all"
+                onClick={loadMoreStories}
+                disabled={isLoadingMore}
+              >
+                더 많은 스토리 보기
+              </Button>
+            ) : stories.length > 10 ? (
+              <div className="text-gray-500 text-sm">
+                모든 스토리를 확인했습니다 ✨
+              </div>
+            ) : null}
           </div>
         )}
       </div>

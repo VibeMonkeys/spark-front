@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -20,14 +20,21 @@ export function LoginPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // 데모 사용자 목록 조회
-  const { data: demoUsers, isLoading: isDemoUsersLoading } = useQuery({
+  const { data: demoUsers, isLoading: isDemoUsersLoading, error: demoUsersError } = useQuery({
     queryKey: ['demo-users'],
     queryFn: authApi.getDemoUsers,
     enabled: mode === 'demo',
-    onSuccess: (data) => {
-      console.log('Demo users loaded:', data);
-    }
   });
+
+  // 데모 사용자 로딩 상태 로그
+  useEffect(() => {
+    if (mode === 'demo') {
+      console.log('Demo mode activated, loading users...');
+      console.log('isDemoUsersLoading:', isDemoUsersLoading);
+      console.log('demoUsers:', demoUsers);
+      console.log('demoUsersError:', demoUsersError);
+    }
+  }, [mode, isDemoUsersLoading, demoUsers, demoUsersError]);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -177,49 +184,65 @@ export function LoginPage() {
 
               {/* Demo Account Selection */}
               <div className="space-y-4 mb-6">
-              {isDemoUsersLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-                  <p className="text-gray-600 mt-2">데모 계정을 불러오는 중...</p>
-                </div>
-              ) : (
-                demoUsers?.map((user) => (
-                  <div
-                    key={user.id}
-                    className={`p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${
-                      selectedUserId === user.id.toString()
-                        ? 'border-purple-400 bg-purple-50/50 shadow-lg'
-                        : 'border-gray-100 hover:border-purple-200 hover:bg-purple-50/20'
-                    }`}
-                    onClick={() => setSelectedUserId(user.id.toString())}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="relative">
-                        <img
-                          src={user.avatarUrl}
-                          alt={user.name}
-                          className="size-14 rounded-full object-cover ring-2 ring-purple-100"
-                        />
-                        {selectedUserId === user.id.toString() && (
-                          <div className="absolute -top-1 -right-1 size-6 bg-purple-500 rounded-full flex items-center justify-center">
-                            <ArrowRight className="size-3 text-white" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-800">{user.name}</h3>
-                          <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
-                            LV.{user.level}
-                          </Badge>
+                {isDemoUsersLoading && (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                    <p className="text-gray-600 mt-2">데모 계정을 불러오는 중...</p>
+                  </div>
+                )}
+                
+                {demoUsersError && (
+                  <div className="text-center py-8">
+                    <p className="text-red-600 mb-2">데모 계정 로딩 실패</p>
+                    <p className="text-sm text-gray-500">{demoUsersError?.message || '알 수 없는 오류'}</p>
+                  </div>
+                )}
+                
+                {!isDemoUsersLoading && !demoUsersError && demoUsers && demoUsers.length > 0 && 
+                  demoUsers.map((user) => (
+                    <div
+                      key={user.id}
+                      className={`p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${
+                        selectedUserId === user.id.toString()
+                          ? 'border-purple-400 bg-purple-50/50 shadow-lg'
+                          : 'border-gray-100 hover:border-purple-200 hover:bg-purple-50/20'
+                      }`}
+                      onClick={() => setSelectedUserId(user.id.toString())}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="relative">
+                          <img
+                            src={user.avatarUrl}
+                            alt={user.name}
+                            className="size-14 rounded-full object-cover ring-2 ring-purple-100"
+                          />
+                          {selectedUserId === user.id.toString() && (
+                            <div className="absolute -top-1 -right-1 size-6 bg-purple-500 rounded-full flex items-center justify-center">
+                              <ArrowRight className="size-3 text-white" />
+                            </div>
+                          )}
                         </div>
-                        <p className="text-sm text-gray-600">{user.email}</p>
-                        <p className="text-xs text-purple-600 font-medium">{user.levelTitle}</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-gray-800">{user.name}</h3>
+                            <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
+                              LV.{user.level}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-gray-600">{user.email}</p>
+                          <p className="text-xs text-purple-600 font-medium">{user.levelTitle}</p>
+                        </div>
                       </div>
                     </div>
+                  ))
+                }
+                
+                {!isDemoUsersLoading && !demoUsersError && (!demoUsers || demoUsers.length === 0) && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 mb-2">데모 계정이 없습니다</p>
+                    <p className="text-sm text-gray-500">관리자에게 문의하세요</p>
                   </div>
-                )) || []
-              )}
+                )}
               </div>
 
               {/* Action Buttons */}

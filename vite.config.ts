@@ -10,10 +10,11 @@ export default defineConfig({
     host: true, // 네트워크 접근 허용
     proxy: {
       // 스프링부트 백엔드 API 프록시 설정
-      '/api': {
+      '^/(auth|missions|levels|notifications|users|stories|rewards|achievements|stats)': {
         target: 'http://localhost:8099',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        rewrite: (path) => `/api/v1${path}`
       }
     }
   },

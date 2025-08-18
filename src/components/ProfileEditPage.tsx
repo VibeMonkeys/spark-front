@@ -18,7 +18,7 @@ interface ProfileEditData {
 
 // API 함수들
 const updateProfile = async (userId: string, data: ProfileEditData) => {
-  const response = await api.put(`/api/v1/users/${userId}/profile`, data);
+  const response = await api.put(`/users/${userId}/profile`, data);
   
   if (response.data.success) {
     return response.data;

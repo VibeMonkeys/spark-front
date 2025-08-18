@@ -9,7 +9,7 @@ interface ConfirmModalProps {
   onConfirm?: () => void;
   type: 'success' | 'error' | 'warning' | 'info';
   title: string;
-  message: string;
+  message: string | React.ReactNode;
   confirmText?: string;
   cancelText?: string;
   showCancel?: boolean;
@@ -112,9 +112,13 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                 )}>
                   {title}
                 </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {message}
-                </p>
+                <div className="text-sm text-gray-600 leading-relaxed">
+                  {typeof message === 'string' ? (
+                    <p>{message}</p>
+                  ) : (
+                    message
+                  )}
+                </div>
               </div>
 
               {/* Close Button */}

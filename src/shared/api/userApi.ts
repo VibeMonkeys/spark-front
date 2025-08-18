@@ -79,11 +79,17 @@ export const userApi = {
 
   // 프로필 페이지 데이터 조회
   getProfilePage: async (userId: number): Promise<ProfilePageResponse> => {
-    const response = await api.get(`/users/${userId}/profile`);
-    if (response.data.success) {
-      return response.data.data;
-    } else {
-      throw new Error(response.data.error?.message || '프로필 데이터 조회에 실패했습니다.');
+    try {
+      const response = await api.get(`/users/${userId}/profile`);
+      if (response.data.success) {
+        return response.data.data;
+      } else {
+        throw new Error(response.data.error?.message || '프로필 데이터 조회에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile page:', error);
+      // React Query에서 undefined 반환을 방지하기 위해 에러를 던집니다
+      throw error;
     }
   },
 

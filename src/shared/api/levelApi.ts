@@ -57,8 +57,43 @@ export const levelApi = {
    * 사용자 레벨 진행 상황 조회
    */
   getUserLevelProgress: async (userId: number): Promise<UserLevelProgress> => {
-    const response = await api.get(`/levels/progress?user_id=${userId}`);
-    return response.data.data;
+    try {
+      const response = await api.get(`/levels/progress?user_id=${userId}`);
+      if (response.data.success && response.data.data) {
+        return response.data.data;
+      } else {
+        // 기본값 반환
+        return {
+          current_level: 1,
+          level_title: 'EXPLORER',
+          level_title_display: '탐험가',
+          current_points: 0,
+          total_points: 0,
+          points_to_next_level: 100,
+          level_progress_percentage: 0,
+          next_level_points: 100,
+          icon: '🗺️',
+          color: '#10B981',
+          badge: '🏃‍♂️'
+        };
+      }
+    } catch (error) {
+      console.error('Failed to fetch level progress:', error);
+      // 기본값 반환
+      return {
+        current_level: 1,
+        level_title: 'EXPLORER',
+        level_title_display: '탐험가',
+        current_points: 0,
+        total_points: 0,
+        points_to_next_level: 100,
+        level_progress_percentage: 0,
+        next_level_points: 100,
+        icon: '🗺️',
+        color: '#10B981',
+        badge: '🏃‍♂️'
+      };
+    }
   },
 
   /**

@@ -84,7 +84,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     
     // API 호출로 서버에 읽음 상태 업데이트
     try {
-      const response = await fetch(`/api/v1/notifications/${notificationId}/read?userId=${parseInt(user.id)}`, {
+      const response = await fetch(`/notifications/${notificationId}/read?userId=${parseInt(user.id)}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -122,7 +122,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     
     // API 호출로 서버에 모든 알림 읽음 처리
     try {
-      const response = await fetch(`/api/v1/notifications/read-all?userId=${parseInt(user.id)}`, {
+      const response = await fetch(`/notifications/read-all?userId=${parseInt(user.id)}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -162,7 +162,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     
     // API 호출로 서버에서 삭제
     try {
-      const response = await fetch(`/api/v1/notifications/${notificationId}?userId=${parseInt(user.id)}`, {
+      const response = await fetch(`/notifications/${notificationId}?userId=${parseInt(user.id)}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -198,7 +198,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     
     // API 호출로 서버에서 모든 알림 삭제
     try {
-      const response = await fetch(`/api/v1/notifications/all?userId=${parseInt(user.id)}`, {
+      const response = await fetch(`/notifications/all?userId=${parseInt(user.id)}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -271,7 +271,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     setError(null);
 
     try {
-      const response = await fetch(`/api/v1/notifications?userId=${parseInt(user.id)}`, {
+      const response = await fetch(`/notifications?userId=${parseInt(user.id)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

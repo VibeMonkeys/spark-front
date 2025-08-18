@@ -9,8 +9,15 @@ import {
 
 export const statsApi = {
   // 사용자 스탯 조회
-  getUserStats: (): Promise<ApiResponse<UserStats>> => {
-    return api.get('/stats');
+  getUserStats: async (): Promise<ApiResponse<UserStats>> => {
+    try {
+      const response = await api.get('/stats');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch user stats:', error);
+      // React Query에서 undefined 반환을 방지하기 위해 에러를 던집니다
+      throw error;
+    }
   },
 
   // 스탯 초기화 (새 사용자용)

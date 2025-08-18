@@ -74,7 +74,7 @@ export function StatsSection({ className }: StatsSectionProps) {
     }
   });
 
-  const userStats = statsResponse?.data?.data; // API 응답에서 실제 데이터 추출
+  const userStats = statsResponse?.data; // API 응답에서 실제 데이터 추출
 
   // 스탯 데이터 유효성 검사 함수
   const isValidStatValue = (stat: any): stat is StatValue => {
