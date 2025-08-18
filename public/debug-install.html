@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#9333ea">
+    <title>PWA 설치 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .result { margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #e8f5e8; border-color: #4caf50; }
+        .error { background: #ffebee; border-color: #f44336; }
+        .warning { background: #fff3e0; border-color: #ff9800; }
+        button { padding: 10px 20px; margin: 5px; background: #9333ea; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #7c3aed; }
+    </style>
+</head>
+<body>
+    <h1>🚀 PWA 설치 강제 테스트</h1>
+    <div id="results"></div>
+    
+    <button onclick="forceRegisterSW()">Service Worker 강제 등록</button>
+    <button onclick="checkPWAInstallability()">PWA 설치 가능성 체크</button>
+    <button onclick="showInstallPrompt()">설치 프롬프트 강제 표시</button>
+    <button onclick="manualInstallGuide()">수동 설치 가이드</button>
+    
+    <script>
+        const results = document.getElementById('results');
+        let deferredPrompt = null;
+        
+        function addResult(message, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `${new Date().toLocaleTimeString()} - ${message}`;
+            results.appendChild(div);
+            console.log(message);
+        }
+        
+        // PWA 설치 이벤트 감지
+        window.addEventListener('beforeinstallprompt', (e) => {
+            addResult('🎉 PWA 설치 가능! beforeinstallprompt 이벤트 발생');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 설치 버튼 추가
+            const installBtn = document.createElement('button');
+            installBtn.textContent = '지금 설치하기!';
+            installBtn.style.background = '#4caf50';
+            installBtn.onclick = async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    addResult(`설치 결과: ${outcome}`);
+                    deferredPrompt = null;
+                }
+            };
+            results.appendChild(installBtn);
+        });
+        
+        window.addEventListener('appinstalled', () => {
+            addResult('🎉 PWA 설치 완료!');
+            deferredPrompt = null;
+        });
+        
+        // Service Worker 강제 등록
+        async function forceRegisterSW() {
+            try {
+                // 기존 등록 해제
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                    addResult('기존 Service Worker 해제됨');
+                }
+                
+                // 새로 등록
+                const registration = await navigator.serviceWorker.register('/sw.js', {
+                    scope: '/'
+                });
+                addResult('✅ Service Worker 재등록 완료');
+                
+                // 강제 활성화
+                if (registration.waiting) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+                
+                // 잠시 후 새로고침
+                setTimeout(() => {
+                    addResult('페이지 새로고침 중...');
+                    window.location.reload();
+                }, 1000);
+                
+            } catch (error) {
+                addResult('❌ Service Worker 등록 실패: ' + error.message, 'error');
+            }
+        }
+        
+        // PWA 설치 가능성 체크
+        function checkPWAInstallability() {
+            addResult('🔍 PWA 설치 조건 체크 중...');
+            
+            // 기본 조건들 체크
+            const checks = [
+                { name: 'HTTPS 또는 localhost', result: location.protocol === 'https:' || location.hostname === 'localhost' },
+                { name: 'Service Worker 지원', result: 'serviceWorker' in navigator },
+                { name: 'Manifest 링크 존재', result: !!document.querySelector('link[rel="manifest"]') },
+            ];
+            
+            checks.forEach(check => {
+                addResult(`${check.result ? '✅' : '❌'} ${check.name}`, check.result ? 'success' : 'error');
+            });
+            
+            // Chrome 설치 조건 강제 체크
+            setTimeout(() => {
+                if (!deferredPrompt) {
+                    addResult('⚠️ beforeinstallprompt 이벤트가 아직 발생하지 않음', 'warning');
+                    addResult('💡 몇 초 더 기다리거나 페이지와 상호작용 해보세요', 'warning');
+                }
+            }, 2000);
+        }
+        
+        // 설치 프롬프트 강제 표시
+        async function showInstallPrompt() {
+            if (deferredPrompt) {
+                addResult('설치 프롬프트 표시 중...');
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                addResult(`사용자 선택: ${outcome}`);
+            } else {
+                addResult('❌ 설치 프롬프트 사용 불가', 'error');
+                
+                // Chrome 메뉴에서 설치 시도
+                addResult('💡 Chrome 메뉴에서 "앱 설치..." 찾아보세요', 'warning');
+                
+                // 개발자 도구 안내
+                addResult('🔧 또는 F12 → Application → Manifest에서 "Add to homescreen" 버튼 찾기', 'warning');
+            }
+        }
+        
+        // 수동 설치 가이드
+        function manualInstallGuide() {
+            const guide = `
+                <h3>🛠️ 수동 설치 방법:</h3>
+                <ol>
+                    <li><strong>Chrome 메뉴(⋮)</strong> 클릭</li>
+                    <li><strong>"앱 설치..."</strong> 또는 <strong>"Spark 설치..."</strong> 메뉴 찾기</li>
+                    <li>없으면 <strong>주소창 우클릭 → "앱 설치..."</strong></li>
+                    <li>또는 <strong>F12 → Application → Manifest → "Add to homescreen"</strong></li>
+                </ol>
+                <p>⚠️ Chrome이 PWA 설치 조건을 까다롭게 판단할 수 있습니다.</p>
+            `;
+            
+            const div = document.createElement('div');
+            div.className = 'result warning';
+            div.innerHTML = guide;
+            results.appendChild(div);
+        }
+        
+        // 페이지 로드 시 자동 체크
+        window.addEventListener('load', () => {
+            addResult('페이지 로드 완료');
+            checkPWAInstallability();
+            
+            // 5초 후 자동 재체크
+            setTimeout(() => {
+                if (!deferredPrompt) {
+                    addResult('⏰ 5초 경과 - beforeinstallprompt 이벤트 여전히 없음', 'warning');
+                }
+            }, 5000);
+        });
+        
+        // 사용자 상호작용 감지
+        let interactionDetected = false;
+        ['click', 'scroll', 'keydown'].forEach(event => {
+            document.addEventListener(event, () => {
+                if (!interactionDetected) {
+                    interactionDetected = true;
+                    addResult('👆 사용자 상호작용 감지됨 (PWA 설치 조건 충족)');
+                }
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>

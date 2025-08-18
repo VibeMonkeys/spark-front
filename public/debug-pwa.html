@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PWA Debug</title>
+</head>
+<body>
+    <h1>PWA 디버깅 페이지</h1>
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.style.margin = '10px 0';
+            div.style.padding = '10px';
+            div.style.border = '1px solid #ccc';
+            div.style.backgroundColor = type === 'error' ? '#ffebee' : '#e8f5e8';
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+        
+        // PWA 지원 확인
+        if ('serviceWorker' in navigator) {
+            log('✅ Service Worker 지원됨');
+        } else {
+            log('❌ Service Worker 지원 안됨', 'error');
+        }
+        
+        // 매니페스트 확인
+        fetch('/manifest.json')
+            .then(response => response.json())
+            .then(manifest => {
+                log('✅ Manifest 로드됨: ' + manifest.name);
+                log('📱 아이콘 개수: ' + manifest.icons.length);
+            })
+            .catch(err => {
+                log('❌ Manifest 로드 실패: ' + err.message, 'error');
+            });
+        
+        // Service Worker 등록 상태 확인
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            log('🔧 등록된 SW 개수: ' + registrations.length);
+            registrations.forEach((registration, index) => {
+                log(`SW ${index + 1}: ${registration.scope}`);
+            });
+        });
+        
+        // beforeinstallprompt 이벤트 감지
+        window.addEventListener('beforeinstallprompt', (e) => {
+            log('🎉 PWA 설치 가능! beforeinstallprompt 이벤트 발생');
+            
+            // 설치 버튼 생성
+            const installBtn = document.createElement('button');
+            installBtn.textContent = '앱 설치하기';
+            installBtn.style.padding = '10px 20px';
+            installBtn.style.margin = '10px';
+            installBtn.style.backgroundColor = '#9333ea';
+            installBtn.style.color = 'white';
+            installBtn.style.border = 'none';
+            installBtn.style.borderRadius = '5px';
+            installBtn.onclick = async () => {
+                e.prompt();
+                const { outcome } = await e.userChoice;
+                log('설치 결과: ' + outcome);
+            };
+            results.appendChild(installBtn);
+        });
+        
+        // 현재 URL 정보
+        log('🌐 현재 URL: ' + window.location.href);
+        log('🔒 HTTPS: ' + (window.location.protocol === 'https:' ? '예' : '아니오 (localhost는 OK)'));
+        
+        // User Agent
+        log('🖥️ 브라우저: ' + navigator.userAgent.substring(0, 100) + '...');
+        
+        // 스탠드얼론 모드 확인
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            log('📱 이미 PWA로 실행 중');
+        } else {
+            log('🌐 브라우저에서 실행 중');
+        }
+    </script>
+</body>
+</html>

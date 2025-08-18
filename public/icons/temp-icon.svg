@@ -1,0 +1,24 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9333ea"/>
+      <stop offset="100%" style="stop-color:#2563eb"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 둥근 배경 -->
+  <rect width="512" height="512" rx="90" fill="url(#sparkGrad)"/>
+  
+  <!-- 메인 텍스트 "S" -->
+  <text x="256" y="340" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="280" 
+        font-weight="bold"
+        fill="white" 
+        text-anchor="middle">S</text>
+        
+  <!-- 작은 번개 이모티콘 -->
+  <text x="380" y="200" 
+        font-size="80" 
+        text-anchor="middle">⚡</text>
+</svg>
