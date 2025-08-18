@@ -15,8 +15,7 @@ html, body {
   /* 오버스크롤 동작 제어 - 세로만 허용하여 Pull-to-refresh 작동 */
   overscroll-behavior-x: none;
   overscroll-behavior-y: auto;
-  /* iOS Safe Area 지원 */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* iOS Safe Area는 개별 컴포넌트에서 처리 */
 }
 
 #root {
@@ -220,4 +219,21 @@ html {
 
 .scrollbar-hide::-webkit-scrollbar { 
   display: none;  /* Safari and Chrome */
+}
+
+/* iOS Safe Area 유틸리티 */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-pl {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-pr {
+  padding-right: env(safe-area-inset-right);
 }

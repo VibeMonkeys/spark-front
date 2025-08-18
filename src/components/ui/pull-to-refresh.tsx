@@ -17,67 +17,15 @@ export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
   canRefresh,
   threshold = 80
 }) => {
-  // 투명도와 크기 계산
-  const opacity = Math.min(pullDistance / threshold, 1);
-  const scale = Math.min(0.5 + (pullDistance / threshold) * 0.5, 1);
-  const rotation = isRefreshing ? 'animate-spin' : '';
+  // 새로고침 중일 때만 표시
+  if (!isRefreshing) {
+    return null;
+  }
 
   return (
-    <div
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 flex items-center justify-center transition-all duration-200",
-        "bg-gradient-to-b from-white/90 to-transparent backdrop-blur-sm",
-        isPulling || isRefreshing ? "visible" : "invisible"
-      )}
-      style={{
-        height: `${Math.max(pullDistance, isRefreshing ? 80 : 0)}px`,
-        opacity: isPulling || isRefreshing ? opacity : 0
-      }}
-    >
-      <div
-        className={cn(
-          "flex flex-col items-center justify-center space-y-2 transition-all duration-200",
-          rotation
-        )}
-        style={{
-          transform: `scale(${scale})`,
-          paddingTop: '20px'
-        }}
-      >
-        <div
-          className={cn(
-            "p-3 rounded-full transition-all duration-200",
-            canRefresh || isRefreshing
-              ? "bg-purple-100 text-purple-600"
-              : "bg-gray-100 text-gray-400"
-          )}
-        >
-          <RefreshCw 
-            className={cn(
-              "w-5 h-5 transition-transform duration-200",
-              isRefreshing && "animate-spin",
-              canRefresh && !isRefreshing && "rotate-180"
-            )}
-          />
-        </div>
-        
-        <div className="text-center">
-          <p
-            className={cn(
-              "text-sm font-medium transition-colors duration-200",
-              canRefresh || isRefreshing
-                ? "text-purple-600"
-                : "text-gray-400"
-            )}
-          >
-            {isRefreshing
-              ? "새로고침 중..."
-              : canRefresh
-              ? "놓으면 새로고침"
-              : "아래로 당겨서 새로고침"
-            }
-          </p>
-        </div>
+    <div className="fixed top-4 left-0 right-0 z-50 flex items-center justify-center">
+      <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
+        <RefreshCw className="w-5 h-5 text-purple-600 animate-spin" />
       </div>
     </div>
   );

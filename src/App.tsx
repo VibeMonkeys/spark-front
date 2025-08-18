@@ -148,11 +148,10 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
     try {
       // 현재 화면에 따라 적절한 데이터 새로고침
       await queryClient.invalidateQueries();
-      showNotification('success', '새로고침 완료', '최신 데이터를 가져왔습니다.', true, 1500);
     } catch (error) {
-      showNotification('error', '새로고침 실패', '다시 시도해주세요.');
+      // 에러는 조용히 처리
     }
-  }, [queryClient, showNotification]);
+  }, [queryClient]);
 
   const pullToRefreshState = usePullToRefresh({
     onRefresh: handleRefresh,
