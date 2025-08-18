@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { webSocketClient, WebSocketNotification } from '../shared/api/websocket';
 import { useAuth } from './AuthContext';
 
@@ -39,6 +40,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   onNavigate 
 }) => {
   const { user, token } = useAuth();
+  const queryClient = useQueryClient();
   const [notifications, setNotifications] = useState<WebSocketNotification[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -240,16 +242,29 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         onNavigate('main', 'missions');
         break;
       case '/profile':
+        // 프로필 관련 데이터 새로고침
+        if (user?.id) {
+          queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['level-progress', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['achievements', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['category-statistics', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['missions-completed-recent', user.id] });
+        }
         onNavigate('main', 'profile');
         break;
       case '/achievements':
+        // 업적 관련 데이터 새로고침
+        if (user?.id) {
+          queryClient.invalidateQueries({ queryKey: ['achievements', user.id] });
+          queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
+        }
         onNavigate('main', 'profile'); // 일단 프로필 탭으로
         break;
       default:
         onNavigate('main', 'home');
         break;
     }
-  }, [onNavigate]);
+  }, [onNavigate, queryClient, user?.id]);
 
   const showNotification = useCallback((notification: Omit<WebSocketNotification, 'id' | 'isRead' | 'createdAt'>) => {
     const fullNotification: WebSocketNotification = {
