@@ -43,12 +43,34 @@ interface AppContentProps {
 }
 
 function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContentProps) {
-  const { user, isLoading, login, forceLogout } = useAuth();
+  const { user, isLoading, login, forceLogout, onStateReset } = useAuth();
 
   // API 에러 시 자동 로그아웃 콜백 등록
   useEffect(() => {
     setForceLogoutCallback(forceLogout);
   }, [forceLogout]);
+
+  // AuthContext에 상태 리셋 콜백 등록
+  useEffect(() => {
+    const resetAppState = () => {
+      // 홈 탭으로 리셋
+      setActiveTab('home');
+      setCurrentView('main');
+      setSelectedMissionId(null);
+      setMissionResult(null);
+      setSelectedSettingsSection(null);
+      
+      // 스크롤 위치 리셋
+      scrollPositions.current = {};
+      setPreviousActiveTab('home');
+      
+      console.log('✅ [App] App state reset completed');
+    };
+    
+    if (onStateReset) {
+      onStateReset(resetAppState);
+    }
+  }, [onStateReset]);
   const queryClient = useQueryClient();
   // 새로고침 시에도 현재 뷰 상태 복원
   const [currentView, setCurrentView] = useState(() => {

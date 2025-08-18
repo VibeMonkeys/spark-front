@@ -42,6 +42,7 @@ interface AuthContextType {
   refreshUser: () => Promise<void>;
   isLoading: boolean;
   isAuthenticated: boolean;
+  onStateReset?: () => void; // 로그인/로그아웃 시 앱 상태 리셋 콜백
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [onStateReset, setOnStateReset] = useState<(() => void) | undefined>();
 
   // 앱 시작 시 localStorage에서 인증 정보 복원
   useEffect(() => {
@@ -117,6 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('lastActiveTab');
     localStorage.removeItem('scrollPositions');
     
+    // App 컴포넌트 상태 리셋 콜백 호출
+    if (onStateReset) {
+      onStateReset();
+    }
+    
     // 로그인 후 스크롤을 최상단으로 이동
     setTimeout(() => {
       window.scrollTo(0, 0);
@@ -134,33 +141,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // API 호출이 실패해도 로컬에서는 로그아웃 처리
     }
     
+    // 모든 localStorage 데이터 정리
+    localStorage.clear();
     
     // 로컬 상태 및 저장소 정리
     setUser(null);
     setToken(null);
     setRefreshToken(null);
-    localStorage.removeItem('current_user');
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('refresh_token');
+    
+    // App 컴포넌트 상태 리셋 콜백 호출
+    if (onStateReset) {
+      onStateReset();
+    }
   };
 
   const forceLogout = (reason?: string) => {
     console.warn('⚠️ [AuthContext] Force logout triggered:', reason);
     
-    // 로컬 상태 및 저장소 정리 (서버 호출 없이)
+    // 모든 localStorage 데이터 정리 (서버 호출 없이)
+    localStorage.clear();
+    
+    // 로컬 상태 정리
     setUser(null);
     setToken(null);
     setRefreshToken(null);
-    localStorage.removeItem('current_user');
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('refresh_token');
     
-    // 관련 상태 정리
-    localStorage.removeItem('currentView');
-    localStorage.removeItem('activeTab');
-    localStorage.removeItem('selectedMissionId');
-    localStorage.removeItem('lastActiveTab');
-    localStorage.removeItem('scrollPositions');
+    // App 컴포넌트 상태 리셋 콜백 호출
+    if (onStateReset) {
+      onStateReset();
+    }
   };
 
   const refreshUser = async () => {
@@ -188,7 +197,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       forceLogout,
       refreshUser,
       isLoading, 
-      isAuthenticated 
+      isAuthenticated,
+      onStateReset: setOnStateReset
     }}>
       {children}
     </AuthContext.Provider>
