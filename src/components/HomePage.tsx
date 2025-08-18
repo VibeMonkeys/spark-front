@@ -14,7 +14,7 @@ import { NotificationBell } from "./ui/notification-bell";
 const getCategoryColor = (category: string) => {
   const colors: Record<string, string> = {
     "ADVENTURE": "bg-orange-500",
-    "SOCIAL": "bg-blue-500", 
+    "SOCIAL": "bg-gradient-to-r from-purple-600 to-blue-600", 
     "HEALTH": "bg-green-500",
     "CREATIVE": "bg-purple-500",
     "LEARNING": "bg-indigo-500",
@@ -69,7 +69,7 @@ const getCategoryTheme = (category: string) => {
   return {
     bg: "bg-white",
     text: "text-gray-900",
-    accent: "bg-blue-500", // 토스 블루 계열 단일 색상
+    accent: "bg-gradient-to-r from-purple-600 to-blue-600", // 스파크 브랜드 색상
     shadow: "shadow-sm hover:shadow-md",
     iconBg: "bg-gray-100 border border-gray-200",
     iconColor: "text-gray-600"
@@ -164,9 +164,9 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
               <Flame className="size-4 text-orange-500" />
               <span className="text-sm font-medium text-orange-700">{userSummary.current_streak}일</span>
             </div>
-            <div className="flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-full">
-              <Star className="size-4 text-blue-500" />
-              <span className="text-sm font-medium text-blue-700">{userSummary.current_points.toLocaleString()}P</span>
+            <div className="flex items-center gap-1 bg-purple-100 px-2 py-1 rounded-full">
+              <Star className="size-4 text-purple-600" />
+              <span className="text-sm font-medium text-purple-700">{userSummary.current_points.toLocaleString()}P</span>
             </div>
             {/* 알림 종 아이콘 */}
             <NotificationBell />
@@ -201,7 +201,7 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="text-blue-600"
+              className="text-purple-600"
               onClick={() => rerollMutation.mutate()}
               disabled={rerollMutation.isPending}
             >
@@ -262,7 +262,7 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
                         <div className="flex items-center gap-1 bg-gray-100 text-gray-700 rounded-md px-2 py-1 border border-gray-200">
                           <span className="text-xs font-medium">+{mission.reward_points}P</span>
                         </div>
-                        <div className="flex items-center gap-1 bg-blue-100 text-blue-700 rounded-md px-2 py-1 border border-blue-200">
+                        <div className="flex items-center gap-1 bg-purple-100 text-purple-700 rounded-md px-2 py-1 border border-purple-200">
                           <span className="text-xs font-medium">스탯+2</span>
                         </div>
                       </div>
@@ -285,7 +285,7 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
                         disabled={!dailyLimit?.can_start}
                         className={`${
                           dailyLimit?.can_start 
-                            ? `${theme.accent} hover:bg-blue-600 text-white` 
+                            ? `${theme.accent} hover:from-purple-700 hover:to-blue-700 text-white` 
                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         } border-0 font-medium text-sm px-6 py-2 rounded-lg transition-colors duration-200`}
                         onClick={(e) => {

@@ -31,7 +31,7 @@ const getCategoryTheme = (category: string) => {
   return {
     bg: "bg-white",
     text: "text-gray-900",
-    accent: "bg-blue-500",
+    accent: "bg-gradient-to-r from-purple-600 to-blue-600",
     shadow: "shadow-sm hover:shadow-md",
     iconBg: "bg-gray-100 border border-gray-200",
     iconColor: "text-gray-600"
@@ -185,8 +185,8 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
         <div className="grid grid-cols-3 gap-3 py-4">
           <div className="text-center bg-white backdrop-blur-sm rounded-lg p-3">
             <div className="flex items-center justify-center gap-1 mb-1">
-              <Target className="size-4 text-blue-500" />
-              <span className="text-lg font-bold text-blue-500">{ongoingMissions.length}</span>
+              <Target className="size-4 text-purple-600" />
+              <span className="text-lg font-bold text-purple-600">{ongoingMissions.length}</span>
             </div>
             <p className="text-xs text-muted-foreground">진행 중</p>
           </div>
@@ -218,7 +218,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
             >
               진행 중
               {ongoingMissions.length > 0 && (
-                <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
+                <span className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
                   {ongoingMissions.length}
                 </span>
               )}
@@ -278,7 +278,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                           <div className="flex items-center gap-1 bg-gray-100 text-gray-700 rounded-md px-2 py-1 border border-gray-200">
                             <span className="text-xs font-medium">+{mission.reward_points}P</span>
                           </div>
-                          <div className="flex items-center gap-1 bg-blue-100 text-blue-700 rounded-md px-2 py-1 border border-blue-200">
+                          <div className="flex items-center gap-1 bg-purple-100 text-purple-700 rounded-md px-2 py-1 border border-purple-200">
                             <span className="text-xs font-medium">스탯+2</span>
                           </div>
                         </div>
@@ -312,7 +312,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
                         <div className="flex gap-2">
                           <Button 
                             size="sm" 
-                            className="bg-blue-500 hover:bg-blue-600 text-white border-0 font-medium text-sm px-4 py-2 rounded-lg transition-colors duration-200"
+                            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 font-medium text-sm px-4 py-2 rounded-lg transition-colors duration-200"
                             onClick={() => onMissionContinue?.(mission.id)}
                           >
                             <Camera className="size-3 mr-1" />

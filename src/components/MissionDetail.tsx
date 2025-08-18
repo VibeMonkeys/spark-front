@@ -44,7 +44,7 @@ const getCategoryTheme = (category: string) => {
   return {
     bg: "bg-white",
     text: "text-gray-900",
-    accent: "bg-blue-500",
+    accent: "bg-gradient-to-r from-purple-600 to-blue-600",
     shadow: "shadow-sm hover:shadow-md",
     iconBg: "bg-gray-100 border border-gray-200",
     iconColor: "text-gray-600"
@@ -329,7 +329,7 @@ export function MissionDetail({
               {/* 핵심 정보 그리드 */}
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">
+                  <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-1">
                     +{missionData.reward_points}
                   </div>
                   <div className="text-xs text-gray-500 font-medium">포인트</div>
@@ -415,7 +415,7 @@ export function MissionDetail({
               disabled={startMissionMutation.isPending || !dailyLimit?.can_start}
               className={`w-full h-14 rounded-2xl font-semibold text-base transition-all duration-200 ${
                 dailyLimit?.can_start 
-                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm" 
+                  ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-sm" 
                   : "bg-gray-200 text-gray-500 cursor-not-allowed"
               }`}
             >
@@ -510,14 +510,14 @@ export function MissionDetail({
                 "{getRandomQuote()}"
               </p>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="bg-white/60 rounded-xl p-3 border border-blue-200">
-                  <div className="font-bold text-blue-600 text-lg">
+                <div className="bg-white/60 rounded-xl p-3 border border-purple-200">
+                  <div className="font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-lg">
                     {missionDetail.completed_by?.toLocaleString() || 0}명
                   </div>
                   <div className="text-gray-600">이미 완료했어요</div>
                 </div>
-                <div className="bg-white/60 rounded-xl p-3 border border-blue-200">
-                  <div className="font-bold text-blue-600 text-lg">
+                <div className="bg-white/60 rounded-xl p-3 border border-purple-200">
+                  <div className="font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent text-lg">
                     {missionData.duration}
                   </div>
                   <div className="text-gray-600">평균 완료 시간</div>

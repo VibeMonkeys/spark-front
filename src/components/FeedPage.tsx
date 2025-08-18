@@ -394,7 +394,7 @@ export function FeedPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="스토리 내용, 해시태그 검색... (예: #카페, 운동, 독서)"
-                className="pl-10 pr-10 py-2 border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-0 transition-colors duration-200"
+                className="pl-10 pr-10 py-2 border border-gray-200 rounded-xl focus:border-purple-500 focus:ring-0 transition-colors duration-200"
                 autoFocus
               />
               <button
@@ -414,9 +414,9 @@ export function FeedPage() {
                     <button
                       key={index}
                       onClick={() => handleHashtagSearchClick(hashtag.hashtag)}
-                      className="flex items-center gap-1 bg-white hover:bg-blue-50 border border-gray-200 rounded-lg px-3 py-1 text-sm transition-colors duration-150"
+                      className="flex items-center gap-1 bg-white hover:bg-purple-50 border border-gray-200 rounded-lg px-3 py-1 text-sm transition-colors duration-150"
                     >
-                      <Hash className="w-3 h-3 text-blue-500" />
+                      <Hash className="w-3 h-3 text-purple-600" />
                       <span>{hashtag.hashtag}</span>
                       <span className="text-xs text-gray-500">({hashtag.totalCount})</span>
                     </button>
@@ -432,7 +432,7 @@ export function FeedPage() {
                 onClick={() => setSearchActiveTab('all')}
                 className={`flex-1 rounded-lg py-1.5 px-3 text-sm font-medium transition-all duration-150 ${
                   searchActiveTab === 'all'
-                    ? 'bg-white text-blue-600 shadow-sm'
+                    ? 'bg-white text-purple-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
@@ -442,7 +442,7 @@ export function FeedPage() {
                 onClick={() => setSearchActiveTab('stories')}
                 className={`flex-1 rounded-lg py-1.5 px-3 text-sm font-medium transition-all duration-150 ${
                   searchActiveTab === 'stories'
-                    ? 'bg-white text-blue-600 shadow-sm'
+                    ? 'bg-white text-purple-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
@@ -452,7 +452,7 @@ export function FeedPage() {
                 onClick={() => setSearchActiveTab('missions')}
                 className={`flex-1 rounded-lg py-1.5 px-3 text-sm font-medium transition-all duration-150 ${
                   searchActiveTab === 'missions'
-                    ? 'bg-white text-blue-600 shadow-sm'
+                    ? 'bg-white text-purple-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
@@ -506,7 +506,7 @@ export function FeedPage() {
             !searchQuery.trim() ? (
               <div className="text-center py-16">
                 <div className="p-4 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl w-fit mx-auto mb-4">
-                  <Search className="w-8 h-8 text-blue-500" />
+                  <Search className="w-8 h-8 text-purple-600" />
                 </div>
                 <div className="text-gray-900 font-semibold mb-2">스토리와 미션을 검색해보세요</div>
                 <div className="text-gray-500 text-sm">
@@ -515,7 +515,7 @@ export function FeedPage() {
               </div>
             ) : isSearchLoading ? (
               <div className="flex items-center justify-center py-16 gap-3">
-                <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
                 <div className="text-gray-600 font-medium">검색 중...</div>
               </div>
             ) : searchResults.filter(result => {
@@ -560,7 +560,7 @@ export function FeedPage() {
                       </div>
                       
                       {result.mission && (
-                        <Badge className={`${result.mission.category_color} text-white border-0 text-xs`}>
+                        <Badge className="bg-gray-100 text-gray-700 border-0 text-xs">
                           {result.mission.category} • {result.mission.title}
                         </Badge>
                       )}
@@ -590,7 +590,7 @@ export function FeedPage() {
                             <button
                               key={index}
                               onClick={() => handleHashtagClick(tag.startsWith('#') ? tag : `#${tag}`)}
-                              className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-1 py-0.5 rounded transition-colors cursor-pointer"
+                              className="text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-50 px-1 py-0.5 rounded transition-colors cursor-pointer"
                             >
                               {tag.startsWith('#') ? tag : `#${tag}`}
                             </button>
@@ -668,7 +668,7 @@ export function FeedPage() {
                     </div>
                     
                     {story.mission && (
-                      <Badge className={`${story.mission.category_color} text-white border-0 text-xs`}>
+                      <Badge className="bg-gray-100 text-gray-700 border-0 text-xs">
                         {story.mission.category} • {story.mission.title}
                       </Badge>
                     )}
@@ -698,7 +698,7 @@ export function FeedPage() {
                           <button
                             key={index}
                             onClick={() => handleHashtagClick(tag.startsWith('#') ? tag : `#${tag}`)}
-                            className="text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-1 py-0.5 rounded transition-colors cursor-pointer"
+                            className="text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-50 px-1 py-0.5 rounded transition-colors cursor-pointer"
                           >
                             {tag.startsWith('#') ? tag : `#${tag}`}
                           </button>
@@ -735,7 +735,7 @@ export function FeedPage() {
                             {story.likes}
                           </span>
                         </button>
-                        <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-blue-500 transition-colors hover:scale-105 duration-200">
+                        <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-purple-600 transition-colors hover:scale-105 duration-200">
                           <MessageCircle className="size-4 hover:scale-110 transition-transform duration-200" />
                           <span className="font-medium">{story.comments}</span>
                         </button>

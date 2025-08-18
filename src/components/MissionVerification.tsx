@@ -225,15 +225,15 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
         <div className="pt-8 pb-3">
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 shadow-sm">
             <div className="flex items-center gap-4">
-              <div className="size-12 bg-blue-500 rounded-2xl flex items-center justify-center">
+              <div className="size-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center">
                 <CheckCircle className="size-6 text-white" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium">
+                  <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-medium">
                     {getCategoryText(missionData.category)}
                   </span>
-                  <span className="text-xs text-blue-600 font-semibold">+{missionData.reward_points}P 획득</span>
+                  <span className="text-xs text-purple-600 font-semibold">+{missionData.reward_points}P 획득</span>
                 </div>
                 <h3 className="font-semibold text-lg text-gray-900 mb-1">{missionData.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">
@@ -296,7 +296,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
         <section className="mb-4">
           <h3 className="font-bold text-lg text-gray-900 mb-1">경험 스토리 작성</h3>
           <p className="text-sm text-gray-600 mb-4">
-            또는 <span className="font-medium text-blue-600">10자 이상의 경험 스토리</span>를 작성해서 미션을 완료하세요
+            또는 <span className="font-medium text-purple-600">10자 이상의 경험 스토리</span>를 작성해서 미션을 완료하세요
           </p>
           <div className="bg-white/80 backdrop-blur-sm border-0 shadow-sm rounded-2xl">
             <div className="p-4">
@@ -313,14 +313,14 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
                 </span>
                 <div className="flex items-center gap-3">
                   <span className={`text-sm font-medium transition-colors ${
-                    isPublic ? "text-blue-600" : "text-gray-600"
+                    isPublic ? "text-purple-600" : "text-gray-600"
                   }`}>
                     {isPublic ? "공개" : "비공개"}
                   </span>
                   <Switch
                     checked={isPublic}
                     onCheckedChange={setIsPublic}
-                    className="h-6 w-11 data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-300 shadow-sm border border-gray-200 data-[state=checked]:border-blue-400 transition-all duration-200"
+                    className="h-6 w-11 data-[state=checked]:bg-purple-600 data-[state=unchecked]:bg-gray-300 shadow-sm border border-gray-200 data-[state=checked]:border-purple-500 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -398,7 +398,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
               <div 
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{ 
                   width: story.trim().length >= 10 || selectedImages.length > 0 ? "100%" : "0%" 
                 }}
@@ -409,7 +409,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
             <Button
               onClick={handleSubmit}
               disabled={(story.trim().length < 10 && selectedImages.length === 0) || verifyMissionMutation.isPending}
-              className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:text-gray-500 text-white font-semibold rounded-2xl h-14 transition-all duration-200"
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:bg-gray-300 disabled:text-gray-500 text-white font-semibold rounded-2xl h-14 transition-all duration-200"
               size="lg"
             >
               <Send className="size-5 mr-2" />

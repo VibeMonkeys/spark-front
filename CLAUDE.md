@@ -18,6 +18,77 @@ This is a React frontend application for the "spark" random mission service. It'
 - **Testing**: Vitest + Testing Library + MSW
 - **Architecture Pattern**: Feature-Sliced Design (FSD)
 
+## Brand Design System
+
+### 🎨 Brand Colors (SPARK Personal Color Palette)
+
+**SPARK** uses a signature purple-to-blue gradient as its primary brand color, reflecting innovation, creativity, and trust.
+
+#### Primary Brand Colors
+```css
+/* Main Brand Gradient */
+bg-gradient-to-r from-purple-600 to-blue-600
+text-gradient: linear-gradient(to right, #9333ea, #2563eb)
+
+/* Primary Purple */
+purple-600: #9333ea
+purple-700: #7c3aed (hover states)
+purple-50: #faf5ff (light backgrounds)
+purple-100: #e9d5ff (subtle backgrounds)
+
+/* Secondary Blue */
+blue-600: #2563eb
+blue-700: #1d4ed8 (hover states)
+blue-50: #eff6ff (light backgrounds)
+blue-100: #dbeafe (subtle backgrounds)
+```
+
+#### Usage Guidelines
+
+**✅ Primary Brand Applications:**
+- Headers and titles: `bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent`
+- Primary buttons: `bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700`
+- Key interactive elements: icons, links, active states
+- Progress bars and completion indicators
+- Notification badges and success states
+
+**✅ Supporting Color Applications:**
+- Single color elements: `text-purple-600`, `bg-purple-600`
+- Subtle backgrounds: `bg-purple-50`, `bg-purple-100`
+- Borders and outlines: `border-purple-200`, `border-purple-500`
+- Hover states: `hover:bg-purple-50`, `hover:text-purple-700`
+
+**❌ Avoid:**
+- Using pure blue colors without purple (breaks brand consistency)
+- Mixing with other color gradients (green, red, etc.) in primary elements
+- Using brand colors for error states (use red variants instead)
+
+#### Component Examples
+```tsx
+// Headers
+<h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+  SPARK
+</h1>
+
+// Primary Buttons
+<Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+  미션 시작하기
+</Button>
+
+// Interactive Elements
+<Switch className="data-[state=checked]:bg-purple-600" />
+<Badge className="bg-purple-100 text-purple-700">태그</Badge>
+
+// Hashtags and Links
+<a className="text-purple-600 hover:text-purple-700 hover:bg-purple-50">#해시태그</a>
+```
+
+#### Color Accessibility
+- All brand colors meet WCAG AA contrast requirements
+- Use `text-purple-700` on light backgrounds for better readability
+- Provide hover states for all interactive elements
+- Ensure sufficient contrast in gradient text applications
+
 ## Feature-Sliced Design Structure
 
 ### Layer Hierarchy (Bottom-up dependency)

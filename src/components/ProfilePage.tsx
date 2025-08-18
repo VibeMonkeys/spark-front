@@ -207,8 +207,8 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
               <Card className="border-0 bg-white backdrop-blur-sm">
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center gap-1 mb-2">
-                    <Star className="size-4 text-blue-500" />
-                    <span className="text-xl font-bold text-blue-500">{userData.current_points.toLocaleString()}</span>
+                    <Star className="size-4 text-purple-600" />
+                    <span className="text-xl font-bold text-purple-600">{userData.current_points.toLocaleString()}</span>
                   </div>
                   <p className="text-xs text-muted-foreground">현재 포인트</p>
                 </CardContent>
@@ -282,7 +282,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                               <div className="size-12 rounded-2xl flex items-center justify-center text-xl bg-gray-50 border border-gray-200">
                                 {achievement.icon}
                               </div>
-                              <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-1">
+                              <div className="absolute -top-1 -right-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full p-1">
                                 <Trophy className="size-2 text-white" />
                               </div>
                             </div>
@@ -363,7 +363,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                                   </div>
                                   <div className="w-full bg-gray-200 rounded-full h-2">
                                     <div 
-                                      className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                                      className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full transition-all duration-500"
                                       style={{ width: `${achievement.progress}%` }}
                                     />
                                   </div>
@@ -395,7 +395,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
             <Card className="border-0 bg-white backdrop-blur-sm">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-bold text-gray-900 flex items-center gap-2">
-                  <div className="bg-blue-500 p-1.5 rounded-lg">
+                  <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-1.5 rounded-lg">
                     <TrendingUp className="size-3 text-white" />
                   </div>
                   카테고리별 활동
@@ -411,7 +411,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                             <div className={`size-3 rounded-full ${category.color}`} />
                             <span className="text-sm font-medium text-gray-900">{category.name}</span>
                           </div>
-                          <div className="bg-blue-500 text-white px-2 py-0.5 rounded-full text-xs font-medium">
+                          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-medium">
                             {category.completed}개
                           </div>
                         </div>
@@ -442,7 +442,7 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="text-blue-600 hover:bg-blue-50 rounded-lg text-sm font-medium"
+                    className="text-purple-600 hover:bg-purple-50 rounded-lg text-sm font-medium"
                     onClick={() => setIsCompletedMissionsModalOpen(true)}
                   >
                     전체보기
@@ -468,13 +468,13 @@ export function ProfilePage({ onEditProfile }: { onEditProfile?: () => void }) {
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-medium text-gray-900 truncate mb-1">{mission.title}</h4>
                             <div className="flex items-center gap-2">
-                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700 border-0">
+                              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 border-0">
                                 {mission.category}
                               </Badge>
                             </div>
                           </div>
                           <div className="text-right">
-                            <div className="bg-blue-500 text-white px-2 py-0.5 rounded-full text-xs font-medium">
+                            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-2 py-0.5 rounded-full text-xs font-medium">
                               +{mission.reward_points}P
                             </div>
                           </div>

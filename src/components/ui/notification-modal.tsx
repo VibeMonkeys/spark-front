@@ -15,12 +15,12 @@ interface NotificationModalProps {
 const typeConfig = {
   success: {
     icon: Trophy,
-    bgGradient: 'bg-gradient-to-br from-green-400 via-blue-500 to-purple-600',
-    cardBg: 'bg-white/95',
-    iconBg: 'bg-gradient-to-br from-green-400 to-blue-500',
+    bgGradient: 'bg-gradient-to-br from-purple-400 via-blue-500 to-pink-500',
+    cardBg: 'bg-white/98',
+    iconBg: 'bg-gradient-to-br from-purple-600 to-blue-600',
     iconColor: 'text-white',
     titleColor: 'text-gray-800',
-    progressColor: 'bg-gradient-to-r from-green-400 to-blue-500',
+    progressColor: 'bg-gradient-to-r from-purple-600 to-blue-600',
     particles: true
   },
   error: {
@@ -111,26 +111,42 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
         onClick={onClose}
       />
       
-      {/* Floating Particles for Success */}
+      {/* Enhanced Floating Particles for Success */}
       {config.particles && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(12)].map((_, i) => (
+          {[...Array(20)].map((_, i) => (
             <div
               key={i}
               className="absolute animate-float"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 2}s`,
-                animationDuration: `${3 + Math.random() * 2}s`
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${4 + Math.random() * 3}s`
               }}
             >
-              <Sparkles 
-                className="w-4 h-4 text-white/40" 
-                style={{
-                  filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.5))'
-                }}
-              />
+              {i % 3 === 0 ? (
+                <Zap 
+                  className="w-3 h-3 text-yellow-300/60" 
+                  style={{
+                    filter: 'drop-shadow(0 0 6px rgba(255,255,0,0.4))'
+                  }}
+                />
+              ) : i % 3 === 1 ? (
+                <Trophy 
+                  className="w-3 h-3 text-purple-300/50" 
+                  style={{
+                    filter: 'drop-shadow(0 0 4px rgba(147,51,234,0.4))'
+                  }}
+                />
+              ) : (
+                <Sparkles 
+                  className="w-4 h-4 text-white/50" 
+                  style={{
+                    filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.6))'
+                  }}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -159,18 +175,22 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
               {/* Animated Icon */}
               <div className="relative">
                 <div className={cn(
-                  "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg",
+                  "w-18 h-18 rounded-3xl flex items-center justify-center shadow-xl border-4 border-white",
                   config.iconBg,
                   "animate-bounce"
                 )}>
-                  <IconComponent className={cn("w-8 h-8", config.iconColor)} />
+                  <IconComponent className={cn("w-10 h-10", config.iconColor)} />
                 </div>
                 
-                {/* Icon Glow Ring */}
+                {/* Enhanced Glow Rings */}
                 <div className={cn(
-                  "absolute inset-0 w-16 h-16 rounded-2xl opacity-30 animate-ping",
+                  "absolute inset-0 w-18 h-18 rounded-3xl opacity-40 animate-ping",
                   config.iconBg
                 )} />
+                <div className={cn(
+                  "absolute -inset-1 w-20 h-20 rounded-3xl opacity-20 animate-ping",
+                  config.iconBg
+                )} style={{animationDelay: '0.5s'}} />
               </div>
               
               <div className="flex-1 min-w-0">

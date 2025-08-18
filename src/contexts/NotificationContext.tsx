@@ -58,8 +58,10 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const addNotification = useCallback((notification: WebSocketNotification) => {
     setNotifications(prev => [notification, ...prev.slice(0, 49)]); // 최대 50개 유지
     
-    // 미션 시작 알림은 팝업으로 표시하지 않음 (알림 종에서만 확인 가능)
-    if (onShowNotification && notification.type !== 'MISSION_STARTED') {
+    // 미션 관련 알림은 팝업으로 표시하지 않음 (알림 종에서만 확인 가능)
+    if (onShowNotification && 
+        notification.type !== 'MISSION_STARTED' && 
+        notification.type !== 'MISSION_COMPLETED') {
       const notificationType = mapNotificationType(notification.type);
       setTimeout(() => {
         onShowNotification(notificationType, notification.title, notification.message);

@@ -166,7 +166,7 @@ export function RewardsPage() {
                 variant={selectedCategory === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory("all")}
-                className={selectedCategory === "all" ? "bg-purple-500 hover:bg-purple-600" : "bg-white"}
+                className={selectedCategory === "all" ? "bg-purple-500 hover:bg-purple-600 text-white" : "bg-white"}
               >
                 전체
               </Button>
@@ -178,7 +178,7 @@ export function RewardsPage() {
                     variant={selectedCategory === category.id ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedCategory(category.id)}
-                    className={selectedCategory === category.id ? "bg-purple-500 hover:bg-purple-600" : "bg-white"}
+                    className={selectedCategory === category.id ? "bg-purple-500 hover:bg-purple-600 text-white" : "bg-white"}
                   >
                     <Icon className="size-4 mr-1" />
                     {category.name}
