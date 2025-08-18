@@ -222,7 +222,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
 
       <div className="max-w-md mx-auto px-4 pb-4">
         {/* Mission Summary */}
-        <div className="py-4">
+        <div className="pt-8 pb-3">
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="size-12 bg-blue-500 rounded-2xl flex items-center justify-center">
@@ -243,9 +243,8 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
             </div>
           </div>
         </div>
-
         {/* Photo Upload Section */}
-        <section className="mb-4">
+        <section className="mb-3">
           <h3 className="font-bold text-lg text-gray-900 mb-1">사진 업로드</h3>
           <p className="text-sm text-gray-600 mb-4">
             사진을 업로드하거나 아래 경험 스토리를 작성해주세요
@@ -294,7 +293,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
         </section>
 
         {/* Story Section */}
-        <section className="mb-6">
+        <section className="mb-4">
           <h3 className="font-bold text-lg text-gray-900 mb-1">경험 스토리 작성</h3>
           <p className="text-sm text-gray-600 mb-4">
             또는 <span className="font-medium text-blue-600">10자 이상의 경험 스토리</span>를 작성해서 미션을 완료하세요
@@ -308,18 +307,20 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
                 className="min-h-[120px] resize-none border-0 bg-transparent focus:ring-0 focus:border-0 p-0 placeholder:text-gray-400"
                 maxLength={500}
               />
-              <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-100">
+              <div className="flex justify-between items-center mt-4 pt-4 pb-2 border-t border-gray-100">
                 <span className="text-xs text-gray-500">
                   {story.length}/500자
                 </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm font-medium transition-colors ${
+                    isPublic ? "text-blue-600" : "text-gray-600"
+                  }`}>
                     {isPublic ? "공개" : "비공개"}
                   </span>
                   <Switch
                     checked={isPublic}
                     onCheckedChange={setIsPublic}
-                    className="scale-75"
+                    className="h-6 w-11 data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-300 shadow-sm border border-gray-200 data-[state=checked]:border-blue-400 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -328,7 +329,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
         </section>
 
         {/* Auto Tags */}
-        <section className="mb-6">
+        <section className="mb-4">
           <div className="bg-white/80 backdrop-blur-sm border-0 shadow-sm rounded-2xl p-4">
             <h3 className="font-bold text-lg text-gray-900 mb-3 flex items-center gap-2">
               <MapPin className="size-5 text-gray-600" />
@@ -354,7 +355,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
         </section>
 
         {/* Progress Indicator */}
-        <div className="mb-4">
+        <div className="mb-3">
           <div className="bg-white/80 backdrop-blur-sm border-0 shadow-sm rounded-2xl p-4">
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-gray-600 font-medium">완료 조건</span>
