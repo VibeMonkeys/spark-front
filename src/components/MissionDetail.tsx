@@ -309,7 +309,7 @@ export function MissionDetail({
 
       <div className="max-w-md mx-auto px-4 pt-6 pb-4">
         {/* Mission Header Card */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="bg-white rounded-3xl border-0 overflow-hidden">
             {/* 메인 콘텐츠 영역 */}
             <div className="px-6 pt-8 pb-6">
@@ -361,41 +361,53 @@ export function MissionDetail({
                 </div>
               </div>
             </div>
-            
-            {/* 하단 액션 영역 */}
-            <div className="px-6 pb-6">
-              <div className="h-px bg-gray-100 mb-6"></div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Users className="size-4" />
-                    <span>{missionDetail.completed_by?.toLocaleString() || 0}명 완료</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="size-4 text-yellow-500" />
-                    <span>{missionDetail.average_rating || 4.5}</span>
-                  </div>
+          </div>
+        </div>
+
+        {/* Mission Statistics */}
+        <div className="mb-4">
+          <div className="bg-white rounded-3xl px-6 py-6">
+            <div className="grid grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 mb-2">
+                  <Users className="size-4 text-gray-500" />
+                  <span className="text-xs text-gray-500 font-medium">완료</span>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs text-gray-500 mb-1">성공률</div>
-                  <div className="text-lg font-bold text-green-600">
-                    {missionDetail.success_rate || 85}%
-                  </div>
+                <div className="text-xl font-bold text-gray-900">
+                  {missionDetail.completed_by?.toLocaleString() || 0}명
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 mb-2">
+                  <Star className="size-4 text-yellow-500" />
+                  <span className="text-xs text-gray-500 font-medium">평점</span>
+                </div>
+                <div className="text-xl font-bold text-gray-900">
+                  {missionDetail.average_rating || 4.5}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-1 mb-2">
+                  <Trophy className="size-4 text-green-500" />
+                  <span className="text-xs text-gray-500 font-medium">성공률</span>
+                </div>
+                <div className="text-xl font-bold text-green-600">
+                  {missionDetail.success_rate || 85}%
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Mission Description - 토스 스타일 */}
-        <div className="mb-6">
+        {/* Mission Description */}
+        <div className="mb-4">
           <div className="bg-white rounded-3xl px-6 py-6">
             <h3 className="font-semibold text-lg text-gray-900 mb-4">미션 설명</h3>
             <p className="text-gray-700 leading-relaxed text-base">{missionData.description}</p>
           </div>
         </div>
 
-        {/* Mission Action Button - 토스 스타일 */}
+        {/* Mission Action Button */}
         <div className="mb-6">
           {!isInProgress ? (
             <Button 
@@ -441,7 +453,7 @@ export function MissionDetail({
         </div>
 
         {/* Detailed Description */}
-        <section className="mb-5">
+        <section className="mb-4">
           <Card className="border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
             <CardHeader className="pb-1">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -461,7 +473,7 @@ export function MissionDetail({
 
         {/* Tips */}
         {tips.length > 0 && (
-          <section className="mb-5">
+          <section className="mb-4">
             <Card className="border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
               <CardHeader className="pb-1">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -488,7 +500,7 @@ export function MissionDetail({
         )}
 
         {/* Encouragement Message */}
-        <section className="mb-5">
+        <section className="mb-4">
           <Card className="border border-gray-300 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
             <CardContent className="p-5 text-center">
               <h3 className="font-bold text-lg text-gray-900 mb-2">
