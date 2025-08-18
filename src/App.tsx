@@ -344,6 +344,7 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
     // 현재 탭을 localStorage에 저장
     localStorage.setItem('lastActiveTab', activeTab);
     setSelectedMissionId(missionId);
+    localStorage.setItem('selectedMissionId', missionId.toString()); // 새로고침 시에도 미션 ID 유지
     navigateToView("mission-verification");
   };
 

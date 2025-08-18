@@ -59,6 +59,13 @@ const getCategoryText = (category: string) => {
 
 export function MissionVerification({ missionId, onBack, onSubmit }: MissionVerificationProps) {
   const { user } = useAuth();
+  
+  // localStorage에서 미션 ID 복원 (새로고침 대응)
+  const actualMissionId = missionId || (() => {
+    const savedMissionId = localStorage.getItem('selectedMissionId');
+    return savedMissionId ? parseInt(savedMissionId) : null;
+  })();
+  
   const [story, setStory] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -68,28 +75,28 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
 
   // 미션 상세 데이터 조회
   const { data: missionData, isLoading: isMissionLoading, error: missionError } = useQuery({
-    queryKey: ['mission-detail', missionId],
+    queryKey: ['mission-detail', actualMissionId],
     queryFn: async () => {
-      if (!missionId) throw new Error('Mission ID is required');
+      if (!actualMissionId) throw new Error('Mission ID is required');
       try {
-        const result = await missionApi.getMissionDetail(missionId);
+        const result = await missionApi.getMissionDetail(actualMissionId);
         return result;
       } catch (error) {
         console.error('❌ [MissionVerification] Failed to load mission detail:', error);
         throw error;
       }
     },
-    enabled: !!missionId,
+    enabled: !!actualMissionId,
   });
 
   // 미션 인증 및 완료 뮤테이션 (통합)
   const verifyMissionMutation = useMutation({
     mutationFn: () => {
-      if (!missionId || !user?.id) {
+      if (!actualMissionId || !user?.id) {
         throw new Error('Mission ID or User ID is missing');
       }
       
-      return missionApi.verifyMission(missionId, {
+      return missionApi.verifyMission(actualMissionId, {
         story: story.trim() || "미션을 완료했습니다! 🎉",
         images: selectedImages,
         location: location,
@@ -175,7 +182,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
 
   const handleSubmit = () => {
     
-    if (!missionId || !user?.id) {
+    if (!actualMissionId || !user?.id) {
       return;
     }
     
@@ -188,11 +195,11 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
     }
   };
 
-  if (!missionId) {
+  if (!actualMissionId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">미션을 선택해주세요.</p>
+          <p className="text-gray-600 mb-4">미션 정보를 불러오는 중입니다...</p>
           <Button onClick={onBack}>돌아가기</Button>
         </div>
       </div>
