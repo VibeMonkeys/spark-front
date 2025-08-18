@@ -5,6 +5,8 @@ import { NotificationProvider } from "./contexts/NotificationContext";
 import { missionApi } from "./shared/api";
 import { NotificationModal } from "./components/ui/notification-modal";
 import { ConfirmModal } from "./components/ui/confirm-modal";
+import { usePullToRefresh } from "./hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "./components/ui/pull-to-refresh";
 
 // Lazy loading으로 컴포넌트 로드
 const HomePage = lazy(() => import("./components/HomePage").then(module => ({ default: module.HomePage })));
@@ -140,6 +142,22 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
   const showNotification = useCallback((type: 'success' | 'error' | 'warning' | 'info', title: string, message: string, autoClose = true, autoCloseDelay = 2000) => {
     setNotification({ isOpen: true, type, title, message, autoClose, autoCloseDelay });
   }, []);
+
+  // Pull-to-refresh 기능
+  const handleRefresh = useCallback(async () => {
+    try {
+      // 현재 화면에 따라 적절한 데이터 새로고침
+      await queryClient.invalidateQueries();
+      showNotification('success', '새로고침 완료', '최신 데이터를 가져왔습니다.', true, 1500);
+    } catch (error) {
+      showNotification('error', '새로고침 실패', '다시 시도해주세요.');
+    }
+  }, [queryClient, showNotification]);
+
+  const pullToRefreshState = usePullToRefresh({
+    onRefresh: handleRefresh,
+    enabled: !!user && currentView === 'main' // 로그인 상태이고 메인 화면일 때만 활성화
+  });
 
   // showNotification 함수를 상위 컴포넌트에 전달
   useEffect(() => {
@@ -491,6 +509,9 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
 
   return (
     <div className="size-full">
+      {/* Pull-to-refresh 인디케이터 */}
+      <PullToRefreshIndicator {...pullToRefreshState} />
+      
       <Suspense fallback={
         <div className="flex items-center justify-center p-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
