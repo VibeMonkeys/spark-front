@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 import { useQueryClient } from '@tanstack/react-query';
 import { webSocketClient, WebSocketNotification } from '../shared/api/websocket';
 import { useAuth } from './AuthContext';
+import { api } from '../shared/api/base';
 
 interface NotificationContextType {
   notifications: WebSocketNotification[];
@@ -88,19 +89,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     
     // API 호출로 서버에 읽음 상태 업데이트
     try {
-      const response = await fetch(`/notifications/${notificationId}/read?userId=${parseInt(user.id)}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('읽음 처리에 실패했습니다.');
-      }
+      await api.put(`/notifications/${notificationId}/read?userId=${parseInt(user.id)}`);
     } catch (error) {
-      console.error('Failed to mark notification as read:', error);
       setError('알림 읽음 처리에 실패했습니다.');
       // 실패 시 상태를 원상복구
       setNotifications(prev => 
@@ -126,19 +116,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     
     // API 호출로 서버에 모든 알림 읽음 처리
     try {
-      const response = await fetch(`/notifications/read-all?userId=${parseInt(user.id)}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('모든 알림 읽음 처리에 실패했습니다.');
-      }
+      await api.put(`/notifications/read-all?userId=${parseInt(user.id)}`);
     } catch (error) {
-      console.error('Failed to mark all notifications as read:', error);
       setError('모든 알림 읽음 처리에 실패했습니다.');
       // 실패 시 원래 상태로 복원 (읽지 않은 상태로 되돌리기)
       setNotifications(prev =>
@@ -166,19 +145,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     
     // API 호출로 서버에서 삭제
     try {
-      const response = await fetch(`/notifications/${notificationId}?userId=${parseInt(user.id)}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('알림 삭제에 실패했습니다.');
-      }
+      await api.delete(`/notifications/${notificationId}?userId=${parseInt(user.id)}`);
     } catch (error) {
-      console.error('Failed to delete notification:', error);
       setError('알림 삭제에 실패했습니다.');
       // 실패 시 삭제된 알림을 다시 복원
       if (deletedNotification) {
@@ -202,19 +170,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     
     // API 호출로 서버에서 모든 알림 삭제
     try {
-      const response = await fetch(`/notifications/all?userId=${parseInt(user.id)}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('모든 알림 삭제에 실패했습니다.');
-      }
+      await api.delete(`/notifications/all?userId=${parseInt(user.id)}`);
     } catch (error) {
-      console.error('Failed to delete all notifications:', error);
       setError('모든 알림 삭제에 실패했습니다.');
       // 실패 시 백업된 알림들을 복원
       setNotifications(previousNotifications);
@@ -288,18 +245,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     setError(null);
 
     try {
-      const response = await fetch(`/notifications?userId=${parseInt(user.id)}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('알림 목록 로드에 실패했습니다.');
-      }
-
-      const result = await response.json();
+      const response = await api.get(`/notifications?userId=${parseInt(user.id)}`);
+      const result = response.data;
       if (result.success && result.data) {
         const existingNotifications = result.data.map((item: any) => ({
           id: item.id.toString(),
@@ -314,7 +261,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
         setNotifications(existingNotifications);
       }
     } catch (error) {
-      console.error('Failed to load notifications:', error);
       setError('알림 목록을 불러오는데 실패했습니다.');
     } finally {
       setIsLoading(false);

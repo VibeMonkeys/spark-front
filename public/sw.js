@@ -10,16 +10,13 @@ const STATIC_CACHE_URLS = [
 
 // 설치 이벤트 - 정적 리소스 캐싱
 self.addEventListener('install', (event) => {
-  console.log('[SW] Service Worker 설치됨');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[SW] 캐시 오픈됨');
         return cache.addAll(STATIC_CACHE_URLS);
       })
       .then(() => {
-        console.log('[SW] 정적 리소스 캐싱 완료');
         return self.skipWaiting(); // 즉시 활성화
       })
   );
@@ -27,7 +24,6 @@ self.addEventListener('install', (event) => {
 
 // 활성화 이벤트 - 이전 캐시 정리
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Service Worker 활성화됨');
   
   event.waitUntil(
     caches.keys()
@@ -35,7 +31,6 @@ self.addEventListener('activate', (event) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (cacheName !== CACHE_NAME) {
-              console.log('[SW] 이전 캐시 삭제:', cacheName);
               return caches.delete(cacheName);
             }
           })
@@ -81,12 +76,10 @@ self.addEventListener('fetch', (event) => {
       .then((response) => {
         // 캐시에서 찾은 경우
         if (response) {
-          console.log('[SW] 캐시에서 반환:', event.request.url);
           return response;
         }
 
         // 캐시에 없으면 네트워크에서 가져오기
-        console.log('[SW] 네트워크에서 가져오기:', event.request.url);
         return fetch(event.request)
           .then((response) => {
             // 유효하지 않은 응답이면 그대로 반환
@@ -115,20 +108,19 @@ self.addEventListener('fetch', (event) => {
 
 // Push 알림 이벤트
 self.addEventListener('push', (event) => {
-  console.log('[SW] Push 알림 수신:', event);
   
   let notificationData = {
     title: 'Spark',
     body: '새로운 알림이 있습니다.',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
+    icon: '/icons/icon-192x192.svg',
+    badge: '/icons/icon-72x72.svg',
     tag: 'spark-notification',
     requireInteraction: true,
     actions: [
       {
         action: 'open',
         title: '열기',
-        icon: '/icons/icon-72x72.png'
+        icon: '/icons/icon-72x72.svg'
       },
       {
         action: 'close',
@@ -142,7 +134,6 @@ self.addEventListener('push', (event) => {
       const data = event.data.json();
       notificationData = { ...notificationData, ...data };
     } catch (error) {
-      console.error('[SW] Push 데이터 파싱 오류:', error);
     }
   }
 
@@ -153,7 +144,6 @@ self.addEventListener('push', (event) => {
 
 // 알림 클릭 이벤트
 self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] 알림 클릭됨:', event.notification.tag);
   
   event.notification.close();
 
@@ -185,7 +175,6 @@ self.addEventListener('sync', (event) => {
   if (event.tag === 'background-sync') {
     event.waitUntil(
       // 오프라인에서 작성한 데이터 동기화
-      console.log('[SW] 백그라운드 동기화 실행')
     );
   }
 });

@@ -33,7 +33,6 @@ class PWAManager {
     if ('serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
-        console.log('✅ Service Worker 등록 성공:', registration.scope);
         
         // 업데이트 확인
         registration.addEventListener('updatefound', () => {
@@ -49,7 +48,6 @@ class PWAManager {
         });
         
       } catch (error) {
-        console.error('❌ Service Worker 등록 실패:', error);
       }
     }
   }
@@ -57,7 +55,6 @@ class PWAManager {
   // 설치 프롬프트 설정
   private setupInstallPrompt() {
     window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('📱 PWA 설치 프롬프트 사용 가능');
       e.preventDefault(); // 기본 프롬프트 방지
       this.deferredPrompt = e as BeforeInstallPromptEvent;
       
@@ -67,7 +64,6 @@ class PWAManager {
 
     // 설치 완료 이벤트
     window.addEventListener('appinstalled', () => {
-      console.log('🎉 PWA 설치 완료!');
       this.isInstalled = true;
       this.hideInstallButton();
       this.deferredPrompt = null;
@@ -79,20 +75,17 @@ class PWAManager {
     // 스탠드얼론 모드인지 확인 (설치된 상태)
     if (window.matchMedia('(display-mode: standalone)').matches) {
       this.isInstalled = true;
-      console.log('📱 PWA가 이미 설치되어 있음');
     }
 
     // iOS Safari 홈화면 추가 확인
     if ((window.navigator as any).standalone === true) {
       this.isInstalled = true;
-      console.log('🍎 iOS에서 홈화면에 추가됨');
     }
   }
 
   // PWA 설치 실행
   public async installPWA(): Promise<boolean> {
     if (!this.deferredPrompt) {
-      console.log('❌ 설치 프롬프트를 사용할 수 없음');
       return false;
     }
 
@@ -104,14 +97,11 @@ class PWAManager {
       const { outcome } = await this.deferredPrompt.userChoice;
       
       if (outcome === 'accepted') {
-        console.log('✅ 사용자가 PWA 설치를 수락함');
         return true;
       } else {
-        console.log('❌ 사용자가 PWA 설치를 거부함');
         return false;
       }
     } catch (error) {
-      console.error('❌ PWA 설치 중 오류:', error);
       return false;
     } finally {
       this.deferredPrompt = null;
@@ -150,7 +140,6 @@ class PWAManager {
   // Push 알림 권한 요청
   public async requestNotificationPermission(): Promise<NotificationPermission> {
     if (!('Notification' in window)) {
-      console.log('❌ 이 브라우저는 알림을 지원하지 않음');
       return 'denied';
     }
 
@@ -179,10 +168,8 @@ class PWAManager {
         )
       });
 
-      console.log('✅ Push 구독 성공:', subscription);
       return subscription;
     } catch (error) {
-      console.error('❌ Push 구독 실패:', error);
       return null;
     }
   }
