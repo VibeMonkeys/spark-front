@@ -161,7 +161,7 @@ export function RewardsPage() {
           {/* Reward Shop */}
           <TabsContent value="shop" className="space-y-4 mt-1">
             {/* Category Filter */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               <Button
                 variant={selectedCategory === "all" ? "default" : "outline"}
                 size="sm"
@@ -190,54 +190,53 @@ export function RewardsPage() {
             {/* Rewards Grid */}
             <div className="space-y-4">
               {filteredRewards.map((reward) => (
-                <Card key={reward.id} className="border-0 bg-white backdrop-blur-sm overflow-hidden relative">
-                  {reward.popular && (
-                    <div className="absolute top-3 left-3 z-10">
-                      <Badge className="bg-red-500 text-white border-0">
-                        <Zap className="size-3 mr-1" />
-                        인기
+                <Card key={reward.id} className="border-0 bg-white backdrop-blur-sm overflow-hidden relative p-3">
+                  {/* 인기/프리미엄 배지 - 오른쪽 정렬로 배치 */}
+                  <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
+                    {reward.popular && (
+                      <Badge className="bg-red-500 text-white border-0 text-xs px-2 py-0.5">
+                        <Zap className="size-3 mr-1 flex-shrink-0" />
+                        <span>인기</span>
                       </Badge>
-                    </div>
-                  )}
-                  {reward.is_premium && (
-                    <div className="absolute top-3 left-3 z-10">
-                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0">
-                        <Crown className="size-3 mr-1" />
-                        프리미엄
+                    )}
+                    {reward.is_premium && (
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 text-xs px-2 py-0.5">
+                        <Crown className="size-3 mr-1 flex-shrink-0" />
+                        <span>프리미엄</span>
                       </Badge>
-                    </div>
-                  )}
+                    )}
+                  </div>
                   
-                  <div className="flex">
-                    <ImageWithFallback
-                      src={reward.image_url}
-                      alt={reward.title}
-                      className="w-24 h-24 object-cover flex-shrink-0"
-                    />
-                    <CardContent className="p-4 flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          {reward.discount && (
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                                {reward.discount}
-                              </Badge>
-                            </div>
-                          )}
-                          <h3 className="font-semibold text-sm">{reward.title}</h3>
-                          <p className="text-xs text-muted-foreground mb-2">{reward.description}</p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Clock className="size-3" />
-                            <span>유효기간: {reward.expires}</span>
-                          </div>
+                  <div className="flex items-center gap-4">
+                    {/* 이미지 영역 - 더 큰 크기로 조정 */}
+                    <div className="w-24 h-24 flex-shrink-0 overflow-hidden bg-gray-100 rounded-xl shadow-sm">
+                      <ImageWithFallback
+                        src={reward.image_url}
+                        alt={reward.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="mb-3">
+                        {reward.discount && (
+                          <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 px-2 py-0.5 mb-2">
+                            {reward.discount}
+                          </Badge>
+                        )}
+                        <h3 className="font-semibold text-sm leading-tight mb-1">{reward.title}</h3>
+                        <p className="text-xs text-muted-foreground mb-2 leading-relaxed">{reward.description}</p>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="size-3 flex-shrink-0" />
+                          <span>유효기간: {reward.expires}</span>
                         </div>
                       </div>
                       
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="flex items-center gap-1 text-purple-600">
-                            <Star className="size-4 fill-current" />
-                            <span className="font-bold">{reward.points.toLocaleString()}</span>
+                            <Star className="size-4 fill-current flex-shrink-0" />
+                            <span className="font-bold text-sm">{reward.points.toLocaleString()}</span>
                           </div>
                           {reward.original_price && (
                             <span className="text-xs text-muted-foreground line-through">
@@ -248,16 +247,17 @@ export function RewardsPage() {
                         <Button
                           size="sm"
                           disabled={!canAfford(reward.points) || exchangeMutation.isPending}
-                          className={canAfford(reward.points) 
-                            ? "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600" 
-                            : "opacity-50"
-                          }
+                          className={`flex-shrink-0 text-white font-medium transition-all duration-200 text-xs px-3 py-1.5 h-auto ${
+                            canAfford(reward.points) 
+                              ? "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 shadow-md hover:shadow-lg" 
+                              : "bg-gray-400 text-gray-100 cursor-not-allowed"
+                          }`}
                           onClick={() => handleExchangeReward(reward.id)}
                         >
                           {exchangeMutation.isPending ? "교환 중..." : canAfford(reward.points) ? "교환하기" : "포인트 부족"}
                         </Button>
                       </div>
-                    </CardContent>
+                    </div>
                   </div>
                 </Card>
               ))}
