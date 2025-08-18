@@ -25,12 +25,12 @@ export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
   // 드래그 중 또는 새로고침 중 스피너의 Y 위치 계산
   const getSpinnerPosition = () => {
     if (isRefreshing) {
-      // 새로고침 중: 80px 위치에서 스피너 돌림
-      return 80;
+      // 새로고침 중: 100px 위치에서 스피너 돌림
+      return 100;
     } else if (isPulling) {
-      // 드래그 중: pullDistance * 0.6 비율로 따라옴 (더 강한 저항감)
-      // 최대 threshold까지만 내려가도록 제한
-      return Math.min(pullDistance * 0.6, threshold);
+      // 드래그 중: pullDistance * 0.8 비율로 더 잘 따라옴
+      // 최대 threshold * 1.2까지 내려가도록 확장
+      return Math.min(pullDistance * 0.8, threshold * 1.2);
     }
     return -50; // 초기 위치는 위에 숨김
   };

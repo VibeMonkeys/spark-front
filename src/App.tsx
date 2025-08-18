@@ -509,8 +509,9 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
   // 배경 드래그 효과를 위한 transform 계산
   const getBackgroundTransform = () => {
     if (pullToRefreshState.isRefreshing || !pullToRefreshState.isPulling) return 0;
-    // 드래그할수록 배경도 아래로 (더 격하게!)
-    return Math.min(pullToRefreshState.pullDistance * 0.7, 80);
+    // 드래그할수록 배경도 아래로 (훨씬 더 강하게!)
+    // 0.9 비율 + 최대 120px로 더 격한 드래그 효과
+    return Math.min(pullToRefreshState.pullDistance * 0.9, 120);
   };
 
   const backgroundTransform = getBackgroundTransform();
@@ -537,25 +538,18 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
         </Suspense>
       </div>
       
-      {/* 하단 네비게이션 - 드래그 시 같이 움직임 */}
+      {/* 하단 네비게이션 - 항상 고정 위치 */}
       {currentView === "main" && (
-        <div 
-          className="transition-transform duration-200 ease-out"
-          style={{
-            transform: `translateY(${backgroundTransform}px)`
-          }}
-        >
-          <Suspense fallback={
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 text-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-            </div>
-          }>
-            <NavigationBar
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
-          </Suspense>
-        </div>
+        <Suspense fallback={
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 text-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+          </div>
+        }>
+          <NavigationBar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        </Suspense>
       )}
       
       {/* 알림 모달 */}
