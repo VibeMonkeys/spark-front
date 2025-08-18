@@ -39,7 +39,7 @@ const getCategoryIcon = (category: string) => {
   return icons[category] || Target;
 };
 
-// 토스 스타일 미니멀 테마
+// 미니멀 테마
 const getCategoryTheme = (category: string) => {
   return {
     bg: "bg-white",
@@ -298,170 +298,140 @@ export function MissionDetail({
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-green-50">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-100">
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-white/20">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={onBack} className="p-2 hover:bg-gray-100">
-            <ArrowLeft className="size-5 text-gray-700" />
+          <Button variant="ghost" size="sm" onClick={onBack} className="p-2 hover:bg-gray-50">
+            <ArrowLeft className="size-5" />
           </Button>
-          <h1 className="font-semibold text-xl text-gray-900">미션 상세</h1>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">미션 상세</h1>
         </div>
       </header>
 
       <div className="max-w-md mx-auto px-4 pt-6 pb-4">
-        {/* Mission Header Card - 홈 스타일 */}
-        <div className="mb-5">
-          <Card className={`overflow-hidden hover:shadow-lg transition-all duration-200 border border-gray-100 bg-white shadow-sm rounded-2xl`}>
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                {/* Left: Title */}
-                <div className="flex-1 min-w-0">
-                  <h2 className={`font-semibold text-xl text-gray-900 leading-tight mb-2`}>
-                    {missionData.title}
-                  </h2>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm text-blue-700 bg-blue-50 px-2 py-1 rounded-md font-medium border border-blue-100">
-                      {getCategoryText(missionData.category)}
-                    </span>
-                    <span className="text-sm text-gray-600 font-medium">
-                      {getDifficultyText(missionData.difficulty)}
-                    </span>
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <Timer className="size-4" />
-                      <span>{missionData.duration}</span>
-                    </div>
+        {/* Mission Header Card */}
+        <div className="mb-6">
+          <div className="bg-white rounded-3xl border-0 overflow-hidden">
+            {/* 메인 콘텐츠 영역 */}
+            <div className="px-6 pt-8 pb-6">
+              {/* 카테고리 태그 */}
+              <div className="mb-4">
+                <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700 bg-gray-50 px-3 py-1.5 rounded-full">
+                  {React.createElement(getCategoryIcon(missionData.category), { className: "size-4" })}
+                  {getCategoryText(missionData.category)}
+                </span>
+              </div>
+              
+              {/* 타이틀 */}
+              <h1 className="text-2xl font-bold text-gray-900 leading-tight mb-6 tracking-tight">
+                {missionData.title}
+              </h1>
+              
+              {/* 핵심 정보 그리드 */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600 mb-1">
+                    +{missionData.reward_points}
+                  </div>
+                  <div className="text-xs text-gray-500 font-medium">포인트</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600 mb-1">
+                    +2
+                  </div>
+                  <div className="text-xs text-gray-500 font-medium">스탯</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    {missionData.duration?.replace(/[^0-9]/g, '') || '15'}
+                  </div>
+                  <div className="text-xs text-gray-500 font-medium">분</div>
+                </div>
+              </div>
+              
+              {/* 부가 정보 */}
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-4">
+                  <span className="text-gray-600">
+                    <span className="font-medium text-gray-900">{getDifficultyText(missionData.difficulty)}</span> 난이도
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 text-gray-500">
+                  <Clock className="size-4" />
+                  <span>{missionData.duration}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* 하단 액션 영역 */}
+            <div className="px-6 pb-6">
+              <div className="h-px bg-gray-100 mb-6"></div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <Users className="size-4" />
+                    <span>{missionDetail.completed_by?.toLocaleString() || 0}명 완료</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Star className="size-4 text-yellow-500" />
+                    <span>{missionDetail.average_rating || 4.5}</span>
                   </div>
                 </div>
-                
-                {/* Right: Points */}
-                <div className="flex flex-col items-end gap-2">
-                  <div className="flex items-center gap-1 bg-gray-100 text-gray-700 rounded-md px-2 py-1 border border-gray-200">
-                    <Trophy className="size-4" />
-                    <span className="text-sm font-medium">+{missionData.reward_points}P</span>
-                  </div>
-                  <div className="flex items-center gap-1 bg-blue-100 text-blue-700 rounded-md px-2 py-1 border border-blue-200">
-                    <span className="text-sm font-medium">스탯+2</span>
+                <div className="text-right">
+                  <div className="text-xs text-gray-500 mb-1">성공률</div>
+                  <div className="text-lg font-bold text-green-600">
+                    {missionDetail.success_rate || 85}%
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Mission Stats */}
-        <div className="mb-5">
-          <div className="grid grid-cols-3 gap-3">
-            <Card className="border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <div className="size-10 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center">
-                    <Users className="size-5 text-blue-600" />
-                  </div>
-                </div>
-                <div className="text-lg font-bold text-blue-600 mb-1">{missionDetail.completed_by?.toLocaleString() || 0}</div>
-                <p className="text-xs text-gray-600 font-medium">명 완료</p>
-              </CardContent>
-            </Card>
-            <Card className="border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <div className="size-10 bg-green-50 border border-green-100 rounded-xl flex items-center justify-center">
-                    <TrendingUp className="size-5 text-green-600" />
-                  </div>
-                </div>
-                <div className="text-lg font-bold text-green-600 mb-1">{missionDetail.success_rate || 0}%</div>
-                <p className="text-xs text-gray-600 font-medium">성공률</p>
-              </CardContent>
-            </Card>
-            <Card className="border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <div className="size-10 bg-purple-50 border border-purple-100 rounded-xl flex items-center justify-center">
-                    <Target className="size-5 text-purple-600" />
-                  </div>
-                </div>
-                <div className="text-lg font-bold text-purple-600 mb-1">{getDifficultyText(missionData.difficulty)}</div>
-                <p className="text-xs text-gray-600 font-medium">난이도</p>
-              </CardContent>
-            </Card>
+            </div>
           </div>
         </div>
 
-        {/* Mission Description */}
-        <section className="mb-5">
-          <Card className="border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-200 rounded-2xl">
-            <CardContent className="p-5">
-              <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
-                <div className="size-9 bg-orange-50 border border-orange-100 rounded-xl flex items-center justify-center">
-                  <Zap className="size-4 text-orange-600" />
-                </div>
-                <span className="text-gray-900">미션 소개</span>
-              </h3>
-              <p className="text-gray-700 leading-relaxed text-base">{missionData.description}</p>
-            </CardContent>
-          </Card>
-        </section>
+        {/* Mission Description - 토스 스타일 */}
+        <div className="mb-6">
+          <div className="bg-white rounded-3xl px-6 py-6">
+            <h3 className="font-semibold text-lg text-gray-900 mb-4">미션 설명</h3>
+            <p className="text-gray-700 leading-relaxed text-base">{missionData.description}</p>
+          </div>
+        </div>
 
-
-        {/* Mission Action Button */}
-        <div className="mb-5">
+        {/* Mission Action Button - 토스 스타일 */}
+        <div className="mb-6">
           {!isInProgress ? (
             <Button 
               onClick={handleStartMission}
               disabled={startMissionMutation.isPending || !dailyLimit?.can_start}
-              className={`w-full relative overflow-hidden font-semibold border-0 shadow-xl hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 ease-out h-16 rounded-2xl group ${
+              className={`w-full h-14 rounded-2xl font-semibold text-base transition-all duration-200 ${
                 dailyLimit?.can_start 
-                  ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white" 
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm" 
+                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
               }`}
-              size="lg"
             >
-              {/* 배경 애니메이션 효과 */}
-              {dailyLimit?.can_start && (
-                <>
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  
-                  {/* 빛나는 효과 */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
-                </>
+              {startMissionMutation.isPending ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  미션 시작 중...
+                </div>
+              ) : !dailyLimit?.can_start ? (
+                "일일 제한 도달 (3/3)"
+              ) : (
+                "미션 시작하기"
               )}
-              
-              {/* 버튼 내용 */}
-              <div className="relative flex items-center justify-center gap-3">
-                {startMissionMutation.isPending ? (
-                  <>
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                    <span className="text-lg">미션 시작 중...</span>
-                  </>
-                ) : !dailyLimit?.can_start ? (
-                  <>
-                    <span className="text-lg">일일 제한 도달 (3/3)</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="relative">
-                      <PlayCircle className="size-6 drop-shadow-lg" />
-                      <div className="absolute inset-0 bg-white/30 rounded-full animate-ping"></div>
-                    </div>
-                    <span className="text-lg tracking-wide">🚀 미션 시작하기</span>
-                  </>
-                )}
-              </div>
             </Button>
           ) : (
-            <div className="space-y-3">
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="space-y-4">
+              <div className="bg-green-50 rounded-2xl p-4">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="size-5 text-green-500" />
+                  <CheckCircle className="size-5 text-green-600" />
                   <div>
-                    <p className="font-medium text-green-700">미션이 시작되었습니다!</p>
+                    <p className="font-medium text-green-800">미션이 시작되었습니다!</p>
                     <p className="text-sm text-green-600">언제든지 아래 버튼으로 인증하세요.</p>
                   </div>
                 </div>
               </div>
               <Button 
                 onClick={onVerifyMission}
-                className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 border-0 shadow-lg transform hover:scale-105 transition-all duration-200 h-14"
-                size="lg"
+                className="w-full h-14 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-semibold text-base transition-all duration-200"
               >
                 <Camera className="size-5 mr-2" />
                 인증하기

@@ -42,9 +42,16 @@ interface AppContentProps {
 function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContentProps) {
   const { user, isLoading, login } = useAuth();
   const queryClient = useQueryClient();
-  const [currentView, setCurrentView] = useState("main"); // "main", "mission-detail", "mission-verification", "mission-success", "profile-edit", "settings", "password-change", "help", "app-info"
+  // 새로고침 시에도 현재 뷰 상태 복원
+  const [currentView, setCurrentView] = useState(() => {
+    const savedView = localStorage.getItem('currentView');
+    return savedView || "main";
+  });
   const [previousView, setPreviousView] = useState<string>("main"); // 이전 뷰 추적
-  const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null);
+  const [selectedMissionId, setSelectedMissionId] = useState<number | null>(() => {
+    const savedMissionId = localStorage.getItem('selectedMissionId');
+    return savedMissionId ? parseInt(savedMissionId) : null;
+  });
   const [missionResult, setMissionResult] = useState<{
     pointsEarned: number;
     streakCount: number;
@@ -188,10 +195,13 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
       
       // 알림 없이 바로 미션 탭으로 이동
       
-      // 미션 탭으로 이동
+      // 이전 탭으로 복원하거나 기본적으로 missions 탭으로 이동
       setCurrentView("main");
-      setActiveTab("missions");
+      localStorage.setItem('currentView', 'main');
+      const lastTab = localStorage.getItem('lastActiveTab') || 'missions';
+      setActiveTab(lastTab);
       setSelectedMissionId(null);
+      localStorage.removeItem('selectedMissionId');
     },
     onError: (error: any) => {
       console.error('❌ [App] Mission start failed:', error);
@@ -220,7 +230,8 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
             '미션 확인하기',
             () => {
               setCurrentView("main");
-              setActiveTab("missions");
+              const lastTab = localStorage.getItem('lastActiveTab') || 'missions';
+              setActiveTab(lastTab);
               setSelectedMissionId(null);
             }
           );
@@ -278,6 +289,7 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
   const navigateToView = (newView: string) => {
     setPreviousView(currentView);
     setCurrentView(newView);
+    localStorage.setItem('currentView', newView);
   };
 
   const handleMissionVerify = () => {
@@ -306,17 +318,27 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
 
   const handleBackToMain = () => {
     setCurrentView("main");
-    setActiveTab("home");
+    localStorage.setItem('currentView', 'main');
+    // 이전 탭으로 복원 (기본값은 home)
+    const lastTab = localStorage.getItem('lastActiveTab') || 'home';
+    setActiveTab(lastTab);
     setSelectedMissionId(null);
+    localStorage.removeItem('selectedMissionId');
     setMissionResult(null);
   };
 
   const handleMissionSelect = (missionId: number) => {
+    // 현재 탭을 localStorage에 저장
+    localStorage.setItem('lastActiveTab', activeTab);
     setSelectedMissionId(missionId);
+    localStorage.setItem('selectedMissionId', missionId.toString());
     setCurrentView("mission-detail");
+    localStorage.setItem('currentView', 'mission-detail');
   };
 
   const handleMissionContinue = (missionId: number) => {
+    // 현재 탭을 localStorage에 저장
+    localStorage.setItem('lastActiveTab', activeTab);
     setSelectedMissionId(missionId);
     navigateToView("mission-verification");
   };
@@ -406,7 +428,8 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
           onShowNotification={showNotification}
           onNavigateToMissions={() => {
             setCurrentView("main");
-            setActiveTab("missions");
+            const lastTab = localStorage.getItem('lastActiveTab') || 'missions';
+            setActiveTab(lastTab);
             setSelectedMissionId(null);
           }}
         />
