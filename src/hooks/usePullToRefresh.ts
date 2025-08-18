@@ -71,7 +71,13 @@ export const usePullToRefresh = ({
       if (!state.isPulling) return;
 
       if (state.canRefresh && !state.isRefreshing) {
-        setState(prev => ({ ...prev, isRefreshing: true }));
+        // 새로고침 상태로 전환
+        setState(prev => ({ 
+          ...prev, 
+          isRefreshing: true,
+          isPulling: false,
+          pullDistance: 0
+        }));
         
         try {
           await onRefresh();
@@ -79,16 +85,24 @@ export const usePullToRefresh = ({
           console.error('Pull to refresh failed:', error);
         }
         
-        setState(prev => ({ ...prev, isRefreshing: false }));
+        // 새로고침 완료 후 잠깐 기다렸다가 상태 초기화
+        setTimeout(() => {
+          setState({
+            isPulling: false,
+            pullDistance: 0,
+            isRefreshing: false,
+            canRefresh: false
+          });
+        }, 300); // 300ms 후 스피너 사라짐
+      } else {
+        // 새로고침 조건 미달성 시 즉시 상태 초기화
+        setState({
+          isPulling: false,
+          pullDistance: 0,
+          isRefreshing: false,
+          canRefresh: false
+        });
       }
-
-      // 상태 초기화
-      setState({
-        isPulling: false,
-        pullDistance: 0,
-        isRefreshing: false,
-        canRefresh: false
-      });
     };
 
     // 터치 이벤트 등록
