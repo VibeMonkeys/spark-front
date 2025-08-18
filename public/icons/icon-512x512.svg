@@ -1,0 +1,41 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sparkGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#2563eb"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 둥근 사각형 배경 (로그인 화면과 동일) -->
+  <rect width="512" height="512" rx="85" fill="url(#sparkGrad512)"/>
+  
+  <!-- Sparkles 아이콘 (✨ 모양) -->
+  <g transform="translate(256,256)" fill="white">
+    <!-- 메인 별 (십자가 모양) -->
+    <rect x="-16" y="-64" width="32" height="128" />
+    <rect x="-64" y="-16" width="128" height="32" />
+    
+    <!-- 대각선들 -->
+    <g transform="rotate(45)">
+      <rect x="-8" y="-42" width="16" height="84" />
+      <rect x="-42" y="-8" width="84" height="16" />
+    </g>
+    
+    <!-- 작은 별들 -->
+    <g transform="translate(85,-64)">
+      <rect x="-25" y="-1" width="50" height="2" />
+      <rect x="-1" y="-25" width="2" height="50" />
+    </g>
+    
+    <g transform="translate(-102,64)">
+      <rect x="-25" y="-1" width="50" height="2" />
+      <rect x="-1" y="-25" width="2" height="50" />
+    </g>
+    
+    <g transform="translate(64,85)">
+      <rect x="-12" y="-1" width="25" height="2" />
+      <rect x="-1" y="-12" width="2" height="25" />
+    </g>
+  </g>
+  
+</svg>
