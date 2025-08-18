@@ -110,6 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('auth_token', authData.token);
     localStorage.setItem('refresh_token', authData.refreshToken);
     
+    // 로그인 후 스크롤을 최상단으로 이동
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 100);
   };
 
   const logout = async () => {
