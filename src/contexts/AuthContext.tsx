@@ -143,6 +143,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 모든 localStorage 데이터 정리
     localStorage.clear();
     
+    // 로그아웃 후에도 홈 탭으로 초기화 (다음 로그인을 위해)
+    localStorage.setItem('activeTab', 'home');
+    localStorage.setItem('currentView', 'main');
+    
     // 로컬 상태 및 저장소 정리
     setUser(null);
     setToken(null);
@@ -161,6 +165,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     // 모든 localStorage 데이터 정리 (서버 호출 없이)
     localStorage.clear();
+    
+    // 강제 로그아웃 후에도 홈 탭으로 초기화 (다음 로그인을 위해)
+    localStorage.setItem('activeTab', 'home');
+    localStorage.setItem('currentView', 'main');
     
     // 로컬 상태 정리
     setUser(null);
