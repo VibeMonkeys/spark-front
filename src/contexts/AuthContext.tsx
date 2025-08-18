@@ -140,12 +140,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // API 호출이 실패해도 로컬에서는 로그아웃 처리
     }
     
-    // 모든 localStorage 데이터 정리
+    // 모든 localStorage 데이터 정리 (완전 삭제)
     localStorage.clear();
-    
-    // 로그아웃 후에도 홈 탭으로 초기화 (다음 로그인을 위해)
-    localStorage.setItem('activeTab', 'home');
-    localStorage.setItem('currentView', 'main');
     
     // 로컬 상태 및 저장소 정리
     setUser(null);
@@ -163,12 +159,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const forceLogout = (reason?: string) => {
     console.warn('⚠️ [AuthContext] Force logout triggered:', reason);
     
-    // 모든 localStorage 데이터 정리 (서버 호출 없이)
+    // 모든 localStorage 데이터 정리 (완전 삭제)
     localStorage.clear();
-    
-    // 강제 로그아웃 후에도 홈 탭으로 초기화 (다음 로그인을 위해)
-    localStorage.setItem('activeTab', 'home');
-    localStorage.setItem('currentView', 'main');
     
     // 로컬 상태 정리
     setUser(null);

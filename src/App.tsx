@@ -44,6 +44,9 @@ interface AppContentProps {
 
 function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContentProps) {
   const { user, isLoading, login, forceLogout, onStateReset } = useAuth();
+  
+  // 사용자 인증 상태가 변경될 때마다 상태 초기화 (로그인/로그아웃 시)
+  const [isUserChanged, setIsUserChanged] = useState(false);
 
   // API 에러 시 자동 로그아웃 콜백 등록
   useEffect(() => {
@@ -90,10 +93,23 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
   } | null>(null);
   const [selectedSettingsSection, setSelectedSettingsSection] = useState<string | null>(null);
 
-  // 탭 상태를 localStorage에서 복원
+  // 탭 상태를 localStorage에서 복원 (사용자 인증 상태 고려)
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem('activeTab') || 'home';
+    // 로그인된 사용자가 있으면 localStorage에서 복원, 없으면 홈
+    if (user) {
+      return localStorage.getItem('activeTab') || 'home';
+    }
+    return 'home';
   });
+  
+  // 사용자 로그인/로그아웃 상태 변경 시 탭 초기화
+  useEffect(() => {
+    if (!user) {
+      // 로그아웃 상태에서는 홈 탭으로 강제 설정
+      setActiveTab('home');
+      setCurrentView('main');
+    }
+  }, [user]);
 
   // 스크롤 위치 저장을 위한 ref
   const scrollPositions = useRef<Record<string, number>>(() => {
