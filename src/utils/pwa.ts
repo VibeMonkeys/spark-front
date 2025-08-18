@@ -31,6 +31,16 @@ class PWAManager {
   // Service Worker 등록
   private async registerServiceWorker() {
     if ('serviceWorker' in navigator) {
+      // 개발 중에는 Service Worker 캐시 문제를 방지하기 위해 비활성화
+      if (import.meta.env.DEV) {
+        // 기존 Service Worker 제거
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for(let registration of registrations) {
+          await registration.unregister();
+        }
+        return;
+      }
+      
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
         

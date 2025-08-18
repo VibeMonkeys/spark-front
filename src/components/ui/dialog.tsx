@@ -53,19 +53,21 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
     if (!open) return null;
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <div className="pointer-events-auto">
-        <div
-          ref={ref}
-          className={cn(
-            "relative bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden",
-            className
-          )}
-          onClick={(e) => e.stopPropagation()}
-          {...props}
-        >
-          {children}
-        </div>
+      <div className="fixed inset-0 z-50 pointer-events-none">
+        <div className="flex items-center justify-center min-h-screen p-4 pointer-events-none">
+          <div className="pointer-events-auto">
+            <div
+              ref={ref}
+              className={cn(
+                "relative bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden",
+                className
+              )}
+              onClick={(e) => e.stopPropagation()}
+              {...props}
+            >
+              {children}
+            </div>
+          </div>
         </div>
       </div>
     );

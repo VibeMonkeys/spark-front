@@ -509,9 +509,9 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
   // 배경 드래그 효과를 위한 transform 계산
   const getBackgroundTransform = () => {
     if (pullToRefreshState.isRefreshing || !pullToRefreshState.isPulling) return 0;
-    // 드래그할수록 배경도 아래로 (훨씬 더 강하게!)
-    // 0.9 비율 + 최대 120px로 더 격한 드래그 효과
-    return Math.min(pullToRefreshState.pullDistance * 0.9, 120);
+    // 드래그할수록 배경도 아래로 (극강 드래그!)
+    // 1.0 비율 + 최대 160px로 극강 드래그 효과
+    return Math.min(pullToRefreshState.pullDistance * 1.0, 160);
   };
 
   const backgroundTransform = getBackgroundTransform();
