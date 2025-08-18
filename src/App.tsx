@@ -50,7 +50,7 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
     setForceLogoutCallback(forceLogout);
   }, [forceLogout]);
 
-  // AuthContext에 상태 리셋 콜백 등록
+  // AuthContext에 상태 리셋 콜백 등록 (최초 한 번만)
   useEffect(() => {
     const resetAppState = () => {
       // 홈 탭으로 리셋
@@ -70,7 +70,7 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
     if (onStateReset) {
       onStateReset(resetAppState);
     }
-  }, [onStateReset]);
+  }, []); // onStateReset 의존성 제거하여 한 번만 실행
   const queryClient = useQueryClient();
   // 새로고침 시에도 현재 뷰 상태 복원
   const [currentView, setCurrentView] = useState(() => {

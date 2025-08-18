@@ -119,15 +119,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('lastActiveTab');
     localStorage.removeItem('scrollPositions');
     
-    // App 컴포넌트 상태 리셋 콜백 호출
-    if (onStateReset) {
-      onStateReset();
-    }
-    
-    // 로그인 후 스크롤을 최상단으로 이동
+    // App 컴포넌트 상태 리셋 콜백 호출 (비동기로 처리)
     setTimeout(() => {
+      if (onStateReset) {
+        onStateReset();
+      }
+      // 로그인 후 스크롤을 최상단으로 이동
       window.scrollTo(0, 0);
-    }, 100);
+    }, 0);
   };
 
   const logout = async () => {
@@ -149,10 +148,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setRefreshToken(null);
     
-    // App 컴포넌트 상태 리셋 콜백 호출
-    if (onStateReset) {
-      onStateReset();
-    }
+    // App 컴포넌트 상태 리셋 콜백 호출 (비동기로 처리)
+    setTimeout(() => {
+      if (onStateReset) {
+        onStateReset();
+      }
+    }, 0);
   };
 
   const forceLogout = (reason?: string) => {
@@ -166,10 +167,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(null);
     setRefreshToken(null);
     
-    // App 컴포넌트 상태 리셋 콜백 호출
-    if (onStateReset) {
-      onStateReset();
-    }
+    // App 컴포넌트 상태 리셋 콜백 호출 (비동기로 처리)
+    setTimeout(() => {
+      if (onStateReset) {
+        onStateReset();
+      }
+    }, 0);
   };
 
   const refreshUser = async () => {
