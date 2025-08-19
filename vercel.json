@@ -10,7 +10,7 @@
       "destination": "/assets/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!assets|icons|sw\\.js|manifest\\.json).*)",
       "destination": "/index.html"
     }
   ],
