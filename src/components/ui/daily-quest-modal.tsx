@@ -198,12 +198,22 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                 />
               </div>
               {/* Progress Scale */}
-              <div className="flex justify-between mt-1 px-1">
-                <span className="text-xs text-gray-400 font-medium">0</span>
-                <span className="text-xs text-gray-400 font-medium">25</span>
-                <span className="text-xs text-gray-400 font-medium">50</span>
-                <span className="text-xs text-gray-400 font-medium">75</span>
-                <span className="text-xs text-gray-400 font-medium">100</span>
+              <div className="relative mt-1 mb-4">
+                <div className="absolute left-0 top-0">
+                  <span className="text-xs text-gray-400 font-medium">0</span>
+                </div>
+                <div className="absolute left-1/4 top-0 -translate-x-1/2">
+                  <span className="text-xs text-gray-400 font-medium">25</span>
+                </div>
+                <div className="absolute left-1/2 top-0 -translate-x-1/2">
+                  <span className="text-xs text-gray-400 font-medium">50</span>
+                </div>
+                <div className="absolute left-3/4 top-0 -translate-x-1/2">
+                  <span className="text-xs text-gray-400 font-medium">75</span>
+                </div>
+                <div className="absolute right-0 top-0">
+                  <span className="text-xs text-gray-400 font-medium">100</span>
+                </div>
               </div>
             </div>
           </div>
