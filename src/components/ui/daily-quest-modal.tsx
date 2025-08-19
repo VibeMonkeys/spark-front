@@ -89,7 +89,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
   if (isLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[360px] h-[520px] mx-auto bg-white rounded-3xl border-0 shadow-2xl">
+        <DialogContent className="w-[371px] h-[520px] mx-auto bg-white rounded-3xl border-0 shadow-2xl">
           <div className="flex flex-col items-center justify-center p-8">
             <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg flex items-center justify-center mb-3">
               <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -106,7 +106,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[360px] h-[520px] mx-auto overflow-hidden flex flex-col bg-white rounded-3xl border-0 shadow-2xl p-0">
+      <DialogContent className="w-[371px] h-[520px] mx-auto overflow-hidden flex flex-col bg-white rounded-3xl border-0 shadow-2xl p-0">
         {/* Modern Header */}
         <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-4 py-3">
           <Button 

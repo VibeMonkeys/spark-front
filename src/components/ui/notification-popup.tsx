@@ -225,11 +225,7 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
                   size="sm"
                   className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
                   disabled={isLoading}
-                  onClick={() => {
-                    if (confirm('모든 알림을 삭제하시겠습니까?')) {
-                      deleteAllNotifications();
-                    }
-                  }}
+                  onClick={deleteAllNotifications}
                 >
                   {isLoading ? (
                     <Loader2 className="size-4 mr-1 animate-spin" />
