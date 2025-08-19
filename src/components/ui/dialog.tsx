@@ -38,7 +38,7 @@ export const Dialog = ({ open = false, onOpenChange = () => {}, children }: Dial
       {children}
       {open && (
         <div 
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[45] bg-black/60 backdrop-blur-md"
           onClick={() => onOpenChange(false)}
         />
       )}
@@ -54,7 +54,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
 
     return (
       <div className="fixed inset-0 z-50 pointer-events-none">
-        <div className="flex items-center justify-center min-h-screen p-4 pointer-events-none">
+        <div className="flex items-start justify-center min-h-screen pt-24 p-4 pointer-events-none">
           <div className="pointer-events-auto">
             <div
               ref={ref}
@@ -62,7 +62,6 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
                 "relative bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-hidden",
                 className
               )}
-              onClick={(e) => e.stopPropagation()}
               {...props}
             >
               {children}
