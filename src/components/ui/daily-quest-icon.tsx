@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { CheckSquare, Target, Sparkles } from 'lucide-react';
-import { Button } from './button';
 import { useDailyQuests } from '../../hooks/useDailyQuests';
 import { DailyQuestModal } from './daily-quest-modal';
 
@@ -13,6 +12,11 @@ export const DailyQuestIcon: React.FC<DailyQuestIconProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { currentProgress, completedQuests, totalQuests, hasUnlockedReward, isLoading } = useDailyQuests();
+
+  // Debug modal state changes
+  React.useEffect(() => {
+    console.log('🎯 [DailyQuestIcon] Modal state changed:', isModalOpen);
+  }, [isModalOpen]);
 
   // 진행률에 따른 아이콘 색상과 상태 결정
   const getIconState = () => {
@@ -92,14 +96,22 @@ export const DailyQuestIcon: React.FC<DailyQuestIconProps> = ({
 
   return (
     <div className={`relative ${className}`}>
-      <Button
-        variant="ghost"
-        size="sm"
-        className={`p-2 h-8 w-8 rounded-full border transition-all duration-200 hover:scale-105 ${iconState.bgColor} ${iconState.borderColor} hover:bg-opacity-80`}
-        onClick={() => setIsModalOpen(true)}
+      <button
+        type="button"
+        className={`p-2 h-8 w-8 rounded-full border transition-all duration-200 hover:scale-105 cursor-pointer ${iconState.bgColor} ${iconState.borderColor} hover:bg-opacity-80`}
+        onClick={(e) => {
+          console.log('🎯 [DailyQuestIcon] Button clicked!', { 
+            isModalOpen, 
+            buttonElement: e.target,
+            isDisabled: e.currentTarget.disabled 
+          });
+          e.preventDefault();
+          e.stopPropagation();
+          setIsModalOpen(true);
+        }}
       >
         <IconComponent className={`size-4 ${iconState.iconColor}`} />
-      </Button>
+      </button>
 
       {/* 진행 상태 배지 */}
       {iconState.showBadge && (
@@ -110,7 +122,7 @@ export const DailyQuestIcon: React.FC<DailyQuestIconProps> = ({
 
       {/* 진행률 링 (100% 완료가 아닐 때만 표시) */}
       {currentProgress < 100 && currentProgress > 0 && (
-        <div className="absolute inset-0 rounded-full">
+        <div className="absolute inset-0 rounded-full pointer-events-none">
           <svg className="size-8 transform -rotate-90" viewBox="0 0 32 32">
             <circle
               cx="16"
@@ -138,7 +150,7 @@ export const DailyQuestIcon: React.FC<DailyQuestIconProps> = ({
 
       {/* Special effect for completed quests */}
       {currentProgress === 100 && hasUnlockedReward && (
-        <div className="absolute inset-0 rounded-full animate-pulse bg-yellow-400 opacity-20"></div>
+        <div className="absolute inset-0 rounded-full animate-pulse bg-yellow-400 opacity-20 pointer-events-none"></div>
       )}
 
       {/* 일일 퀘스트 모달 */}

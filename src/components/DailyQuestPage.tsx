@@ -51,17 +51,17 @@ export const DailyQuestPage: React.FC<DailyQuestPageProps> = ({ onBack }) => {
   } = useDailyQuests();
 
   // 퀘스트 완료 처리
-  const handleCompleteQuest = async (questId: number) => {
+  const handleCompleteQuest = async (questId: string) => {
     try {
-      await completeQuest(questId);
+      await completeQuest(parseInt(questId));
     } catch (error) {
       console.error('Quest completion failed:', error);
     }
   };
 
-  // 퀘스트와 진행 상황을 매칭
-  const getQuestProgress = (questId: number) => {
-    return userProgress?.find(progress => progress.questId === questId);
+  // 퀘스트 완료 상태 확인 (백엔드 응답에서 직접 확인)
+  const isQuestCompleted = (quest: any) => {
+    return quest.isCompleted;
   };
 
   if (isLoading) {
@@ -220,8 +220,7 @@ export const DailyQuestPage: React.FC<DailyQuestPageProps> = ({ onBack }) => {
             {/* Quest List */}
             <div className="space-y-3">
               {quests.map((quest) => {
-                const progress = getQuestProgress(quest.id);
-                const isCompleted = progress?.isCompleted || false;
+                const isCompleted = isQuestCompleted(quest);
 
                 return (
                   <Card
@@ -244,10 +243,10 @@ export const DailyQuestPage: React.FC<DailyQuestPageProps> = ({ onBack }) => {
                           <p className="text-sm text-gray-600 mb-2">{quest.description}</p>
                           <div className="flex items-center gap-2">
                             <Badge variant="secondary" className="text-xs">
-                              +{quest.pointsReward}P
+                              +{quest.rewardPoints}P
                             </Badge>
                             <Badge variant="secondary" className="text-xs">
-                              +{quest.statReward} 규율
+                              +5 규율
                             </Badge>
                           </div>
                         </div>

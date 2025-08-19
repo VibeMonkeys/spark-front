@@ -42,23 +42,26 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
     }
   }, [isOpen, isLoading, quests.length, initializeDailyQuests]);
 
-  // 전역 클릭 이벤트로 모달 닫기
+  // 모달 외부 클릭 시만 닫기 (내부 클릭은 무시)
   useEffect(() => {
-    const handleClick = () => {
+    const handleOutsideClick = (event: MouseEvent) => {
       if (isOpen) {
-        onClose();
+        const modalContent = document.querySelector('[data-dialog-content="true"]');
+        if (modalContent && !modalContent.contains(event.target as Node)) {
+          onClose();
+        }
       }
     };
 
     if (isOpen) {
       // 약간의 딜레이를 두어 모달 열기 클릭과 겹치지 않도록 함
       const timer = setTimeout(() => {
-        document.addEventListener('click', handleClick);
+        document.addEventListener('click', handleOutsideClick);
       }, 100);
 
       return () => {
         clearTimeout(timer);
-        document.removeEventListener('click', handleClick);
+        document.removeEventListener('click', handleOutsideClick);
       };
     }
   }, [isOpen, onClose]);
@@ -89,7 +92,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
   if (isLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[371px] h-[520px] mx-auto bg-white rounded-3xl border-0 shadow-2xl">
+        <DialogContent className="w-[371px] h-[640px] mx-auto bg-white rounded-3xl border-0 shadow-2xl">
           <div className="flex flex-col items-center justify-center p-8">
             <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg flex items-center justify-center mb-3">
               <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -106,7 +109,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[371px] h-[520px] mx-auto overflow-hidden flex flex-col bg-white rounded-3xl border-0 shadow-2xl p-0">
+      <DialogContent className="w-[371px] h-[640px] mx-auto overflow-hidden flex flex-col bg-white rounded-3xl border-0 shadow-2xl p-0" data-dialog-content="true">
         {/* Modern Header */}
         <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-4 py-3">
           <Button 
@@ -195,27 +198,9 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto bg-gray-50/30">
+        <div className="flex-1 bg-gray-50/30 overflow-y-auto">
           {activeTab === 'today' && (
             <div className="px-4 py-3 space-y-4">
-              {/* Motivational Message */}
-              {motivationalMessage && (
-                <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/50 rounded-2xl p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-400 rounded-2xl flex items-center justify-center">
-                      <span className="text-2xl">{motivationalMessage.emoji}</span>
-                    </div>
-                    <div>
-                      <p className="text-lg font-semibold text-amber-900 leading-relaxed">
-                        {motivationalMessage.message}
-                      </p>
-                      <p className="text-sm text-amber-700 mt-1">
-                        오늘도 멋진 하루 만들어가요! ✨
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Special Rewards */}
               {availableSpecialRewards.length > 0 && (

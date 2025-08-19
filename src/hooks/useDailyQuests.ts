@@ -15,6 +15,7 @@ import type {
 export function useDailyQuests() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  console.log('🎯 [useDailyQuests] Current user:', user?.id);
 
   // 오늘의 일일 퀘스트 조회
   const {
@@ -189,18 +190,18 @@ export function useDailyQuests() {
   const messageData = motivationalMessage?.data;
   const notificationsData = notificationSettings?.data;
 
-  // 현재 진행률 계산
-  const currentProgress = questsData?.overview.summary.completionPercentage || 0;
-  const completedQuests = questsData?.overview.summary.completedQuests || 0;
-  const totalQuests = questsData?.overview.summary.totalQuests || 4;
+  // 현재 진행률 계산 (백엔드 응답 구조에 맞춤)
+  const currentProgress = questsData?.completionPercentage || 0;
+  const completedQuests = questsData?.completedCount || 0;
+  const totalQuests = questsData?.totalCount || 4;
 
-  // 특수 보상 상태 확인
-  const availableSpecialRewards = questsData?.overview.availableSpecialRewards || [];
-  const hasUnlockedReward = availableSpecialRewards.some(reward => reward.isUnlocked);
+  // 특수 보상 상태 확인 (일단 빈 배열로 설정)
+  const availableSpecialRewards: any[] = [];
+  const hasUnlockedReward = false;
 
-  // 스트릭 정보
-  const currentStreak = questsData?.overview.summary.currentStreak || 0;
-  const longestStreak = questsData?.overview.summary.longestStreak || 0;
+  // 스트릭 정보 (현재 백엔드에서 제공하지 않으므로 기본값)
+  const currentStreak = 0;
+  const longestStreak = 0;
 
   // 로딩 상태
   const isLoading = isLoadingQuests || isLoadingStats;
@@ -210,10 +211,16 @@ export function useDailyQuests() {
   const hasError = questsError || statsError || weeklyError || monthlyError;
 
   return {
-    // 데이터
-    quests: questsData?.overview.quests || [],
-    userProgress: questsData?.overview.userProgress || [],
-    summary: questsData?.overview.summary,
+    // 데이터 (백엔드 응답 구조에 맞춤)
+    quests: questsData?.quests || [],
+    userProgress: [], // 현재 백엔드에서 별도로 제공하지 않음
+    summary: {
+      completionPercentage: currentProgress,
+      completedQuests: completedQuests,
+      totalQuests: totalQuests,
+      currentStreak: currentStreak,
+      longestStreak: longestStreak
+    },
     stats: statsData,
     weeklySummary: weeklyData,
     monthlySummary: monthlyData,

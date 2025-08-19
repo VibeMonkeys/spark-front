@@ -15,23 +15,20 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
 }) => {
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, isConnected, isLoading, error, navigateFromNotification } = useNotifications();
 
-  // 전역 클릭 이벤트로 팝업 닫기
+  // 팝업 외부 클릭 시에만 닫기 (백드롭 클릭)
   React.useEffect(() => {
-    const handleClick = () => {
-      if (isOpen) {
+    const handleBackdropClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // 백드롭 영역을 클릭했을 때만 닫기
+      if (target.classList.contains('backdrop-blur-sm')) {
         onClose();
       }
     };
 
     if (isOpen) {
-      // 약간의 딜레이를 두어 팝업 열기 클릭과 겹치지 않도록 함
-      const timer = setTimeout(() => {
-        document.addEventListener('click', handleClick);
-      }, 100);
-
+      document.addEventListener('click', handleBackdropClick);
       return () => {
-        clearTimeout(timer);
-        document.removeEventListener('click', handleClick);
+        document.removeEventListener('click', handleBackdropClick);
       };
     }
   }, [isOpen, onClose]);

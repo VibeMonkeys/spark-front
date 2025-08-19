@@ -330,18 +330,17 @@ export interface AllocateStatPointsRequest {
   points: number;
 }
 
-// 일일 퀘스트 관련 타입들
+// 일일 퀘스트 관련 타입들 (백엔드 실제 응답에 맞춤)
 export interface DailyQuest {
-  id: number;
+  id: string;
   type: 'MAKE_BED' | 'TAKE_SHOWER' | 'CLEAN_HOUSE' | 'GRATITUDE_JOURNAL';
   title: string;
   description: string;
   icon: string;
   order: number;
-  pointsReward: number;
-  statReward: number;
-  isActive: boolean;
-  createdAt: string;
+  rewardPoints: number;
+  isCompleted: boolean;
+  completedAt: string | null;
 }
 
 export interface DailyQuestProgress {
@@ -408,10 +407,15 @@ export interface DailyQuestStats {
   lastActiveDate: string;
 }
 
-// 일일 퀘스트 API 응답 타입들
+// 일일 퀘스트 API 응답 타입들 (백엔드 실제 응답 구조에 맞춤)
 export interface DailyQuestResponse {
-  overview: DailyQuestOverview;
-  stats: DailyQuestStats;
+  userId: string;
+  date: string;
+  quests: DailyQuest[];
+  completedCount: number;
+  totalCount: number;
+  completionPercentage: number;
+  statusMessage: string;
 }
 
 export interface CompleteDailyQuestResponse {

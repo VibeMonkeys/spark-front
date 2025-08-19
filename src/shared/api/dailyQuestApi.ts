@@ -19,7 +19,9 @@ export const dailyQuestApi = {
    * - 완료율 기반 특수 보상 정보
    */
   getTodaysQuests: async (userId: number): Promise<ApiResponse<DailyQuestResponse>> => {
+    console.log('🎯 [Daily Quest API] Getting today\'s quests for user:', userId);
     const response = await api.get(`/daily-quests/today?userId=${userId}`);
+    console.log('🎯 [Daily Quest API] Response:', response.data);
     return response.data;
   },
 
@@ -34,7 +36,12 @@ export const dailyQuestApi = {
     userId: number, 
     request: CompleteDailyQuestRequest
   ): Promise<ApiResponse<CompleteDailyQuestResponse>> => {
-    const response = await api.post(`/daily-quests/complete?userId=${userId}`, request);
+    const response = await api.post(`/daily-quests/complete`, { 
+      userId: userId, 
+      questType: request.questId === 5 ? 'MAKE_BED' : 
+                 request.questId === 6 ? 'TAKE_SHOWER' :
+                 request.questId === 7 ? 'CLEAN_HOUSE' : 'GRATITUDE_JOURNAL'
+    });
     return response.data;
   },
 
@@ -59,7 +66,7 @@ export const dailyQuestApi = {
     userId: number, 
     date: string
   ): Promise<ApiResponse<DailyQuestResponse>> => {
-    const response = await api.get(`/daily-quests/history?userId=${userId}&date=${date}`);
+    const response = await api.get(`/daily-quests/date/${date}?userId=${userId}`);
     return response.data;
   },
 
@@ -91,8 +98,34 @@ export const dailyQuestApi = {
       isPerfectDay: boolean;
     }>;
   }>> => {
-    const response = await api.get(`/daily-quests/weekly-summary?userId=${userId}`);
-    return response.data;
+    // 주간 요약 데이터를 모의 데이터로 제공 (백엔드 엔드포인트가 아직 없음)
+    return {
+      success: true,
+      data: {
+        weekStartDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        weekEndDate: new Date().toISOString().split('T')[0],
+        totalQuests: 28,
+        completedQuests: 20,
+        completionRate: 71,
+        perfectDays: 2,
+        totalPointsEarned: 100,
+        specialRewardsEarned: 3,
+        averageDailyCompletion: 2.9,
+        streakProgress: {
+          currentStreak: 3,
+          longestStreakThisWeek: 5
+        },
+        dailyBreakdown: Array.from({ length: 7 }, (_, i) => ({
+          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          completedQuests: Math.floor(Math.random() * 5),
+          totalQuests: 4,
+          completionPercentage: Math.floor(Math.random() * 101),
+          isPerfectDay: Math.random() > 0.7
+        }))
+      },
+      message: 'Weekly summary retrieved',
+      timestamp: new Date().toISOString()
+    };
   },
 
   /**
@@ -128,8 +161,43 @@ export const dailyQuestApi = {
       pointsDiff: number;
     };
   }>> => {
-    const response = await api.get(`/daily-quests/monthly-summary?userId=${userId}`);
-    return response.data;
+    // 월간 요약 데이터를 모의 데이터로 제공 (백엔드 엔드포인트가 아직 없음)
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    
+    return {
+      success: true,
+      data: {
+        monthYear: `${year}-${month.toString().padStart(2, '0')}`,
+        totalQuests: 120,
+        completedQuests: 85,
+        completionRate: 71,
+        perfectDays: 8,
+        totalPointsEarned: 425,
+        specialRewardsEarned: 12,
+        averageDailyCompletion: 2.8,
+        streakProgress: {
+          longestStreakThisMonth: 7,
+          currentStreak: 3
+        },
+        weeklyBreakdown: Array.from({ length: 4 }, (_, i) => ({
+          weekNumber: i + 1,
+          weekStartDate: new Date(year, month - 1, i * 7 + 1).toISOString().split('T')[0],
+          weekEndDate: new Date(year, month - 1, (i + 1) * 7).toISOString().split('T')[0],
+          completionRate: Math.floor(Math.random() * 40) + 60,
+          perfectDays: Math.floor(Math.random() * 3)
+        })),
+        improvementTrend: '📊 향상 중' as const,
+        comparisonWithPreviousMonth: {
+          completionRateDiff: 15,
+          perfectDaysDiff: 3,
+          pointsDiff: 85
+        }
+      },
+      message: 'Monthly summary retrieved',
+      timestamp: new Date().toISOString()
+    };
   },
 
   /**
@@ -160,8 +228,31 @@ export const dailyQuestApi = {
       percentile: number;
     };
   }>> => {
-    const response = await api.get(`/daily-quests/leaderboard?period=${period}&limit=${limit}`);
-    return response.data;
+    // 리더보드 데이터를 모의 데이터로 제공 (백엔드 엔드포인트가 아직 없음)
+    return {
+      success: true,
+      data: {
+        period,
+        leaderboard: Array.from({ length: Math.min(limit, 10) }, (_, i) => ({
+          rank: i + 1,
+          userId: 1000 + i,
+          userName: `사용자${i + 1}`,
+          avatarUrl: `https://example.com/avatar${i + 1}.jpg`,
+          level: Math.floor(Math.random() * 10) + 1,
+          completionRate: Math.floor(Math.random() * 40) + 60,
+          perfectDays: Math.floor(Math.random() * 15),
+          totalPoints: Math.floor(Math.random() * 1000) + 500,
+          currentStreak: Math.floor(Math.random() * 10)
+        })),
+        userRank: {
+          rank: Math.floor(Math.random() * 50) + 1,
+          totalParticipants: 100,
+          percentile: Math.floor(Math.random() * 80) + 10
+        }
+      },
+      message: 'Leaderboard retrieved',
+      timestamp: new Date().toISOString()
+    };
   },
 
   /**
@@ -181,8 +272,26 @@ export const dailyQuestApi = {
       time: string; // "23:50" 형식
     };
   }>> => {
-    const response = await api.get(`/daily-quests/notification-settings?userId=${userId}`);
-    return response.data;
+    // 알림 설정 데이터를 모의 데이터로 제공 (백엔드 엔드포인트가 아직 없음)
+    return {
+      success: true,
+      data: {
+        morningReminder: {
+          enabled: true,
+          time: "09:00"
+        },
+        eveningCheck: {
+          enabled: true,
+          time: "18:00"
+        },
+        lastChanceAlert: {
+          enabled: false,
+          time: "23:50"
+        }
+      },
+      message: 'Notification settings retrieved',
+      timestamp: new Date().toISOString()
+    };
   },
 
   /**
@@ -196,8 +305,13 @@ export const dailyQuestApi = {
       lastChanceAlert?: { enabled: boolean; time: string; };
     }
   ): Promise<ApiResponse<{ message: string }>> => {
-    const response = await api.put(`/daily-quests/notification-settings?userId=${userId}`, settings);
-    return response.data;
+    // 알림 설정 업데이트를 모의 응답으로 제공 (백엔드 엔드포인트가 아직 없음)
+    return {
+      success: true,
+      data: { message: '알림 설정이 업데이트되었습니다.' },
+      message: 'Notification settings updated',
+      timestamp: new Date().toISOString()
+    };
   },
 
   /**
@@ -215,8 +329,31 @@ export const dailyQuestApi = {
       specialReward?: string;
     };
   }>> => {
-    const response = await api.get(`/daily-quests/motivational-message?userId=${userId}`);
-    return response.data;
+    // 격려 메시지를 모의 데이터로 제공 (백엔드 엔드포인트가 아직 없음)
+    const messages = [
+      { message: "오늘도 힘찬 하루 시작해봐요!", emoji: "🌅", type: 'encouragement' as const },
+      { message: "벌써 절반 완료! 잘하고 있어요!", emoji: "🎉", type: 'celebration' as const },
+      { message: "퀘스트를 완료하고 성장해보세요!", emoji: "🚀", type: 'reminder' as const },
+      { message: "대단해요! 연속 달성 중이에요!", emoji: "🔥", type: 'achievement' as const }
+    ];
+    
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    
+    return {
+      success: true,
+      data: {
+        message: randomMessage.message,
+        messageType: randomMessage.type,
+        emoji: randomMessage.emoji,
+        additionalInfo: {
+          streakCount: Math.floor(Math.random() * 10),
+          completionRate: Math.floor(Math.random() * 100),
+          specialReward: "포인트 보너스"
+        }
+      },
+      message: 'Motivational message retrieved',
+      timestamp: new Date().toISOString()
+    };
   },
 
   /**
