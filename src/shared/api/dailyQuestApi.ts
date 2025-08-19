@@ -75,55 +75,16 @@ export const dailyQuestApi = {
    * - 트렌드 분석
    */
   getWeeklySummary: async (userId: number): Promise<ApiResponse<{
-    weekStartDate: string;
-    weekEndDate: string;
+    week: string;
     totalQuests: number;
-    completedQuests: number;
-    completionRate: number;
+    completionRate: string;
+    streak: number;
     perfectDays: number;
-    totalPointsEarned: number;
-    specialRewardsEarned: number;
-    averageDailyCompletion: number;
-    streakProgress: {
-      currentStreak: number;
-      longestStreakThisWeek: number;
-    };
-    dailyBreakdown: Array<{
-      date: string;
-      completedQuests: number;
-      totalQuests: number;
-      completionPercentage: number;
-      isPerfectDay: boolean;
-    }>;
+    totalPoints: number;
+    avgDailyCompletion: string;
   }>> => {
-    // 주간 요약 데이터를 모의 데이터로 제공 (백엔드 엔드포인트가 아직 없음)
-    return {
-      success: true,
-      data: {
-        weekStartDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        weekEndDate: new Date().toISOString().split('T')[0],
-        totalQuests: 28,
-        completedQuests: 20,
-        completionRate: 71,
-        perfectDays: 2,
-        totalPointsEarned: 100,
-        specialRewardsEarned: 3,
-        averageDailyCompletion: 2.9,
-        streakProgress: {
-          currentStreak: 3,
-          longestStreakThisWeek: 5
-        },
-        dailyBreakdown: Array.from({ length: 7 }, (_, i) => ({
-          date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          completedQuests: Math.floor(Math.random() * 5),
-          totalQuests: 4,
-          completionPercentage: Math.floor(Math.random() * 101),
-          isPerfectDay: Math.random() > 0.7
-        }))
-      },
-      message: 'Weekly summary retrieved',
-      timestamp: new Date().toISOString()
-    };
+    const response = await api.get(`/daily-quests/weekly-summary?userId=${userId}`);
+    return response.data;
   },
 
   /**
@@ -133,69 +94,16 @@ export const dailyQuestApi = {
    * - 성과 비교 (이전 달 대비)
    */
   getMonthlySummary: async (userId: number): Promise<ApiResponse<{
-    monthYear: string;
+    month: string;
     totalQuests: number;
-    completedQuests: number;
-    completionRate: number;
+    completionRate: string;
     perfectDays: number;
-    totalPointsEarned: number;
-    specialRewardsEarned: number;
-    averageDailyCompletion: number;
-    streakProgress: {
-      longestStreakThisMonth: number;
-      currentStreak: number;
-    };
-    weeklyBreakdown: Array<{
-      weekNumber: number;
-      weekStartDate: string;
-      weekEndDate: string;
-      completionRate: number;
-      perfectDays: number;
-    }>;
-    improvementTrend: '📈 큰 향상' | '📊 향상 중' | '🔥 조금씩 향상' | '➡️ 유지' | '📉 개선 필요';
-    comparisonWithPreviousMonth: {
-      completionRateDiff: number;
-      perfectDaysDiff: number;
-      pointsDiff: number;
-    };
+    totalPoints: number;
+    activeDays: number;
+    bestStreak: number;
   }>> => {
-    // 월간 요약 데이터를 모의 데이터로 제공 (백엔드 엔드포인트가 아직 없음)
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth() + 1;
-    
-    return {
-      success: true,
-      data: {
-        monthYear: `${year}-${month.toString().padStart(2, '0')}`,
-        totalQuests: 120,
-        completedQuests: 85,
-        completionRate: 71,
-        perfectDays: 8,
-        totalPointsEarned: 425,
-        specialRewardsEarned: 12,
-        averageDailyCompletion: 2.8,
-        streakProgress: {
-          longestStreakThisMonth: 7,
-          currentStreak: 3
-        },
-        weeklyBreakdown: Array.from({ length: 4 }, (_, i) => ({
-          weekNumber: i + 1,
-          weekStartDate: new Date(year, month - 1, i * 7 + 1).toISOString().split('T')[0],
-          weekEndDate: new Date(year, month - 1, (i + 1) * 7).toISOString().split('T')[0],
-          completionRate: Math.floor(Math.random() * 40) + 60,
-          perfectDays: Math.floor(Math.random() * 3)
-        })),
-        improvementTrend: '📊 향상 중' as const,
-        comparisonWithPreviousMonth: {
-          completionRateDiff: 15,
-          perfectDaysDiff: 3,
-          pointsDiff: 85
-        }
-      },
-      message: 'Monthly summary retrieved',
-      timestamp: new Date().toISOString()
-    };
+    const response = await api.get(`/daily-quests/monthly-summary?userId=${userId}`);
+    return response.data;
   },
 
   /**
