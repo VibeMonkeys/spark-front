@@ -34,11 +34,22 @@ export const dailyQuestApi = {
     userId: number, 
     request: CompleteDailyQuestRequest
   ): Promise<ApiResponse<CompleteDailyQuestResponse>> => {
+    // questId를 questType enum으로 매핑 (5=MAKE_BED, 6=TAKE_SHOWER, 7=CLEAN_HOUSE, 8=GRATITUDE_JOURNAL)
+    const questTypeMapping = {
+      5: 'MAKE_BED',
+      6: 'TAKE_SHOWER', 
+      7: 'CLEAN_HOUSE',
+      8: 'GRATITUDE_JOURNAL'
+    } as const;
+    
+    const questType = questTypeMapping[request.questId as keyof typeof questTypeMapping];
+    if (!questType) {
+      throw new Error(`Invalid quest ID: ${request.questId}`);
+    }
+    
     const response = await api.post(`/daily-quests/complete`, { 
       userId: userId, 
-      questType: request.questId === 5 ? 'MAKE_BED' : 
-                 request.questId === 6 ? 'TAKE_SHOWER' :
-                 request.questId === 7 ? 'CLEAN_HOUSE' : 'GRATITUDE_JOURNAL'
+      questType: questType
     });
     return response.data;
   },

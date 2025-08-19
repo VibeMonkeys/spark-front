@@ -67,11 +67,13 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
   }, [isOpen, onClose]);
 
   // 퀘스트 완료 처리
-  const handleCompleteQuest = async (questId: number) => {
+  const handleCompleteQuest = async (questId: string | number) => {
     try {
-      await completeQuest(questId);
+      const numericQuestId = typeof questId === 'string' ? parseInt(questId) : questId;
+      console.log('Completing quest with ID:', numericQuestId, 'Original:', questId);
+      await completeQuest(numericQuestId);
     } catch (error) {
-      // Error handled silently
+      console.error('Failed to complete quest:', error);
     }
   };
 
@@ -85,8 +87,14 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
   };
 
   // 퀘스트와 진행 상황을 매칭
-  const getQuestProgress = (questId: number) => {
-    return userProgress?.find(progress => progress.questId === questId);
+  const getQuestProgress = (questId: string | number) => {
+    const numericQuestId = typeof questId === 'string' ? parseInt(questId) : questId;
+    const stringQuestId = questId.toString();
+    return userProgress?.find(progress => 
+      progress.questId === numericQuestId || 
+      progress.questId === stringQuestId ||
+      progress.questId.toString() === stringQuestId
+    );
   };
 
   if (isLoading) {
@@ -287,7 +295,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                           <div
                             className={`bg-white rounded-lg p-3 border transition-all duration-200 hover:shadow-md hover:scale-[1.01] ${
                               isCompleted
-                                ? 'border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50 shadow-sm'
+                                ? 'border-gray-300 bg-gray-50 shadow-sm'
                                 : 'border-gray-100 hover:border-purple-200 hover:bg-purple-50/20'
                             }`}
                           >
@@ -295,7 +303,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                               {/* 아이콘 영역 */}
                               <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all duration-200 ${
                                 isCompleted 
-                                  ? 'bg-gradient-to-br from-emerald-100 to-green-100' 
+                                  ? 'bg-gray-100' 
                                   : 'bg-gradient-to-br from-purple-100 to-blue-100 group-hover:scale-105'
                               }`}>
                                 {quest.icon}
@@ -304,7 +312,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                               {/* 내용 영역 */}
                               <div className="flex-1 min-w-0">
                                 <h4 className={`text-sm font-bold mb-0.5 transition-all duration-200 ${
-                                  isCompleted ? 'text-emerald-700 line-through opacity-75' : 'text-gray-900'
+                                  isCompleted ? 'text-gray-700' : 'text-gray-900'
                                 }`}>
                                   {quest.title}
                                 </h4>
@@ -321,9 +329,16 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                               {/* 완료 버튼 영역 */}
                               <div className="flex-shrink-0">
                                 {isCompleted ? (
-                                  <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg flex items-center justify-center shadow-md">
-                                    <CheckCircle className="size-3.5 text-white drop-shadow-sm" />
-                                  </div>
+                                  <Button
+                                    size="sm"
+                                    disabled
+                                    className="bg-gray-400 text-gray-100 text-xs
+                                             border-0 px-3 py-1.5 h-auto rounded-lg cursor-not-allowed
+                                             opacity-75"
+                                  >
+                                    <CheckCircle className="size-3 mr-1" />
+                                    완료됨
+                                  </Button>
                                 ) : (
                                   <Button
                                     size="sm"
@@ -334,7 +349,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                                              shadow-md hover:shadow-lg transition-all duration-200
                                              hover:scale-105 active:scale-95 border-0 px-3 py-1.5 h-auto rounded-lg"
                                   >
-                                    완료하기
+                                    {isUpdating ? '처리중...' : '완료하기'}
                                   </Button>
                                 )}
                               </div>
@@ -356,24 +371,26 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">퀘스트 현황</h3>
                   <div className="text-2xl">
-                    {(stats.averageCompletionRate || 0) >= 80 ? '🔥' : 
-                     (stats.averageCompletionRate || 0) >= 60 ? '💪' : '🌱'}
+                    {(stats.averageCompletionRate || 0) >= 0.8 ? '🔥' : 
+                     (stats.averageCompletionRate || 0) >= 0.6 ? '💪' : '🌱'}
                   </div>
                 </div>
                 
                 <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 text-white">
                   <div className="flex justify-between items-center">
                     <div>
-                      <div className="text-sm opacity-90 mb-1">전체 완료율</div>
+                      <div className="text-sm opacity-90 mb-1">최근 30일 평균 완료율</div>
                       <div className="text-3xl font-bold">
-                        {Math.round(stats.averageCompletionRate || 0)}%
+                        {Math.round((stats.averageCompletionRate || 0) * 100)}%
                       </div>
+                      <div className="text-xs opacity-80 mt-1">4개 퀘스트 중 완료 비율</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm opacity-90 mb-1">연속 기록</div>
+                      <div className="text-sm opacity-90 mb-1">최고 연속 완벽일</div>
                       <div className="text-2xl font-semibold">
-                        {stats.longestStreak || 0}일
+                        {stats.consecutivePerfectDays || 0}일
                       </div>
+                      <div className="text-xs opacity-80 mt-1">4개 모두 완료한 날</div>
                     </div>
                   </div>
                 </div>
@@ -383,21 +400,24 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900 mb-1">
-                    {stats.totalDaysParticipated || 0}
+                    {stats.totalDays || 0}
                   </div>
-                  <div className="text-sm text-gray-600">참여일</div>
+                  <div className="text-sm text-gray-600">참여한 날</div>
+                  <div className="text-xs text-gray-500 mt-1">최근 30일 중</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900 mb-1">
                     {stats.totalQuestsCompleted || 0}
                   </div>
-                  <div className="text-sm text-gray-600">완료 퀘스트</div>
+                  <div className="text-sm text-gray-600">완료 일일 퀘스트</div>
+                  <div className="text-xs text-gray-500 mt-1">누적 완료 개수</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-gray-900 mb-1">
                     {stats.perfectDays || 0}
                   </div>
                   <div className="text-sm text-gray-600">완벽한 날</div>
+                  <div className="text-xs text-gray-500 mt-1">4개 모두 완료</div>
                 </div>
               </div>
 
@@ -426,8 +446,8 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
               {/* 간단한 메시지 */}
               <div className="mt-6 p-4 bg-gray-50 rounded-xl text-center">
                 <div className="text-sm text-gray-700">
-                  {(stats.averageCompletionRate || 0) >= 80 ? '🎉 멋진 성과를 보여주고 있어요!' :
-                   (stats.averageCompletionRate || 0) >= 60 ? '👍 꾸준히 잘하고 있어요!' :
+                  {(stats.averageCompletionRate || 0) >= 0.8 ? '🎉 멋진 성과를 보여주고 있어요!' :
+                   (stats.averageCompletionRate || 0) >= 0.6 ? '👍 꾸준히 잘하고 있어요!' :
                    '🌟 좋은 시작이에요. 화이팅!'}
                 </div>
               </div>

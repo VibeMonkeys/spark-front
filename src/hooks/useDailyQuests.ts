@@ -185,6 +185,10 @@ export function useDailyQuests() {
   const messageData = motivationalMessage?.data;
   const notificationsData = notificationSettings?.data;
 
+  // 백엔드 응답 구조 확인을 위한 로그
+  console.log('Full todaysQuests response:', todaysQuests);
+  console.log('questsData:', questsData);
+  
   // 현재 진행률 계산 (백엔드 응답 구조에 맞춤)
   
   // 두 가지 위치 모두 확인해서 값이 있는 곳을 사용
@@ -211,7 +215,11 @@ export function useDailyQuests() {
   return {
     // 데이터 (백엔드 응답 구조에 맞춤)
     quests: questsData?.quests || [],
-    userProgress: [], // 현재 백엔드에서 별도로 제공하지 않음
+    userProgress: questsData?.quests?.map((quest: any) => ({
+      questId: quest.id,
+      isCompleted: quest.isCompleted || false,
+      completedAt: quest.completedAt || null
+    })) || [], // quest 데이터에서 progress 정보 추출
     summary: {
       completionPercentage: currentProgress,
       completedQuests: completedQuests,
