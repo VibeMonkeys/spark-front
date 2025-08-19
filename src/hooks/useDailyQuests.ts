@@ -185,9 +185,6 @@ export function useDailyQuests() {
   const messageData = motivationalMessage?.data;
   const notificationsData = notificationSettings?.data;
 
-  // 백엔드 응답 구조 확인을 위한 로그
-  console.log('Full todaysQuests response:', todaysQuests);
-  console.log('questsData:', questsData);
   
   // 현재 진행률 계산 (백엔드 응답 구조에 맞춤)
   

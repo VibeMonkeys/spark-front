@@ -70,7 +70,6 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
   const handleCompleteQuest = async (questId: string | number) => {
     try {
       const numericQuestId = typeof questId === 'string' ? parseInt(questId) : questId;
-      console.log('Completing quest with ID:', numericQuestId, 'Original:', questId);
       await completeQuest(numericQuestId);
     } catch (error) {
       console.error('Failed to complete quest:', error);
