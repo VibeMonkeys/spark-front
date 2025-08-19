@@ -329,3 +329,108 @@ export interface AllocateStatPointsRequest {
   statType: string;
   points: number;
 }
+
+// 일일 퀘스트 관련 타입들
+export interface DailyQuest {
+  id: number;
+  type: 'MAKE_BED' | 'TAKE_SHOWER' | 'CLEAN_HOUSE' | 'GRATITUDE_JOURNAL';
+  title: string;
+  description: string;
+  icon: string;
+  order: number;
+  pointsReward: number;
+  statReward: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface DailyQuestProgress {
+  id: number;
+  userId: number;
+  questId: number;
+  questDate: string;
+  isCompleted: boolean;
+  completedAt?: string;
+  pointsEarned: number;
+  statPointsEarned: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DailyQuestSummary {
+  id: number;
+  userId: number;
+  questDate: string;
+  totalQuests: number;
+  completedQuests: number;
+  completionPercentage: number;
+  totalPointsEarned: number;
+  totalStatPointsEarned: number;
+  currentStreak: number;
+  longestStreak: number;
+  hasSpecialReward: boolean;
+  specialRewardTier?: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+  statusMessage: string;
+  lastCompletedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DailyQuestOverview {
+  quests: DailyQuest[];
+  userProgress: DailyQuestProgress[];
+  summary: DailyQuestSummary;
+  availableSpecialRewards: SpecialReward[];
+}
+
+export interface SpecialReward {
+  tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+  description: string;
+  emoji: string;
+  basePoints: number;
+  requiredPercentage: number;
+  isUnlocked: boolean;
+  unlockedAt?: string;
+}
+
+export interface DailyQuestStats {
+  totalDaysParticipated: number;
+  totalQuestsCompleted: number;
+  totalPointsEarned: number;
+  totalStatPointsEarned: number;
+  currentStreak: number;
+  longestStreak: number;
+  perfectDays: number;
+  averageCompletionRate: number;
+  weeklyCompletionRate: number;
+  monthlyCompletionRate: number;
+  specialRewardsEarned: number;
+  lastActiveDate: string;
+}
+
+// 일일 퀘스트 API 응답 타입들
+export interface DailyQuestResponse {
+  overview: DailyQuestOverview;
+  stats: DailyQuestStats;
+}
+
+export interface CompleteDailyQuestResponse {
+  questProgress: DailyQuestProgress;
+  summary: DailyQuestSummary;
+  pointsEarned: number;
+  statPointsEarned: number;
+  specialReward?: SpecialReward;
+  streakBonus?: {
+    points: number;
+    streakCount: number;
+  };
+  levelUp?: boolean;
+  newLevel?: number;
+  rewardMessage: string;
+}
+
+// 일일 퀘스트 요청 타입들
+export interface CompleteDailyQuestRequest {
+  questId: number;
+  note?: string;
+}

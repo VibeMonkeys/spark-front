@@ -11,6 +11,7 @@ export * from './levelApi';
 export * from './statsApi';
 export * from './achievement';
 export * from './hashtagApi';
+export * from './dailyQuestApi';
 
 // 편의를 위한 통합 객체
 export { authApi } from './authApi';
@@ -23,3 +24,4 @@ export { levelApi } from './levelApi';
 export { statsApi } from './statsApi';
 export { achievementApi } from './achievement';
 export { hashtagApi } from './hashtagApi';
+export { dailyQuestApi } from './dailyQuestApi';
