@@ -36,7 +36,7 @@ export const HashtagSearchModal: React.FC<HashtagSearchModalProps> = ({
         setSearchResults(response.data.hashtags);
       }
     } catch (error) {
-      console.error('Failed to search hashtags:', error);
+      // Error handled silently
       setSearchResults([]);
     } finally {
       setIsLoading(false);
@@ -55,7 +55,7 @@ export const HashtagSearchModal: React.FC<HashtagSearchModalProps> = ({
         setAutocompleteResults(response.data);
       }
     } catch (error) {
-      console.error('Failed to get autocomplete:', error);
+      // Error handled silently
       setAutocompleteResults([]);
     }
   };
@@ -67,7 +67,7 @@ export const HashtagSearchModal: React.FC<HashtagSearchModalProps> = ({
         setPopularHashtags(response.data);
       }
     } catch (error) {
-      console.error('Failed to get popular hashtags:', error);
+      // Error handled silently
       setPopularHashtags([]);
     }
   };

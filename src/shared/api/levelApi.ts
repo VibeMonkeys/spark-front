@@ -78,7 +78,7 @@ export const levelApi = {
         };
       }
     } catch (error) {
-      console.error('Failed to fetch level progress:', error);
+      // Error handled silently
       // 기본값 반환
       return {
         current_level: 1,

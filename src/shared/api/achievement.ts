@@ -36,7 +36,7 @@ export const achievementApi = {
         return [];
       }
     } catch (error) {
-      console.error('Failed to fetch user achievements:', error);
+      // Error handled silently
       // 기본값 반환
       return [];
     }
@@ -58,7 +58,7 @@ export const achievementApi = {
         };
       }
     } catch (error) {
-      console.error('Failed to fetch achievement count:', error);
+      // Error handled silently
       // 기본값 반환
       return {
         unlockedCount: 0,

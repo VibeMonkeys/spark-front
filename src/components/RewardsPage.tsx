@@ -57,7 +57,7 @@ export function RewardsPage() {
       queryClient.invalidateQueries({ queryKey: ['rewards-page', user?.id] });
     },
     onError: (error: any) => {
-      console.error('Failed to exchange reward:', error);
+      // Error handled silently
     }
   });
 

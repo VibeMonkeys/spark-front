@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(freshUser);
             localStorage.setItem('current_user', JSON.stringify(freshUser));
           } catch (error) {
-            console.warn('⚠️ [AuthContext] Failed to refresh user data with JWT:', error);
+            // Failed to refresh user data with JWT
             // JWT가 만료되었을 수 있으므로 토큰 자동 갱신이 시도될 것임
             // 저장된 데이터로 계속 진행
           }
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem('refresh_token');
         }
       } catch (error) {
-        console.error('❌ [AuthContext] Failed to initialize auth:', error);
+        // Error handled silently
         // 오류 발생 시 인증 정보 정리
         localStorage.removeItem('current_user');
         localStorage.removeItem('auth_token');
@@ -102,7 +102,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (authData: AuthResponse) => {
-    
     setUser(authData.user);
     setToken(authData.token);
     setRefreshToken(authData.refreshToken);
@@ -136,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await authApi.logout();
       }
     } catch (error) {
-      console.error('⚠️ [AuthContext] Logout API call failed:', error);
+      // Logout API call failed
       // API 호출이 실패해도 로컬에서는 로그아웃 처리
     }
     
@@ -157,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const forceLogout = (reason?: string) => {
-    console.warn('⚠️ [AuthContext] Force logout triggered:', reason);
+    // Force logout triggered
     
     // 모든 localStorage 데이터 정리 (완전 삭제)
     localStorage.clear();
@@ -182,9 +181,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const updatedUserData = await userApi.getUser(user.id);
       setUser(updatedUserData);
       localStorage.setItem('current_user', JSON.stringify(updatedUserData));
-      console.log('✅ [AuthContext] User data refreshed:', updatedUserData);
+      // User data refreshed
     } catch (error) {
-      console.error('❌ [AuthContext] Failed to refresh user data:', error);
+      // Error handled silently
     }
   };
 

@@ -64,7 +64,7 @@ export const DailyQuestWidget: React.FC<DailyQuestWidgetProps> = ({
     try {
       await completeQuest(questId);
     } catch (error) {
-      console.error('Quest completion failed:', error);
+      // Error handled silently
     }
   };
 

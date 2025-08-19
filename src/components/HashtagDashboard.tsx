@@ -62,7 +62,7 @@ export const HashtagDashboard: React.FC<HashtagDashboardProps> = ({
         setSummary(data.data);
       }
     } catch (error) {
-      console.error('Failed to fetch hashtag summary:', error);
+      // Error handled silently
     } finally {
       setIsLoading(false);
     }

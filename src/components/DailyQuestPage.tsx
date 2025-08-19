@@ -55,7 +55,7 @@ export const DailyQuestPage: React.FC<DailyQuestPageProps> = ({ onBack }) => {
     try {
       await completeQuest(parseInt(questId));
     } catch (error) {
-      console.error('Quest completion failed:', error);
+      // Error handled silently
     }
   };
 

@@ -82,7 +82,7 @@ export const usePullToRefresh = ({
         try {
           await onRefresh();
         } catch (error) {
-          console.error('Pull to refresh failed:', error);
+          // Error handled silently
         }
         
         // 새로고침 완료 후 부드러운 사라짐을 위해 딜레이

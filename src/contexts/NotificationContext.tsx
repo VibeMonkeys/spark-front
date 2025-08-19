@@ -279,7 +279,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
           setIsConnected(true);
         })
         .catch(error => {
-          console.error('Failed to connect WebSocket:', error);
+          // Error handled silently
           setIsConnected(false);
         });
 

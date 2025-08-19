@@ -19,10 +19,10 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
     try {
       const success = await installPWA();
       if (success) {
-        console.log('✅ PWA 설치 성공!');
+        // PWA installation successful
       }
     } catch (error) {
-      console.error('❌ PWA 설치 실패:', error);
+      // Error handled silently
     }
   };
 

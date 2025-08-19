@@ -91,7 +91,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
       // 알림 없이 바로 포기 완료
     },
     onError: (error: any) => {
-      console.error('미션 포기 실패:', error);
+      // Error handled silently
       onNotification?.('error', '미션 포기 실패', '미션 포기에 실패했습니다. 다시 시도해주세요.');
     }
   });
@@ -127,7 +127,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
         const result = await missionApi.getOngoingMissions(user!.id);
         return result;
       } catch (error) {
-        console.error('❌ [MissionsPage] Failed to load ongoing missions:', error);
+        // Error handled silently
         throw error;
       }
     },
@@ -142,7 +142,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
         const result = await missionApi.getCompletedMissions(user!.id, 0, 20);
         return result;
       } catch (error) {
-        console.error('❌ [MissionsPage] Failed to load completed missions:', error);
+        // Error handled silently
         throw error;
       }
     },

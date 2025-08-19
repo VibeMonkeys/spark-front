@@ -71,7 +71,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
     try {
       await completeQuest(questId);
     } catch (error) {
-      console.error('Quest completion failed:', error);
+      // Error handled silently
     }
   };
 
@@ -80,7 +80,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
     try {
       await initializeDailyQuests();
     } catch (error) {
-      console.error('Quest initialization failed:', error);
+      // Error handled silently
     }
   };
 
@@ -190,13 +190,19 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
               </div>
             </div>
             <div className="mt-1.5">
-              <Progress value={currentProgress} className="h-1 bg-gray-200/50 rounded-full" />
+              {/* Custom Progress Bar */}
+              <div className="relative w-full h-2 bg-gray-200/50 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${currentProgress}%` }}
+                />
+              </div>
               {/* Progress Scale */}
               <div className="flex justify-between mt-1 px-1">
-                <span className="text-xs text-gray-400 font-medium">20</span>
-                <span className="text-xs text-gray-400 font-medium">40</span>
-                <span className="text-xs text-gray-400 font-medium">60</span>
-                <span className="text-xs text-gray-400 font-medium">80</span>
+                <span className="text-xs text-gray-400 font-medium">0</span>
+                <span className="text-xs text-gray-400 font-medium">25</span>
+                <span className="text-xs text-gray-400 font-medium">50</span>
+                <span className="text-xs text-gray-400 font-medium">75</span>
                 <span className="text-xs text-gray-400 font-medium">100</span>
               </div>
             </div>

@@ -13,10 +13,6 @@ export const DailyQuestIcon: React.FC<DailyQuestIconProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { currentProgress, completedQuests, totalQuests, hasUnlockedReward, isLoading } = useDailyQuests();
 
-  // Debug modal state changes
-  React.useEffect(() => {
-    console.log('🎯 [DailyQuestIcon] Modal state changed:', isModalOpen);
-  }, [isModalOpen]);
 
   // 진행률에 따른 아이콘 색상과 상태 결정
   const getIconState = () => {
@@ -100,11 +96,6 @@ export const DailyQuestIcon: React.FC<DailyQuestIconProps> = ({
         type="button"
         className={`p-2 h-8 w-8 rounded-full border transition-all duration-200 hover:scale-105 cursor-pointer ${iconState.bgColor} ${iconState.borderColor} hover:bg-opacity-80`}
         onClick={(e) => {
-          console.log('🎯 [DailyQuestIcon] Button clicked!', { 
-            isModalOpen, 
-            buttonElement: e.target,
-            isDisabled: e.currentTarget.disabled 
-          });
           e.preventDefault();
           e.stopPropagation();
           setIsModalOpen(true);

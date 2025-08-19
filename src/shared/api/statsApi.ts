@@ -14,7 +14,7 @@ export const statsApi = {
       const response = await api.get('/stats');
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch user stats:', error);
+      // Error handled silently
       // React Query에서 undefined 반환을 방지하기 위해 에러를 던집니다
       throw error;
     }

@@ -51,7 +51,7 @@ export const HashtagWidget: React.FC<HashtagWidgetProps> = ({
         setLastUpdated(new Date());
       }
     } catch (error) {
-      console.error(`Failed to fetch ${type} hashtags:`, error);
+      // Error handled silently
     } finally {
       setIsLoading(false);
     }

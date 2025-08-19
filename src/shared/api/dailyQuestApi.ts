@@ -19,9 +19,7 @@ export const dailyQuestApi = {
    * - 완료율 기반 특수 보상 정보
    */
   getTodaysQuests: async (userId: number): Promise<ApiResponse<DailyQuestResponse>> => {
-    console.log('🎯 [Daily Quest API] Getting today\'s quests for user:', userId);
     const response = await api.get(`/daily-quests/today?userId=${userId}`);
-    console.log('🎯 [Daily Quest API] Response:', response.data);
     return response.data;
   },
 

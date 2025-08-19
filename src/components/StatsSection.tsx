@@ -47,7 +47,7 @@ export function StatsSection({ className }: StatsSectionProps) {
     staleTime: 5 * 60 * 1000, // 5분
     enabled: true, // 항상 실행되도록 설정
     onError: (error) => {
-      console.error('Stats query failed:', error);
+      // Error handled silently
     }
   });
 
@@ -70,7 +70,7 @@ export function StatsSection({ className }: StatsSectionProps) {
       setIsApplyMode(false);
     },
     onError: (error) => {
-      console.error('스탯 포인트 할당 실패:', error);
+      // Error handled silently
     }
   });
 
@@ -231,13 +231,7 @@ export function StatsSection({ className }: StatsSectionProps) {
     typeof userStats.totalStats === 'number';
 
   if (error || !hasValidUserStats) {
-    // 디버깅을 위한 로깅
-    if (error) {
-      console.error('Stats API error:', error);
-    }
-    if (!hasValidUserStats) {
-      console.warn('Invalid userStats data:', userStats);
-    }
+    // Handle errors silently
     
     return (
       <Card className={`border-0 bg-white backdrop-blur-sm ${className}`}>
@@ -302,7 +296,6 @@ export function StatsSection({ className }: StatsSectionProps) {
               const stat = userStats?.[key as keyof typeof userStats] as StatValue;
               // 스탯 데이터 유효성 검사
               if (!isValidStatValue(stat)) {
-                console.warn(`Invalid stat data for ${key}:`, stat);
                 return null;
               }
               return renderStatItem(key, stat);

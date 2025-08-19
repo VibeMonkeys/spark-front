@@ -49,7 +49,7 @@ export const rewardsApi = {
       }
       return response.data.data;
     } catch (error) {
-      console.error('Failed to fetch rewards page:', error);
+      // Error handled silently
       throw error;
     }
   },
@@ -63,7 +63,7 @@ export const rewardsApi = {
       }
       return response.data.data;
     } catch (error) {
-      console.error('Failed to fetch user points:', error);
+      // Error handled silently
       throw error;
     }
   },
@@ -92,7 +92,7 @@ export const rewardsApi = {
       }
       return response.data.data.data;
     } catch (error) {
-      console.error('Failed to fetch available rewards:', error);
+      // Error handled silently
       throw error;
     }
   },
@@ -106,7 +106,7 @@ export const rewardsApi = {
       }
       return response.data.data;
     } catch (error) {
-      console.error('Failed to exchange reward:', error);
+      // Error handled silently
       throw error;
     }
   },
@@ -133,7 +133,7 @@ export const rewardsApi = {
       }
       return response.data.data.data;
     } catch (error) {
-      console.error('Failed to fetch user rewards:', error);
+      // Error handled silently
       throw error;
     }
   },
@@ -147,7 +147,7 @@ export const rewardsApi = {
       }
       return response.data.data;
     } catch (error) {
-      console.error('Failed to fetch popular rewards:', error);
+      // Error handled silently
       throw error;
     }
   },
@@ -161,7 +161,7 @@ export const rewardsApi = {
       }
       return response.data.data;
     } catch (error) {
-      console.error('Failed to fetch rewards by category:', error);
+      // Error handled silently
       throw error;
     }
   }

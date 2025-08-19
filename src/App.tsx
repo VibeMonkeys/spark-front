@@ -67,7 +67,7 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
       scrollPositions.current = {};
       setPreviousActiveTab('home');
       
-      console.log('✅ [App] App state reset completed');
+      // App state reset completed
     };
     
     if (onStateReset) {
@@ -248,7 +248,6 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
       return missionApi.startMission(missionId, userId);
     },
     onSuccess: (data) => {
-      
       // 성공시 관련 쿼리들을 무효화하여 데이터 새로고침
       queryClient.invalidateQueries({ queryKey: ['missions-ongoing', user?.id] }); // 사용자별 진행중 미션
       queryClient.invalidateQueries({ queryKey: ['missions', 'today', user?.id] }); // 오늘의 미션
@@ -266,14 +265,13 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
       localStorage.removeItem('lastActiveTab'); // 이전 탭 정보 제거
     },
     onError: (error: any) => {
-      console.error('❌ [App] Mission start failed:', error);
-      console.error('❌ [App] Full error object:', JSON.stringify(error, null, 2));
+      // Error handled silently
       
       // 에러 구조 파싱: axios 에러와 직접 응답 모두 처리
       const errorResponse = error?.response?.data || error;
       const errorCode = errorResponse?.error?.code;
       const errorMessage = errorResponse?.error?.message || errorResponse?.message || '알 수 없는 오류가 발생했습니다.';
-      console.error('❌ [App] Parsed error:', { errorCode, errorMessage });
+      // Error parsed silently
       
       let title = '미션 시작 실패';
       let message = errorMessage;
@@ -333,7 +331,7 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
   const handleMissionStart = () => {
     
     if (!selectedMissionId || !user?.id) {
-      console.error('❌ [App] Mission start failed - missing data:', { selectedMissionId, userId: user?.id });
+      // Mission start failed - missing data
       showNotification(
         'warning',
         '미션 정보 누락',
@@ -342,7 +340,6 @@ function AppContent({ onSetShowNotification, onSetNavigateFunction }: AppContent
       return;
     }
 
-    
     // 실제 미션 시작 API 호출
     startMissionMutation.mutate({
       missionId: selectedMissionId,

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { dailyQuestApi } from '../shared/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,7 +16,6 @@ import type {
 export function useDailyQuests() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  console.log('🎯 [useDailyQuests] Current user:', user?.id);
 
   // 오늘의 일일 퀘스트 조회
   const {
@@ -30,6 +30,7 @@ export function useDailyQuests() {
     staleTime: 5 * 60 * 1000, // 5분
     gcTime: 10 * 60 * 1000,   // 10분
   });
+
 
   // 일일 퀘스트 통계 조회
   const {
@@ -115,9 +116,6 @@ export function useDailyQuests() {
       queryClient.invalidateQueries({ queryKey: ['userStats', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['home', user?.id] });
     },
-    onError: (error) => {
-      console.error('❌ [useDailyQuests] Quest completion failed:', error);
-    }
   });
 
   // 알림 설정 조회
@@ -151,9 +149,6 @@ export function useDailyQuests() {
       queryClient.invalidateQueries({ queryKey: ['dailyQuests', 'stats', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['dailyQuests', 'message', user?.id] });
     },
-    onError: (error) => {
-      console.error('❌ [useDailyQuests] Quest initialization failed:', error);
-    }
   });
 
   // 편의 함수들
@@ -191,9 +186,12 @@ export function useDailyQuests() {
   const notificationsData = notificationSettings?.data;
 
   // 현재 진행률 계산 (백엔드 응답 구조에 맞춤)
-  const currentProgress = questsData?.completionPercentage || 0;
-  const completedQuests = questsData?.completedCount || 0;
-  const totalQuests = questsData?.totalCount || 4;
+  
+  // 두 가지 위치 모두 확인해서 값이 있는 곳을 사용
+  const currentProgress = questsData?.completionPercentage || todaysQuests?.completionPercentage || 0;
+  const completedQuests = questsData?.completedCount || todaysQuests?.completedCount || 0;
+  const totalQuests = questsData?.totalCount || todaysQuests?.totalCount || 4;
+  
 
   // 특수 보상 상태 확인 (일단 빈 배열로 설정)
   const availableSpecialRewards: any[] = [];

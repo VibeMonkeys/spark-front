@@ -97,7 +97,7 @@ export const UnifiedSearchModal: React.FC<UnifiedSearchModalProps> = ({
         }
       }
     } catch (error) {
-      console.error('Search failed:', error);
+      // Error handled silently
       setSearchResults([]);
       setHashtagSuggestions([]);
     } finally {

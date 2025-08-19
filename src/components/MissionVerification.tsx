@@ -82,7 +82,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
         const result = await missionApi.getMissionDetail(actualMissionId);
         return result;
       } catch (error) {
-        console.error('❌ [MissionVerification] Failed to load mission detail:', error);
+        // Error handled silently
         throw error;
       }
     },
@@ -127,7 +127,7 @@ export function MissionVerification({ missionId, onBack, onSubmit }: MissionVeri
       onSubmit(result);
     },
     onError: (error) => {
-      console.error('미션 완료 실패:', error);
+      // Error handled silently
       
       // 개발 중이므로 API 에러 시에도 성공으로 처리하여 UX 테스트 가능하도록 함
       const simulatedResult = {

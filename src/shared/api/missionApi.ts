@@ -28,7 +28,7 @@ export const missionApi = {
         };
       }
     } catch (error) {
-      console.error('Failed to fetch today missions:', error);
+      // Error handled silently
       // 기본값 반환
       return {
         dailyMissions: [],
@@ -55,7 +55,7 @@ export const missionApi = {
       }
       return response.data.data;
     } catch (error: any) {
-      console.error('Failed to fetch mission detail:', error);
+      // Error handled silently
       // React Query에서 undefined 반환을 방지하기 위해 에러를 던집니다
       throw error;
     }
