@@ -15,6 +15,27 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
 }) => {
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, deleteAllNotifications, isConnected, isLoading, error, navigateFromNotification } = useNotifications();
 
+  // 전역 클릭 이벤트로 팝업 닫기
+  React.useEffect(() => {
+    const handleClick = () => {
+      if (isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      // 약간의 딜레이를 두어 팝업 열기 클릭과 겹치지 않도록 함
+      const timer = setTimeout(() => {
+        document.addEventListener('click', handleClick);
+      }, 100);
+
+      return () => {
+        clearTimeout(timer);
+        document.removeEventListener('click', handleClick);
+      };
+    }
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const formatTimeAgo = (dateString: string) => {
@@ -50,7 +71,7 @@ export const NotificationPopup: React.FC<NotificationPopupProps> = ({
       />
       
       {/* 팝업 컨테이너 - 종 버튼 하단에 위치 */}
-      <div className="absolute top-12 right-0 z-50 w-80 max-w-[calc(100vw-2rem)]">
+      <div className="absolute top-16 right-0 z-50 w-80 max-w-[calc(100vw-2rem)]">
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-in slide-in-from-top-2 duration-300">
           {/* 헤더 */}
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50">
