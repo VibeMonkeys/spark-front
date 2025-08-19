@@ -549,7 +549,7 @@ export const DailyQuestPage: React.FC<DailyQuestPageProps> = ({ onBack }) => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {weeklySummary.data.dailyBreakdown && weeklySummary.data.dailyBreakdown.map((day, index) => (
+                      {weeklySummary?.data?.dailyBreakdown && Array.isArray(weeklySummary.data.dailyBreakdown) ? weeklySummary.data.dailyBreakdown.map((day, index) => (
                         <div 
                           key={index} 
                           className={`flex items-center justify-between p-4 rounded-lg transition-all duration-200 hover:scale-[1.02] ${
@@ -616,7 +616,32 @@ export const DailyQuestPage: React.FC<DailyQuestPageProps> = ({ onBack }) => {
                             </div>
                           </div>
                         </div>
-                      ))}
+                      )) : (
+                        // dailyBreakdown 데이터가 없을 때 주간 요약만 표시
+                        <div className="p-6 text-center">
+                          <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                            <Calendar className="size-8 text-blue-600" />
+                          </div>
+                          <h3 className="text-lg font-bold text-gray-900 mb-2">주간 요약</h3>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="bg-white p-4 rounded-lg border">
+                              <div className="text-2xl font-bold text-blue-600 mb-1">
+                                {parseFloat(weeklySummary.data.completionRate.replace('%', ''))}%
+                              </div>
+                              <div className="text-sm text-gray-600">완료율</div>
+                            </div>
+                            <div className="bg-white p-4 rounded-lg border">
+                              <div className="text-2xl font-bold text-green-600 mb-1">
+                                {weeklySummary.data.perfectDays}일
+                              </div>
+                              <div className="text-sm text-gray-600">완벽한 하루</div>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-500">
+                            더 자세한 일별 기록은 곧 제공될 예정입니다! 📊
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* 주간 요약 메시지 */}

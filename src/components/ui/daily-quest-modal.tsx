@@ -350,52 +350,85 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
           )}
 
           {activeTab === 'stats' && stats && (
-            <div className="p-4 space-y-4">
-              {/* Overall Stats */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-purple-50 p-3 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-purple-600">
-                    {stats.totalDaysParticipated}
+            <div className="p-5 bg-white">
+              {/* 핵심 지표 - 대시보드 스타일 */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">퀘스트 현황</h3>
+                  <div className="text-2xl">
+                    {(stats.averageCompletionRate || 0) >= 80 ? '🔥' : 
+                     (stats.averageCompletionRate || 0) >= 60 ? '💪' : '🌱'}
                   </div>
-                  <div className="text-sm text-purple-700">참여일수</div>
                 </div>
-                <div className="bg-blue-50 p-3 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {Math.round(stats.averageCompletionRate)}%
+                
+                <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 text-white">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <div className="text-sm opacity-90 mb-1">전체 완료율</div>
+                      <div className="text-3xl font-bold">
+                        {Math.round(stats.averageCompletionRate || 0)}%
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm opacity-90 mb-1">연속 기록</div>
+                      <div className="text-2xl font-semibold">
+                        {stats.longestStreak || 0}일
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-sm text-blue-700">평균 완료율</div>
-                </div>
-                <div className="bg-orange-50 p-3 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {stats.longestStreak}
-                  </div>
-                  <div className="text-sm text-orange-700">최고 스트릭</div>
-                </div>
-                <div className="bg-green-50 p-3 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    {stats.perfectDays}
-                  </div>
-                  <div className="text-sm text-green-700">완벽한 하루</div>
                 </div>
               </div>
 
-              {/* Detailed Stats */}
+              {/* 간단한 통계 그리드 */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {stats.totalDaysParticipated || 0}
+                  </div>
+                  <div className="text-sm text-gray-600">참여일</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {stats.totalQuestsCompleted || 0}
+                  </div>
+                  <div className="text-sm text-gray-600">완료 퀘스트</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900 mb-1">
+                    {stats.perfectDays || 0}
+                  </div>
+                  <div className="text-sm text-gray-600">완벽한 날</div>
+                </div>
+              </div>
+
+              {/* 포인트 & 보상 섹션 */}
               <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">총 완료한 퀘스트</span>
-                  <span className="font-medium">{stats.totalQuestsCompleted}개</span>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-700">획득 포인트</span>
+                  <span className="font-semibold text-gray-900">
+                    {(stats.totalPointsEarned || 0).toLocaleString()}P
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">획득한 포인트</span>
-                  <span className="font-medium">{stats.totalPointsEarned.toLocaleString()}P</span>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="text-gray-700">스탯 포인트</span>
+                  <span className="font-semibold text-gray-900">
+                    {stats.totalStatPointsEarned || 0}
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">획득한 스탯</span>
-                  <span className="font-medium">{stats.totalStatPointsEarned}</span>
+                <div className="flex justify-between items-center py-3">
+                  <span className="text-gray-700">특수 보상</span>
+                  <span className="font-semibold text-gray-900">
+                    {stats.specialRewardsEarned || 0}개
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">특수 보상</span>
-                  <span className="font-medium">{stats.specialRewardsEarned}회</span>
+              </div>
+
+              {/* 간단한 메시지 */}
+              <div className="mt-6 p-4 bg-gray-50 rounded-xl text-center">
+                <div className="text-sm text-gray-700">
+                  {(stats.averageCompletionRate || 0) >= 80 ? '🎉 멋진 성과를 보여주고 있어요!' :
+                   (stats.averageCompletionRate || 0) >= 60 ? '👍 꾸준히 잘하고 있어요!' :
+                   '🌟 좋은 시작이에요. 화이팅!'}
                 </div>
               </div>
             </div>
