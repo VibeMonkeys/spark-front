@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { storyApi, hashtagApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
 import { NotificationBell } from "./ui/notification-bell";
+import { DailyQuestIcon } from "./ui/daily-quest-icon";
 import { StoryCreateModal } from "./StoryCreateModal";
 
 interface StoryFeedItem {
@@ -372,6 +373,7 @@ export function FeedPage() {
               >
                 <Search className="size-4" />
               </Button>
+              <DailyQuestIcon />
               <NotificationBell />
             </div>
           </div>

@@ -9,6 +9,7 @@ import { homeApi, missionApi, levelApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
 import { MissionLimitIndicator } from "../shared/ui";
 import { NotificationBell } from "./ui/notification-bell";
+import { DailyQuestIcon } from "./ui/daily-quest-icon";
 
 // 카테고리별 색상 매핑
 const getCategoryColor = (category: string) => {
@@ -167,6 +168,8 @@ export function HomePage({ onMissionSelect }: HomePageProps) {
               <Star className="size-4 text-purple-600" />
               <span className="text-sm font-medium text-purple-700">{userSummary.current_points.toLocaleString()}P</span>
             </div>
+            {/* 일일 퀘스트 아이콘 */}
+            <DailyQuestIcon />
             {/* 알림 종 아이콘 */}
             <NotificationBell />
           </div>

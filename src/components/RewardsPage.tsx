@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { rewardsApi } from "../shared/api/rewardsApi";
 import { useAuth } from "../contexts/AuthContext";
 import { NotificationBell } from "./ui/notification-bell";
+import { DailyQuestIcon } from "./ui/daily-quest-icon";
 import { Dialog, DialogContent } from "./ui/dialog";
 
 const rewardCategories = [
@@ -116,7 +117,10 @@ export function RewardsPage() {
             <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
               리워드
             </h1>
-            <NotificationBell />
+            <div className="flex items-center gap-2">
+              <DailyQuestIcon />
+              <NotificationBell />
+            </div>
           </div>
         </div>
       </header>

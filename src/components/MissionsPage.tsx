@@ -11,6 +11,7 @@ import { missionApi } from "../shared/api";
 import { useAuth } from "../contexts/AuthContext";
 import { ConfirmModal } from "./ui/confirm-modal";
 import { NotificationBell } from "./ui/notification-bell";
+import { DailyQuestIcon } from "./ui/daily-quest-icon";
 
 // 카테고리별 아이콘 반환
 const getCategoryIcon = (category: string) => {
@@ -174,6 +175,7 @@ export function MissionsPage({ onMissionSelect, onMissionContinue, onNotificatio
               <Button variant="ghost" size="sm">
                 <Filter className="size-4" />
               </Button>
+              <DailyQuestIcon />
               <NotificationBell />
             </div>
           </div>
