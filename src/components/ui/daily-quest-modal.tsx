@@ -247,9 +247,9 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                   {quests.length === 0 ? (
                     // 로딩 중이거나 초기화 중일 때 스켈레톤 표시
                     Array.from({ length: 4 }).map((_, index) => (
-                      <div key={index} className="bg-white rounded-lg p-3 border border-gray-200 animate-pulse">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+                      <div key={index} className="bg-white rounded-lg p-3 border border-gray-100 animate-pulse shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gray-200 rounded-lg"></div>
                           <div className="flex-1">
                             <div className="h-3 bg-gray-200 rounded mb-1 w-20"></div>
                             <div className="h-2 bg-gray-200 rounded mb-2 w-28"></div>
@@ -268,44 +268,49 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                       const isCompleted = progress?.isCompleted || false;
 
                       return (
-                        <div key={quest.id} className="relative">
+                        <div key={quest.id} className="relative group">
                           <div
-                            className={`bg-white rounded-lg p-3 border transition-all duration-200 hover:shadow-md ${
+                            className={`bg-white rounded-lg p-3 border transition-all duration-200 hover:shadow-md hover:scale-[1.01] ${
                               isCompleted
-                                ? 'border-green-200 bg-green-50/50 shadow-sm'
-                                : 'border-gray-200 hover:border-purple-200'
+                                ? 'border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50 shadow-sm'
+                                : 'border-gray-100 hover:border-purple-200 hover:bg-purple-50/20'
                             }`}
                           >
-                            <div className="flex items-center gap-2">
-                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg ${
+                            <div className="flex items-center gap-3">
+                              {/* 아이콘 영역 */}
+                              <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-xl transition-all duration-200 ${
                                 isCompleted 
-                                  ? 'bg-green-100' 
-                                  : 'bg-gradient-to-br from-purple-50 to-blue-50'
+                                  ? 'bg-gradient-to-br from-emerald-100 to-green-100' 
+                                  : 'bg-gradient-to-br from-purple-100 to-blue-100 group-hover:scale-105'
                               }`}>
                                 {quest.icon}
                               </div>
+                              
+                              {/* 내용 영역 */}
                               <div className="flex-1 min-w-0">
-                                <h4 className={`text-sm font-bold mb-0.5 ${
-                                  isCompleted ? 'text-green-700 line-through' : 'text-gray-900'
+                                <h4 className={`text-sm font-bold mb-0.5 transition-all duration-200 ${
+                                  isCompleted ? 'text-emerald-700 line-through opacity-75' : 'text-gray-900'
                                 }`}>
                                   {quest.title}
                                 </h4>
-                                <p className="text-xs text-gray-600 mb-1.5 leading-relaxed">
+                                <p className="text-xs text-gray-600 mb-2 leading-relaxed">
                                   {quest.description}
                                 </p>
-                                <div className="flex items-center gap-1">
-                                  <div className="bg-purple-100 text-purple-700 text-xs font-bold py-0.5 px-1.5 rounded-full">
+                                <div className="flex items-center gap-1.5">
+                                  <div className="bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 text-xs font-bold py-1 px-2 rounded-full border border-purple-200">
                                     +{quest.pointsReward}P
                                   </div>
-                                  <div className="bg-blue-100 text-blue-700 text-xs font-bold py-0.5 px-1.5 rounded-full">
+                                  <div className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 text-xs font-bold py-1 px-2 rounded-full border border-blue-200">
                                     +{quest.statReward} 규율
                                   </div>
                                 </div>
                               </div>
+                              
+                              {/* 완료 버튼 영역 */}
                               <div className="flex-shrink-0">
                                 {isCompleted ? (
-                                  <div className="w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center">
-                                    <CheckCircle className="size-3.5 text-white" />
+                                  <div className="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-500 rounded-lg flex items-center justify-center shadow-md">
+                                    <CheckCircle className="size-3.5 text-white drop-shadow-sm" />
                                   </div>
                                 ) : (
                                   <Button
@@ -314,25 +319,13 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                                     onClick={() => handleCompleteQuest(quest.id)}
                                     className="w-6 h-6 bg-gradient-to-br from-purple-500 to-blue-500 
                                              hover:from-purple-600 hover:to-blue-600 rounded-lg p-0
-                                             shadow-lg hover:shadow-xl transition-all duration-200"
+                                             shadow-md hover:shadow-lg transition-all duration-200
+                                             hover:scale-105 active:scale-95 border-0"
                                   >
                                     <Circle className="size-3.5 text-white" />
                                   </Button>
                                 )}
                               </div>
-                            </div>
-                          </div>
-                          
-                          {/* 완료 상태 프로그레스 바 */}
-                          <div className="mt-1 px-3">
-                            <div className="h-0.5 bg-gray-200 rounded-full overflow-hidden">
-                              <div 
-                                className={`h-full transition-all duration-500 ease-out ${
-                                  isCompleted 
-                                    ? 'w-full bg-gradient-to-r from-green-400 to-green-500' 
-                                    : 'w-0 bg-gray-200'
-                                }`}
-                              />
                             </div>
                           </div>
                         </div>
