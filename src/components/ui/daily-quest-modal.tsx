@@ -92,7 +92,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
   if (isLoading) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[371px] h-[640px] mx-auto bg-white rounded-3xl border-0 shadow-2xl">
+        <DialogContent className="w-[371px] h-[580px] mx-auto bg-white rounded-3xl border-0 shadow-2xl">
           <div className="flex flex-col items-center justify-center p-8">
             <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg flex items-center justify-center mb-3">
               <div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
@@ -111,7 +111,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-[371px] h-[640px] mx-auto overflow-hidden flex flex-col bg-white rounded-3xl border-0 shadow-2xl p-0" data-dialog-content="true">
         {/* Modern Header */}
-        <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-4 py-3">
+        <div className="relative bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 px-4 py-4">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -120,7 +120,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
           >
             <X className="size-4 text-gray-600" />
           </Button>
-          <div>
+          <div className="mt-2">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-lg">🎯</span>
@@ -133,30 +133,6 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                   매일 성장하는 나를 만나보세요
                 </p>
               </div>
-            </div>
-          </div>
-          
-          {/* Progress Summary Card */}
-          <div className="mt-3 bg-white/80 backdrop-blur-sm rounded-lg p-3 border border-white/50 shadow-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-bold text-gray-900">오늘의 진행률</span>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 bg-gradient-to-br from-orange-400 to-red-400 rounded-md flex items-center justify-center">
-                  <Flame className="size-2.5 text-white" />
-                </div>
-                <span className="text-sm font-bold text-orange-600">{currentStreak}일</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex-1">
-                <Progress value={currentProgress} className="h-2 bg-gray-100 rounded-full" />
-              </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                {completedQuests}/{totalQuests}
-              </span>
-            </div>
-            <div className="text-xs text-gray-600 font-medium">
-              {currentProgress}% 완료 • {4 - completedQuests}개 남음
             </div>
           </div>
         </div>
@@ -194,6 +170,36 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
             >
               주간
             </button>
+          </div>
+          
+          {/* Progress Summary - Subtle */}
+          <div className="mt-2 px-2 py-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-1.5">
+                <span className="font-medium text-gray-600">진행률</span>
+                <span className="font-bold text-gray-800">
+                  {completedQuests}/{totalQuests}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 bg-gradient-to-br from-orange-400 to-red-400 rounded flex items-center justify-center">
+                  <Flame className="size-1.5 text-white" />
+                </div>
+                <span className="text-xs font-medium text-orange-600">{currentStreak}일</span>
+                <span className="text-xs font-medium text-gray-600">{currentProgress}%</span>
+              </div>
+            </div>
+            <div className="mt-1.5">
+              <Progress value={currentProgress} className="h-1 bg-gray-200/50 rounded-full" />
+              {/* Progress Scale */}
+              <div className="flex justify-between mt-1 px-1">
+                <span className="text-xs text-gray-400 font-medium">20</span>
+                <span className="text-xs text-gray-400 font-medium">40</span>
+                <span className="text-xs text-gray-400 font-medium">60</span>
+                <span className="text-xs text-gray-400 font-medium">80</span>
+                <span className="text-xs text-gray-400 font-medium">100</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -236,13 +242,6 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
 
               {/* Quest List */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-gray-900">📋 퀘스트</h3>
-                  <div className="text-xs text-gray-600 font-medium">
-                    {completedQuests}/{totalQuests || 4} 완료
-                  </div>
-                </div>
-                
                 <div className="space-y-2">
                   {quests.length === 0 ? (
                     // 로딩 중이거나 초기화 중일 때 스켈레톤 표시
@@ -298,10 +297,7 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                                 </p>
                                 <div className="flex items-center gap-1.5">
                                   <div className="bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 text-xs font-bold py-1 px-2 rounded-full border border-purple-200">
-                                    +{quest.pointsReward}P
-                                  </div>
-                                  <div className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 text-xs font-bold py-1 px-2 rounded-full border border-blue-200">
-                                    +{quest.statReward} 규율
+                                    +3P
                                   </div>
                                 </div>
                               </div>
@@ -317,12 +313,12 @@ export const DailyQuestModal: React.FC<DailyQuestModalProps> = ({
                                     size="sm"
                                     disabled={isUpdating}
                                     onClick={() => handleCompleteQuest(quest.id)}
-                                    className="w-6 h-6 bg-gradient-to-br from-purple-500 to-blue-500 
-                                             hover:from-purple-600 hover:to-blue-600 rounded-lg p-0
+                                    className="bg-gradient-to-br from-purple-500 to-blue-500 
+                                             hover:from-purple-600 hover:to-blue-600 text-white text-xs
                                              shadow-md hover:shadow-lg transition-all duration-200
-                                             hover:scale-105 active:scale-95 border-0"
+                                             hover:scale-105 active:scale-95 border-0 px-3 py-1.5 h-auto rounded-lg"
                                   >
-                                    <Circle className="size-3.5 text-white" />
+                                    완료하기
                                   </Button>
                                 )}
                               </div>
