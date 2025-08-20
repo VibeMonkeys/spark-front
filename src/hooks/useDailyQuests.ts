@@ -153,7 +153,13 @@ export function useDailyQuests() {
 
   // 편의 함수들
   const completeQuest = (questId: number, note?: string) => {
-    return completeQuestMutation.mutate({ questId, note });
+    console.log('useDailyQuests.completeQuest:', { questId, note });
+    
+    // 🔥 하드코딩 제거! questId만 전달하면 백엔드에서 알아서 처리
+    return completeQuestMutation.mutate({ 
+      questId, 
+      note
+    });
   };
 
   const updateNotifications = (settings: Parameters<typeof dailyQuestApi.updateNotificationSettings>[1]) => {
